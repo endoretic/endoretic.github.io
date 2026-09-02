@@ -1,0 +1,237 @@
+---
+import {
+  getAsset,
+  getResponsiveImageFiles,
+  getVideoSources,
+  toSrcSet,
+} from "../lib/assets";
+
+interface Props {
+  assetId: string;
+  posterAssetId: string;
+  posterAlt?: string;
+  width: number;
+  height: number;
+  sizes?: string;
+  class?: string;
+  showAttribution?: boolean;
+  desktopQuery?: string;
+}
+
+const {
+  assetId,
+  posterAssetId,
+  posterAlt = "",
+  width,
+  height,
+  sizes = "(min-width: 52rem) 58vw, 100vw",
+  class: className,
+  showAttribution = false,
+  desktopQuery = "(min-width: 52rem)",
+} = Astro.props;
+
+if (
+  typeof posterAlt !== "string" ||
+  (posterAlt.length > 0 && posterAlt.trim().length === 0)
+) {
+  throw new Error(
+    `LicensedVideo ${assetId} needs meaningful posterAlt text or posterAlt="" when decorative.`,
+  );
+}
+
+if (!(width > 0) || !(height > 0)) {
+  throw new Error(`LicensedVideo ${assetId} needs positive width and height.`);
+}
+
+const asset = getAsset(assetId, "video");
+getAsset(posterAssetId, "image");
+const posterFiles = getResponsiveImageFiles(posterAssetId);
+const avifSrcSet = toSrcSet(posterFiles.avif);
+const webpSrcSet = toSrcSet(posterFiles.webp);
+const sources = getVideoSources(assetId);
+---
+
+<div
+  class:list={["licensed-video", className]}
+  data-licensed-video
+  data-asset-id={assetId}
+  data-desktop-query={desktopQuery}
+  data-poster={posterFiles.fallback.path}
+  data-sources={JSON.stringify(sources)}
+  data-video-state="poster"
+  style={`aspect-ratio: ${width} / ${height}`}
+>
+  <picture class="licensed-video__poster">
+    {avifSrcSet && <source type="image/avif" srcset={avifSrcSet} sizes={sizes} />}
+    {webpSrcSet && <source type="image/webp" srcset={webpSrcSet} sizes={sizes} />}
+    <img
+      src={posterFiles.fallback.path}
+      width={width}
+      height={height}
+      alt={posterAlt}
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  </picture>
+  <video
+    class="licensed-video__motion"
+    width={width}
+    height={height}
+    muted
+    loop
+    playsinline
+    autoplay
+    preload="none"
+    aria-hidden="true"
+    tabindex="-1"
+    disablepictureinpicture
+  ></video>
+</div>
+
+{
+  showAttribution && (
+    <small class="licensed-media-attribution">
+      <span>{asset.attribution}</span>{" "}
+      <a href={asset.source_page}>Original source</a>
+    </small>
+  )
+}
+
+<script>
+  interface ConnectionWithSaveData extends EventTarget {
+    saveData?: boolean;
+  }
+
+  interface LocalVideoSource {
+    path: string;
+    mimeType: string;
+  }
+
+  const connection = (
+    navigator as Navigator & { connection?: ConnectionWithSaveData }
+  ).connection;
+
+  document
+    .querySelectorAll<HTMLElement>("[data-licensed-video]")
+    .forEach((root) => {
+      if (root.dataset.videoInitialized === "true") return;
+      root.dataset.videoInitialized = "true";
+
+      const video = root.querySelector<HTMLVideoElement>("video");
+      const poster = root.querySelector<HTMLImageElement>("img");
+      const desktop = window.matchMedia(
+        root.dataset.desktopQuery ?? "(min-width: 52rem)",
+      );
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      );
+      let failed = false;
+
+      if (!video || !poster) return;
+
+      const usePoster = () => {
+        failed = true;
+        root.dataset.videoState = "poster";
+        video.pause();
+        video.removeAttribute("src");
+        video.querySelectorAll("source").forEach((source) => source.remove());
+        video.load();
+      };
+
+      const isEligible =
+        desktop.matches && !reducedMotion.matches && connection?.saveData !== true;
+
+      if (!isEligible) return;
+
+      let sources: LocalVideoSource[];
+      try {
+        sources = JSON.parse(root.dataset.sources ?? "[]") as LocalVideoSource[];
+      } catch {
+        usePoster();
+        return;
+      }
+
+      if (sources.length === 0) {
+        usePoster();
+        return;
+      }
+
+      video.poster = poster.currentSrc || root.dataset.poster || "";
+      video.muted = true;
+
+      let remainingSources = sources.length;
+      sources.forEach(({ path, mimeType }) => {
+        const source = document.createElement("source");
+        source.src = path;
+        source.type = mimeType;
+        source.addEventListener(
+          "error",
+          () => {
+            remainingSources -= 1;
+            if (remainingSources === 0 && !failed) usePoster();
+          },
+          { once: true },
+        );
+        video.append(source);
+      });
+
+      video.addEventListener(
+        "playing",
+        () => {
+          if (!failed) root.dataset.videoState = "playing";
+        },
+        { once: true },
+      );
+      video.addEventListener("error", usePoster, { once: true });
+      reducedMotion.addEventListener("change", (event) => {
+        if (event.matches && !failed) usePoster();
+      });
+
+      video.load();
+      void video.play().catch(usePoster);
+    });
+</script>
+
+<style>
+  .licensed-video {
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    background: var(--carbon-925, #111412);
+  }
+
+  .licensed-video__poster,
+  .licensed-video__poster :global(img),
+  .licensed-video__motion {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .licensed-video__motion {
+    opacity: 0;
+  }
+
+  .licensed-video[data-video-state="playing"] .licensed-video__motion {
+    opacity: 1;
+  }
+
+  .licensed-media-attribution {
+    display: block;
+    margin-top: var(--space-2, 0.75rem);
+    color: var(--ash-500, #858982);
+    font-family: var(--font-meta, monospace);
+    font-size: var(--type-meta, 0.75rem);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .licensed-video__motion {
+      display: none;
+    }
+  }
+</style>

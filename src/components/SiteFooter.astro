@@ -1,16 +1,26 @@
 ---
+import AmbientAudio from "./AmbientAudio.astro";
 import NotationMotif from "./NotationMotif.astro";
 import { SITE } from "../data/site";
 ---
 
 <footer class="site-footer">
   <div class="shell site-footer__inner">
-    <p>
-      <span class="eyebrow">Archive node</span>
-      <span class="site-footer__mark"><NotationMotif /> {SITE.name}</span>
-    </p>
-    <p class="site-footer__note">
-      Static and silent by default.
-    </p>
+    <div class="site-footer__identity">
+      <p>
+        <span class="eyebrow">Archive node</span>
+        <span class="site-footer__mark"><NotationMotif /> {SITE.name}</span>
+      </p>
+      <p class="site-footer__note">
+        Static and silent by default. Optional sound begins only when enabled.
+      </p>
+    </div>
+    <AmbientAudio
+      assetId="ambient-cylinder-seven-01"
+      label="Optional archive ambience"
+      initialVolume={0.15}
+      class="site-footer__audio"
+      showAttribution={true}
+    />
   </div>
 </footer>

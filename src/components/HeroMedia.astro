@@ -1,33 +1,33 @@
+---
+import LicensedVideo from "./LicensedVideo.astro";
+import { getAsset } from "../lib/assets";
+
+const heroAsset = getAsset("hero-radio-array-01", "video");
+---
+
 <figure class="hero-media">
   <div class="hero-media__plate">
-    <img
-      src="/media/generated/hero-memory-transport.svg"
-      width="960"
-      height="640"
-      alt=""
-      decoding="async"
-      fetchpriority="high"
+    <LicensedVideo
+      assetId="hero-radio-array-01"
+      posterAssetId="hero-radio-array-01-poster"
+      posterAlt="A line of wire-frame radio telescope dishes crosses a misty grassland beneath a low sun."
+      width={1280}
+      height={720}
+      sizes="(min-width: 64rem) 58vw, (min-width: 52rem) 52vw, 100vw"
+      showAttribution={false}
     />
-    <svg
-      class="hero-media__overlay"
-      viewBox="0 0 960 640"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        class="hero-media__trace hero-media__trace--signal"
-        d="M112 426h88c24 0 34-94 58-94s35 58 59 58 34-31 58-31 35 70 59 70 34-109 58-109 35 52 59 52 34-25 58-25 35 79 59 79h240"
-      />
-    </svg>
     <span class="hero-media__coordinate hero-media__coordinate--start" aria-hidden="true">
       00.00
     </span>
     <span class="hero-media__coordinate hero-media__coordinate--end" aria-hidden="true">
-      09.60
+      11.22
     </span>
   </div>
   <figcaption>
-    <span><strong>Media slot</strong> / generated signal study</span>
-    <span>Local SVG / no external media</span>
+    <span>
+      <strong>Signal 00</strong> / {heroAsset.attribution}
+      {" · "}<a href={heroAsset.source_page}>Source</a>
+    </span>
+    <span>Motion: desktop only · poster otherwise</span>
   </figcaption>
 </figure>

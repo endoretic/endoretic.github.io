@@ -13,12 +13,6 @@
     transition: transform 180ms ease;
   }
 
-  .hero-media__trace--signal {
-    stroke-dasharray: 530;
-    stroke-dashoffset: 530;
-    animation: trace-arrive 900ms 180ms cubic-bezier(0.22, 0.7, 0.24, 1) forwards;
-  }
-
   @media (hover: hover) {
     .text-link:hover > span[aria-hidden="true"] {
       transform: translateX(0.2rem);
@@ -39,12 +33,6 @@
   }
 }
 
-@keyframes trace-arrive {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
@@ -56,10 +44,5 @@
     animation: none !important;
     scroll-behavior: auto !important;
     transition: none !important;
-  }
-
-  .hero-media__trace--signal {
-    stroke-dasharray: none;
-    stroke-dashoffset: 0;
   }
 }

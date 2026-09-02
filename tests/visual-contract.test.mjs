@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { parse } from "yaml";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const publicRoot = join(repositoryRoot, "public");
@@ -17,12 +18,25 @@ function collectFiles(directory) {
   });
 }
 
-test("the public asset inventory contains only approved local generated files", () => {
+test("the public asset inventory contains only generated or manifest-approved files", () => {
   const actual = collectFiles(publicRoot)
     .map((file) => relative(publicRoot, file).replaceAll("\\", "/"))
     .sort();
+  const manifest = parse(
+    readFileSync(join(sourceRoot, "data/assets.yml"), "utf8"),
+  );
+  const approvedMedia = manifest
+    .filter((asset) => asset.status === "active")
+    .flatMap((asset) => asset.local_files)
+    .map((file) => file.replace(/^\//, ""));
+  const expected = [
+    "CNAME",
+    "favicon.svg",
+    generatedPlaceholder,
+    ...approvedMedia,
+  ].sort();
 
-  assert.deepEqual(actual, ["CNAME", "favicon.svg", generatedPlaceholder]);
+  assert.deepEqual(actual, expected);
 });
 
 test("unreviewed bundled media and data payloads cannot enter source", () => {
@@ -83,17 +97,63 @@ test("the hero placeholder is small, inert, and explicitly repository-authored",
   assert.doesNotMatch(svg, /\b(?:href|src)\s*=\s*["']/i);
 });
 
-test("the home page uses the local placeholder with deliberate decorative semantics", () => {
+test("the home page is poster-first and defers optional media downloads", () => {
   const html = readFileSync(join(distRoot, "index.html"), "utf8");
-  const imageTag = html.match(
-    /<img\b[^>]*hero-memory-transport\.svg[^>]*>/i,
+  const poster = html.match(
+    /<picture\b[^>]*licensed-video__poster[\s\S]*?<\/picture>/i,
   )?.[0];
+  const video = html.match(/<video\b[^>]*>[\s\S]*?<\/video>/i)?.[0];
+  const audio = html.match(/<audio\b[^>]*>[\s\S]*?<\/audio>/i)?.[0];
 
-  assert.ok(imageTag, "Missing generated hero placeholder image");
-  assert.match(imageTag, /\balt=""/i);
-  assert.match(html, /Local SVG \/ no external media/);
+  assert.ok(poster, "Missing local hero poster");
+  assert.match(poster, /\/media\/images\/hero-radio-array-01-poster-640\.avif 640w/i);
+  assert.match(poster, /\/media\/images\/hero-radio-array-01-poster-1280\.webp 1280w/i);
+  assert.match(poster, /\bwidth="1280"[^>]*\bheight="720"/i);
+  assert.match(poster, /\balt="[^"]+"/i);
+
+  assert.ok(video, "Missing optional hero video element");
+  assert.match(video, /\bmuted\b/i);
+  assert.match(video, /\bloop\b/i);
+  assert.match(video, /\bplaysinline\b/i);
+  assert.match(video, /\bpreload="none"/i);
+  assert.doesNotMatch(video, /\bsrc\s*=|<source\b/i);
+  assert.match(html, /data-sources="[^\"]*\/media\/video\/hero-radio-array-01\.webm/i);
+
+  assert.ok(audio, "Missing optional ambient audio element");
+  assert.match(audio, /\bpreload="none"/i);
+  assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
+  assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
-  assert.doesNotMatch(html, /<(?:audio|video)\b/i);
+});
+
+test("optional media controllers preserve poster and user-gesture fallbacks", () => {
+  const videoComponent = readFileSync(
+    join(sourceRoot, "components/LicensedVideo.astro"),
+    "utf8",
+  );
+  const audioComponent = readFileSync(
+    join(sourceRoot, "components/AmbientAudio.astro"),
+    "utf8",
+  );
+
+  assert.match(videoComponent, /desktop\.matches/);
+  assert.match(videoComponent, /connection\?\.saveData\s*!==\s*true/);
+  assert.match(videoComponent, /prefers-reduced-motion:\s*reduce/);
+  assert.match(videoComponent, /video\.play\(\)\.catch\(usePoster\)/);
+  assert.match(videoComponent, /data-video-state="poster"/);
+  assert.match(videoComponent, /video\.addEventListener\("error",\s*usePoster/);
+
+  assert.match(audioComponent, /<audio preload="none" hidden><\/audio>/);
+  assert.match(audioComponent, /enable\.addEventListener\("click"/);
+  assert.match(audioComponent, /document\.createElement\("source"\)/);
+  assert.match(audioComponent, /localStorage\.setItem/);
+  assert.match(audioComponent, /visibilitychange/);
+  assert.match(audioComponent, /document\.hidden\s*&&\s*!audio\.paused/);
+  assert.match(
+    audioComponent,
+    /<button\b[^>]*data-audio-toggle[^>]*disabled>/,
+  );
+  assert.match(audioComponent, /type="range"/);
 });
 
 test("motion is opt-in and completely disabled for reduced-motion users", () => {
@@ -107,7 +167,7 @@ test("motion is opt-in and completely disabled for reduced-motion users", () => 
   assert.match(css, /animation:\s*none\s*!important/);
   assert.match(css, /transition:\s*none\s*!important/);
   assert.match(css, /scroll-behavior:\s*auto\s*!important/);
-  assert.match(css, /\.hero-media__trace--signal/);
+  assert.doesNotMatch(css, /@keyframes|animation-name/);
 
   const layout = readFileSync(
     join(repositoryRoot, "src/layouts/BaseLayout.astro"),
