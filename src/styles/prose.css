@@ -1,25 +1,27 @@
 .prose {
   max-width: var(--text);
-  color: var(--paper-200);
-  font-size: 1.05rem;
+  color: var(--bone-200);
+  font-size: var(--type-body);
+  line-height: 1.78;
+  overflow-wrap: anywhere;
 }
 
 .prose > * + * {
-  margin-top: 1.25em;
+  margin-top: 1.35em;
 }
 
 .prose h2,
 .prose h3 {
-  margin-top: 2em;
-  color: var(--paper-100);
+  margin-top: 2.25em;
+  color: var(--bone-100);
 }
 
 .prose h2 {
-  font-size: clamp(1.55rem, 3vw, 2.2rem);
+  font-size: clamp(1.65rem, 1.4rem + 1.1vw, 2.35rem);
 }
 
 .prose h3 {
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-size: clamp(1.25rem, 1.12rem + 0.55vw, 1.6rem);
 }
 
 .prose ul,
@@ -28,40 +30,196 @@
 }
 
 .prose li + li {
-  margin-top: 0.4em;
+  margin-top: 0.45em;
 }
 
 .prose blockquote {
   margin-inline: 0;
-  padding-left: 1.25rem;
-  border-left: 2px solid var(--signal-500);
-  color: var(--paper-300);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 2px solid var(--oxide-500);
+  color: var(--bone-300);
 }
 
 .prose code {
   font-family: var(--font-meta);
   font-size: 0.9em;
+  overflow-wrap: anywhere;
 }
 
 .prose pre {
+  max-width: 100%;
   overflow-x: auto;
   padding: 1rem;
-  border: 1px solid var(--line);
-  background: var(--ink-950);
+  border: 1px solid var(--rule);
+  background: var(--carbon-975);
+  white-space: pre;
+}
+
+.prose pre code {
+  overflow-wrap: normal;
+}
+
+.prose table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  font-weight: 500;
+}
+
+.prose figure {
+  margin-inline: 0;
+}
+
+.prose figure img,
+.prose figure svg {
+  width: 100%;
+  height: auto;
+}
+
+.prose figcaption {
+  margin-top: var(--space-2);
+  color: var(--ash-500);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+}
+
+.prose hr {
+  margin-block: var(--space-6);
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.note-page--paper {
+  color: var(--paper-ink);
+  background:
+    radial-gradient(circle at 8% 12%, rgb(168 100 78 / 0.045), transparent 18rem),
+    radial-gradient(circle at 92% 84%, rgb(41 42 37 / 0.04), transparent 23rem),
+    var(--paper-surface);
+  border: 1px solid rgb(226 221 207 / 0.28);
+  box-shadow: 0 2rem 5rem rgb(0 0 0 / 0.28);
+}
+
+.note-page--paper .note-page__registration {
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
+  border-color: var(--rule-paper);
+  color: var(--paper-muted);
+}
+
+.note-page--paper .note-page__header {
+  margin-bottom: 0;
+  padding: clamp(2.25rem, 7vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+  border-color: var(--rule-paper);
+}
+
+.note-page--paper .note-page__header h1,
+.note-page--paper .note-page__header .lede {
+  color: var(--paper-ink);
+}
+
+.note-page--paper .note-page__header .eyebrow,
+.note-page--paper .note-page__metadata dt {
+  color: var(--paper-muted);
+}
+
+.note-page--paper .note-page__metadata dd {
+  color: var(--paper-ink);
 }
 
 .note-page--paper .prose {
-  padding: clamp(1.25rem, 4vw, 3rem);
-  color: #242625;
-  background: var(--paper-100);
+  max-width: none;
+  padding: clamp(2.25rem, 7vw, 5rem) clamp(1.25rem, 5vw, 4rem)
+    clamp(3.5rem, 9vw, 7rem);
+  color: var(--paper-ink);
+  font-family: var(--font-reading);
+  font-size: clamp(1.04rem, 1rem + 0.2vw, 1.16rem);
+  line-height: 1.82;
+}
+
+.note-page--paper .prose > * {
+  max-width: var(--reading-text);
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .note-page--paper .prose h2,
 .note-page--paper .prose h3,
 .note-page--paper .prose a {
-  color: #151817;
+  color: #181a17;
+}
+
+.note-page--paper .prose a {
+  text-decoration-color: var(--oxide-500);
+}
+
+.note-page--paper :focus-visible {
+  outline-color: var(--paper-ink);
+  box-shadow: none;
+}
+
+.note-page--paper .prose blockquote {
+  border-color: var(--oxide-500);
+  color: #48483f;
+}
+
+.note-page--paper .prose figcaption {
+  color: var(--paper-muted);
+}
+
+.note-page--paper .prose code:not(pre code) {
+  background: rgb(41 42 37 / 0.08);
 }
 
 .note-page--paper .prose pre {
-  color: var(--paper-100);
+  color: var(--bone-100);
+  background: var(--paper-ink);
+}
+
+.note-page--paper .prose th,
+.note-page--paper .prose td {
+  border-color: var(--rule-paper);
+}
+
+.note-page--dark {
+  padding: clamp(1.25rem, 4vw, 3rem);
+  border: 1px solid var(--rule);
+  background: rgb(17 20 18 / 0.72);
+}
+
+@media (max-width: 38rem) {
+  .note-shell {
+    width: 100%;
+  }
+
+  .note-shell > .breadcrumb {
+    width: calc(100% - 1.5rem);
+    margin-inline: auto;
+  }
+
+  .note-page--paper {
+    border-right: 0;
+    border-left: 0;
+    box-shadow: none;
+  }
+
+  .note-page--paper .note-page__registration,
+  .note-page--paper .note-page__header,
+  .note-page--paper .prose {
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
+  }
 }

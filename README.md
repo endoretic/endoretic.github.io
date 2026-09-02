@@ -2,10 +2,9 @@
 
 A static personal archive built with Astro and TypeScript.
 
-This repository is in its foundation phase. It contains working routes and
-typed content collections, but biographical details, project descriptions, and
-published notes remain owner-supplied TODOs. No third-party visual or audio
-media is used.
+This repository contains the static Astro foundation and its first local-only
+visual system. Biographical details, project descriptions, and published notes
+remain owner-supplied TODOs. No third-party visual or audio media is used.
 
 ## Requirements
 
@@ -99,12 +98,29 @@ exclude all draft notes from indexes and generated detail routes.
 
 ## Media policy
 
-This foundation contains no third-party images, video, audio, or remote fonts.
-The inline geometry and favicon are original repository-authored SVG/CSS.
+This phase contains no third-party images, video, audio, or remote fonts. The
+hero placeholder, inline geometry, notation motif, and favicon are original
+repository-authored SVG/CSS.
 
 Do not add third-party media until its original source, exact license,
 attribution, local files, modifications, and pages used are recorded through
 the asset-manifest workflow described in AGENTS.md and the design brief.
+
+## Future optional ambience
+
+No audio ships in this phase. If a later release adds ambience, it remains a
+secondary preserved-memory or transmission layer: the site must keep its full
+identity when silent, playback stays off by default, and it starts only after
+an explicit user action. Use plain-language play, pause, mute, and volume
+controls; set `preload="none"`; pause when the page is hidden; and never turn a
+remembered preference into autoplay.
+
+One restrained track is the maximum. It cannot enter `public/media/audio/`
+until its original source, exact allowed license, attribution, retrieval date,
+local files, modifications, pages used, and rights notes are recorded and pass
+the future asset check. Commercial soundtracks, rips, unknown licenses, NC,
+ND, and unreviewed SA remain blocked. Reduced-motion mode uses a static label
+or waveform rather than animated audio visualization.
 
 ## Deployment
 

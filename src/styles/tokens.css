@@ -1,0 +1,53 @@
+:root {
+  color-scheme: dark;
+
+  /* Material palette: oxidized machinery beside a warm archival surface. */
+  --carbon-975: #0b0d0c;
+  --carbon-925: #111412;
+  --carbon-875: #171a18;
+  --carbon-825: #1d211e;
+  --bone-100: #e2ddcf;
+  --bone-200: #c9c3b5;
+  --bone-300: #aaa598;
+  --ash-500: #858982;
+  --oxide-500: #a8644e;
+  --paper-surface: #ded6c6;
+  --paper-ink: #292a25;
+  --paper-muted: #5f5e55;
+  --rule: rgb(226 221 207 / 0.16);
+  --rule-strong: rgb(226 221 207 / 0.3);
+  --rule-paper: rgb(41 42 37 / 0.22);
+
+  --font-display:
+    Bahnschrift, "Avenir Next Condensed", "Arial Narrow", "Noto Sans",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-body:
+    Aptos, "Segoe UI Variable", "Segoe UI", "Noto Sans", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  --font-reading:
+    Charter, "Iowan Old Style", "Palatino Linotype", "Noto Serif CJK SC",
+    "Songti SC", SimSun, serif;
+  --font-meta:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --type-meta: clamp(0.7rem, 0.67rem + 0.12vw, 0.78rem);
+  --type-body: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+  --type-lede: clamp(1.14rem, 1.04rem + 0.46vw, 1.42rem);
+  --type-h3: clamp(1.28rem, 1.12rem + 0.72vw, 1.75rem);
+  --type-h2: clamp(2rem, 1.56rem + 1.9vw, 3.45rem);
+  --type-page: clamp(2.8rem, 2.15rem + 3vw, 5.4rem);
+  --type-hero: clamp(3.45rem, 2.15rem + 6.4vw, 8.8rem);
+
+  --space-1: 0.375rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: clamp(4.25rem, 8vw, 7.5rem);
+  --space-8: clamp(6rem, 12vw, 11rem);
+
+  --shell: 78rem;
+  --text: 72ch;
+  --reading-text: 70ch;
+}

@@ -16,10 +16,11 @@ const formattedDate = data.publishedAt
       timeZone: "UTC",
     }).format(data.publishedAt)
   : null;
+const recordId = "N / " + note.id.toUpperCase();
 ---
 
 <BaseLayout title={data.title} description={data.description} lang={data.lang}>
-  <div class="shell page-shell">
+  <div class="shell page-shell note-shell">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="/notes/">Notes</a>
       <span aria-hidden="true">/</span>
@@ -27,20 +28,35 @@ const formattedDate = data.publishedAt
     </nav>
 
     <article class:list={["note-page", "note-page--" + data.readingMode]}>
-      <header class="record-page__header">
+      <div class="note-page__registration">
+        <span>{recordId}</span>
+        <span>{data.lang}</span>
+      </div>
+      <header class="note-page__header">
         <p class="eyebrow">
           Note
           {data.draft && <span> / local draft preview</span>}
         </p>
         <h1>{data.title}</h1>
         <p class="lede">{data.description}</p>
-        {
-          formattedDate && (
-            <time datetime={data.publishedAt?.toISOString()}>
-              {formattedDate}
-            </time>
-          )
-        }
+        <dl class="note-page__metadata">
+          <div>
+            <dt>Record state</dt>
+            <dd>{data.draft ? "Draft preview" : "Published"}</dd>
+          </div>
+          {formattedDate && (
+            <div>
+              <dt>Published</dt>
+              <dd><time datetime={data.publishedAt?.toISOString()}>{formattedDate}</time></dd>
+            </div>
+          )}
+          {data.tags.length > 0 && (
+            <div>
+              <dt>Tags</dt>
+              <dd>{data.tags.join(", ")}</dd>
+            </div>
+          )}
+        </dl>
       </header>
 
       <div class="prose">

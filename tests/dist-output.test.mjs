@@ -56,10 +56,17 @@ test("draft notes are excluded from production", () => {
 test("generated pages keep a semantic, no-JavaScript shell", () => {
   for (const file of collectHtml(dist)) {
     const html = readFileSync(file, "utf8");
+    const mainCount = (html.match(/<main\b/g) ?? []).length;
+    const h1Count = (html.match(/<h1\b/g) ?? []).length;
+
     assert.match(html, /<html lang="(?:en|zh-CN)">/);
     assert.match(html, /href="#main-content"/);
-    assert.match(html, /<main id="main-content"/);
+    assert.match(html, /<main id="main-content" tabindex="-1"/);
     assert.match(html, /aria-label="Primary navigation"/);
+    assert.equal(mainCount, 1, "Expected one main landmark in " + file);
+    assert.equal(h1Count, 1, "Expected one h1 in " + file);
+    assert.doesNotMatch(html, /tabindex="[1-9][0-9]*"/);
+    assert.doesNotMatch(html, /<img\b(?![^>]*\balt=)[^>]*>/i);
     assert.doesNotMatch(html, /<script\b/i);
   }
 });
@@ -94,7 +101,11 @@ test("production output contains no remote media or font requests", () => {
     const html = readFileSync(file, "utf8");
     assert.doesNotMatch(
       html,
-      /<(?:img|audio|video|source|script)\b[^>]*(?:src|srcset)=["']https?:/i,
+      /<(?:img|audio|video|source|script|iframe|embed|object)\b[^>]*(?:src|srcset|poster|data)=["'](?:https?:)?\/\//i,
+    );
+    assert.doesNotMatch(
+      html,
+      /\b(?:src|srcset|poster)=["']data:(?:image|audio|video|font)\//i,
     );
     assert.doesNotMatch(
       html,
@@ -108,6 +119,8 @@ test("production output contains no remote media or font requests", () => {
       if (file.endsWith(".css")) {
         const css = readFileSync(join(cssDirectory, file), "utf8");
         assert.doesNotMatch(css, /(?:url|@import)\s*\(\s*["']?https?:/i);
+        assert.doesNotMatch(css, /url\(\s*["']?data:(?:image|audio|video|font)\//i);
+        assert.doesNotMatch(css, /@font-face/i);
       }
     }
   }

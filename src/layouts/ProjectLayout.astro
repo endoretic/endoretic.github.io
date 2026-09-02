@@ -22,6 +22,10 @@ const metadataDescription = data.placeholder
     </nav>
 
     <article class="record-page">
+      <div class="record-page__registration">
+        <span>W / {project.id.toUpperCase()}</span>
+        <span>{data.lang}</span>
+      </div>
       <header class="record-page__header">
         <p class="eyebrow">
           Project record
@@ -30,30 +34,34 @@ const metadataDescription = data.placeholder
         <h1>{data.title}</h1>
         <p class="lede">{data.summary}</p>
 
-        {
-          (data.status || data.year || data.tags.length > 0) && (
-            <dl class="record-metadata">
-              {data.status && (
-                <>
-                  <dt>Status</dt>
-                  <dd>{data.status}</dd>
-                </>
-              )}
-              {data.year && (
-                <>
-                  <dt>Year</dt>
-                  <dd>{data.year}</dd>
-                </>
-              )}
-              {data.tags.length > 0 && (
-                <>
-                  <dt>Tags</dt>
-                  <dd>{data.tags.join(", ")}</dd>
-                </>
-              )}
-            </dl>
-          )
-        }
+        <dl class="record-metadata">
+          <dt>Language</dt>
+          <dd>{data.lang}</dd>
+          {data.placeholder && (
+            <>
+              <dt>Record state</dt>
+              <dd>Incomplete</dd>
+            </>
+          )}
+          {data.status && (
+            <>
+              <dt>Status</dt>
+              <dd>{data.status}</dd>
+            </>
+          )}
+          {data.year && (
+            <>
+              <dt>Year</dt>
+              <dd>{data.year}</dd>
+            </>
+          )}
+          {data.tags.length > 0 && (
+            <>
+              <dt>Tags</dt>
+              <dd>{data.tags.join(", ")}</dd>
+            </>
+          )}
+        </dl>
       </header>
 
       <div class="prose">

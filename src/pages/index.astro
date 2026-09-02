@@ -1,5 +1,7 @@
 ---
+import HeroMedia from "../components/HeroMedia.astro";
 import NoteCard from "../components/NoteCard.astro";
+import NotationMotif from "../components/NotationMotif.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { SITE } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
@@ -13,36 +15,23 @@ const notes = await getVisibleNotes();
   <section class="hero">
     <div class="shell hero__grid">
       <div class="hero__copy">
-        <p class="eyebrow">Personal archive / foundation record</p>
+        <div class="hero__index-line">
+          <p class="eyebrow">00 / Home · Personal archive</p>
+          <NotationMotif />
+        </div>
         <h1>ENDORETIC</h1>
         <p class="hero__lede">{SITE.description}</p>
         <a class="text-link" href="/works/">
           Browse works <span aria-hidden="true">→</span>
         </a>
       </div>
-
-      <div class="hero__diagram" aria-hidden="true">
-        <svg viewBox="0 0 640 420" focusable="false">
-          <g fill="none" vector-effect="non-scaling-stroke">
-            <circle cx="355" cy="206" r="126"></circle>
-            <circle cx="355" cy="206" r="64"></circle>
-            <path d="M40 206h528M355 30v352"></path>
-            <path d="M106 112l421 188M135 332L515 91"></path>
-            <path d="M82 63h115v46H82zM489 296h92v61h-92z"></path>
-          </g>
-          <g class="hero__diagram-points">
-            <circle cx="355" cy="206" r="6"></circle>
-            <circle cx="197" cy="206" r="4"></circle>
-            <circle cx="489" cy="296" r="4"></circle>
-          </g>
-        </svg>
-      </div>
+      <HeroMedia />
     </div>
   </section>
 
   <section class="section shell section--split" aria-labelledby="identity-title">
     <div>
-      <p class="eyebrow">Identity / awaiting source</p>
+      <p class="eyebrow">H.01 / Introduction · awaiting source</p>
       <h2 id="identity-title">About this archive</h2>
     </div>
     <div class="pending-copy">
@@ -56,7 +45,7 @@ const notes = await getVisibleNotes();
   <section class="section shell" aria-labelledby="works-title">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">Initial records</p>
+        <p class="eyebrow">H.02 / Works · initial records</p>
         <h2 id="works-title">Works</h2>
       </div>
       <a class="text-link" href="/works/">View all works</a>
@@ -73,7 +62,7 @@ const notes = await getVisibleNotes();
   <section class="section shell" aria-labelledby="notes-title">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">Recent records</p>
+        <p class="eyebrow">H.03 / Notes · recent records</p>
         <h2 id="notes-title">Notes</h2>
       </div>
       <a class="text-link" href="/notes/">View notes</a>
@@ -97,7 +86,7 @@ const notes = await getVisibleNotes();
   <section class="section shell" aria-labelledby="links-title">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">Carried forward from the current site</p>
+        <p class="eyebrow">H.04 / Existing links · carried forward</p>
         <h2 id="links-title">Existing links</h2>
       </div>
     </div>

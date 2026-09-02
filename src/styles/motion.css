@@ -1,0 +1,65 @@
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  .record-card,
+  .note-card,
+  .link-records article {
+    transition:
+      color 180ms ease,
+      border-color 220ms ease,
+      background-color 220ms ease;
+  }
+
+  .text-link > span[aria-hidden="true"] {
+    transition: transform 180ms ease;
+  }
+
+  .hero-media__trace--signal {
+    stroke-dasharray: 530;
+    stroke-dashoffset: 530;
+    animation: trace-arrive 900ms 180ms cubic-bezier(0.22, 0.7, 0.24, 1) forwards;
+  }
+
+  @media (hover: hover) {
+    .text-link:hover > span[aria-hidden="true"] {
+      transform: translateX(0.2rem);
+    }
+
+    .record-card:hover,
+    .note-card:hover,
+    .link-records article:hover {
+      border-color: var(--rule-strong);
+      background-color: rgb(23 26 24 / 0.9);
+    }
+  }
+
+  .record-card:focus-within,
+  .note-card:focus-within,
+  .link-records article:focus-within {
+    border-color: var(--oxide-500);
+  }
+}
+
+@keyframes trace-arrive {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+
+  .hero-media__trace--signal {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+}
