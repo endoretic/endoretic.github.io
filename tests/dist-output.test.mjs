@@ -53,7 +53,7 @@ test("draft notes are excluded from production", () => {
   assert.doesNotMatch(output, /未发布模板/);
 });
 
-test("generated pages keep a semantic, no-JavaScript shell", () => {
+test("generated pages keep a semantic progressive-enhancement shell", () => {
   for (const file of collectHtml(dist)) {
     const html = readFileSync(file, "utf8");
     const mainCount = (html.match(/<main\b/g) ?? []).length;
@@ -67,7 +67,14 @@ test("generated pages keep a semantic, no-JavaScript shell", () => {
     assert.equal(h1Count, 1, "Expected one h1 in " + file);
     assert.doesNotMatch(html, /tabindex="[1-9][0-9]*"/);
     assert.doesNotMatch(html, /<img\b(?![^>]*\balt=)[^>]*>/i);
-    assert.doesNotMatch(html, /<script\b/i);
+
+    if (html.includes("data-ambient-audio")) {
+      const audio = html.match(/<audio\b[^>]*>[\s\S]*?<\/audio>/i)?.[0];
+      assert.ok(audio, "Missing optional audio element in " + file);
+      assert.match(audio, /\bpreload="none"/i);
+      assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
+      assert.match(html, /<noscript>/i);
+    }
   }
 });
 
@@ -84,7 +91,9 @@ test("project placeholders are explicit and contain no invented links", () => {
       html,
       /<meta\b[^>]*(?:name|property)=["'](?:description|og:description|twitter:description)["'][^>]*content=["'][^"']*TODO/i,
     );
-    assert.doesNotMatch(html, /<a\b[^>]*href="https?:\/\//i);
+    const main = html.match(/<main\b[\s\S]*?<\/main>/i)?.[0];
+    assert.ok(main, "Missing project main content");
+    assert.doesNotMatch(main, /<a\b[^>]*href="https?:\/\//i);
   }
 });
 

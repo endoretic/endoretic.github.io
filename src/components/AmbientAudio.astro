@@ -1,0 +1,337 @@
+---
+import { getAsset, getAudioSources } from "../lib/assets";
+
+interface Props {
+  assetId: string;
+  label?: string;
+  initialVolume?: number;
+  class?: string;
+  showAttribution?: boolean;
+}
+
+const {
+  assetId,
+  label = "Ambient audio",
+  initialVolume = 0.15,
+  class: className,
+  showAttribution = true,
+} = Astro.props;
+
+if (initialVolume < 0 || initialVolume > 1) {
+  throw new Error(`AmbientAudio ${assetId} initialVolume must be from 0 to 1.`);
+}
+
+const asset = getAsset(assetId, "audio");
+const sources = getAudioSources(assetId);
+const settingsKey = `endoretic:audio:${assetId}:settings`;
+---
+
+<section
+  class:list={["ambient-audio", className]}
+  aria-label={label}
+  data-ambient-audio
+  data-asset-id={assetId}
+  data-sources={JSON.stringify(sources)}
+  data-settings-key={settingsKey}
+  data-initial-volume={initialVolume}
+>
+  <div class="ambient-audio__heading">
+    <span class="ambient-audio__label">{label}</span>
+    <span class="ambient-audio__status" data-audio-status role="status">Off</span>
+  </div>
+
+  <audio preload="none" hidden></audio>
+
+  <div class="ambient-audio__controls">
+    <button type="button" data-audio-enable>Enable ambience</button>
+    <button type="button" data-audio-toggle aria-pressed="false" disabled>Play</button>
+    <button type="button" data-audio-mute aria-pressed="false" disabled>Mute</button>
+    <label class="ambient-audio__volume">
+      <span>Volume</span>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        value={initialVolume}
+        data-audio-volume
+        disabled
+      />
+    </label>
+  </div>
+
+  <noscript><p>Ambience remains off because JavaScript is unavailable.</p></noscript>
+
+  {
+    showAttribution && (
+      <small class="ambient-audio__attribution">
+        <span>{asset.attribution}</span>{" "}
+        <a href={asset.source_page}>Original source</a>{" · "}
+        <a href={asset.license_url}>License</a>
+      </small>
+    )
+  }
+</section>
+
+<script>
+  interface LocalAudioSource {
+    path: string;
+    mimeType: string;
+  }
+
+  interface AudioSettings {
+    muted: boolean;
+    volume: number;
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-ambient-audio]")
+    .forEach((root) => {
+      if (root.dataset.audioInitialized === "true") return;
+      root.dataset.audioInitialized = "true";
+
+      const audio = root.querySelector<HTMLAudioElement>("audio");
+      const enable = root.querySelector<HTMLButtonElement>("[data-audio-enable]");
+      const toggle = root.querySelector<HTMLButtonElement>("[data-audio-toggle]");
+      const mute = root.querySelector<HTMLButtonElement>("[data-audio-mute]");
+      const volume = root.querySelector<HTMLInputElement>("[data-audio-volume]");
+      const status = root.querySelector<HTMLElement>("[data-audio-status]");
+      const storageKey = root.dataset.settingsKey ?? "endoretic:audio:settings";
+      const defaultVolume = Number(root.dataset.initialVolume ?? "0.15");
+      let enabled = false;
+
+      if (!audio || !enable || !toggle || !mute || !volume || !status) return;
+
+      const readSettings = (): AudioSettings => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null") as
+            | Partial<AudioSettings>
+            | null;
+          return {
+            muted: typeof saved?.muted === "boolean" ? saved.muted : false,
+            volume:
+              typeof saved?.volume === "number" &&
+              saved.volume >= 0 &&
+              saved.volume <= 1
+                ? saved.volume
+                : defaultVolume,
+          };
+        } catch {
+          return { muted: false, volume: defaultVolume };
+        }
+      };
+
+      const saveSettings = () => {
+        try {
+          localStorage.setItem(
+            storageKey,
+            JSON.stringify({ muted: audio.muted, volume: audio.volume }),
+          );
+        } catch {
+          // Storage can be unavailable; playback controls continue to work.
+        }
+      };
+
+      const applySettings = () => {
+        const saved = readSettings();
+        audio.muted = saved.muted;
+        audio.volume = saved.volume;
+        volume.value = String(saved.volume);
+        mute.textContent = saved.muted ? "Unmute" : "Mute";
+        mute.setAttribute("aria-pressed", String(saved.muted));
+      };
+
+      const setUnavailable = () => {
+        audio.pause();
+        status.textContent = "Audio unavailable";
+        enable.disabled = true;
+        toggle.disabled = true;
+        mute.disabled = true;
+        volume.disabled = true;
+      };
+
+      applySettings();
+
+      enable.addEventListener("click", () => {
+        if (enabled) return;
+
+        let sources: LocalAudioSource[];
+        try {
+          sources = JSON.parse(root.dataset.sources ?? "[]") as LocalAudioSource[];
+        } catch {
+          setUnavailable();
+          return;
+        }
+
+        if (sources.length === 0) {
+          setUnavailable();
+          return;
+        }
+
+        sources.forEach(({ path, mimeType }) => {
+          const source = document.createElement("source");
+          source.src = path;
+          source.type = mimeType;
+          audio.append(source);
+        });
+        audio.load();
+        enabled = true;
+        enable.disabled = true;
+        enable.textContent = "Ambience enabled";
+        toggle.disabled = false;
+        mute.disabled = false;
+        volume.disabled = false;
+        status.textContent = "Starting";
+
+        void audio.play().catch(() => {
+          toggle.textContent = "Play";
+          status.textContent = "Ready — press Play";
+        });
+      });
+
+      toggle.addEventListener("click", () => {
+        if (!enabled) return;
+        if (audio.paused) {
+          void audio.play().catch(setUnavailable);
+        } else {
+          audio.pause();
+        }
+      });
+
+      mute.addEventListener("click", () => {
+        audio.muted = !audio.muted;
+        mute.textContent = audio.muted ? "Unmute" : "Mute";
+        mute.setAttribute("aria-pressed", String(audio.muted));
+        if (!audio.paused) {
+          status.textContent = audio.muted ? "Playing muted" : "Playing";
+        }
+        saveSettings();
+      });
+
+      volume.addEventListener("input", () => {
+        audio.volume = Number(volume.value);
+        saveSettings();
+      });
+
+      audio.addEventListener("play", () => {
+        toggle.textContent = "Pause";
+        toggle.setAttribute("aria-pressed", "true");
+        status.textContent = audio.muted ? "Playing muted" : "Playing";
+      });
+      audio.addEventListener("pause", () => {
+        toggle.textContent = "Play";
+        toggle.setAttribute("aria-pressed", "false");
+        if (enabled && !audio.ended) status.textContent = "Paused";
+      });
+      audio.addEventListener("ended", () => {
+        toggle.textContent = "Play";
+        toggle.setAttribute("aria-pressed", "false");
+        status.textContent = "Finished";
+      });
+      audio.addEventListener("error", setUnavailable, { once: true });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && !audio.paused) {
+          audio.pause();
+          status.textContent = "Paused while tab hidden";
+        }
+      });
+    });
+</script>
+
+<style>
+  .ambient-audio {
+    display: grid;
+    gap: var(--space-3, 1rem);
+    padding: var(--space-4, 1.5rem);
+    border: 1px solid var(--rule, rgb(226 221 207 / 0.16));
+    background: rgb(17 20 18 / 0.7);
+  }
+
+  .ambient-audio__heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2, 0.75rem);
+  }
+
+  .ambient-audio__label,
+  .ambient-audio__status,
+  .ambient-audio__volume,
+  .ambient-audio__attribution {
+    font-family: var(--font-meta, monospace);
+    font-size: var(--type-meta, 0.75rem);
+  }
+
+  .ambient-audio__label {
+    color: var(--bone-200, #c9c3b5);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ambient-audio__status,
+  .ambient-audio__attribution {
+    color: var(--ash-500, #858982);
+  }
+
+  .ambient-audio__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2, 0.75rem);
+  }
+
+  .ambient-audio button {
+    min-height: 2.75rem;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--rule-strong, rgb(226 221 207 / 0.3));
+    color: var(--bone-100, #e2ddcf);
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .ambient-audio button:disabled {
+    color: var(--ash-500, #858982);
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .ambient-audio__volume {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: var(--space-2, 0.75rem);
+    padding-inline: 0.3rem;
+  }
+
+  .ambient-audio__volume input {
+    width: min(10rem, 30vw);
+    accent-color: var(--oxide-500, #a8644e);
+  }
+
+  .ambient-audio noscript p {
+    color: var(--ash-500, #858982);
+    font-size: var(--type-meta, 0.75rem);
+  }
+
+  @media (max-width: 38rem) {
+    .ambient-audio__controls {
+      align-items: stretch;
+    }
+
+    .ambient-audio button {
+      flex: 1 1 calc(50% - var(--space-2, 0.75rem));
+    }
+
+    .ambient-audio__volume {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .ambient-audio__volume input {
+      width: min(13rem, 56vw);
+    }
+  }
+</style>

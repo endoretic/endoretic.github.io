@@ -2,9 +2,10 @@
 
 A static personal archive built with Astro and TypeScript.
 
-This repository contains the static Astro foundation and its first local-only
-visual system. Biographical details, project descriptions, and published notes
-remain owner-supplied TODOs. No third-party visual or audio media is used.
+This repository contains the static Astro foundation, its first visual system,
+and a deliberately small set of self-hosted, rights-verified media.
+Biographical details, project descriptions, and published notes remain
+owner-supplied TODOs.
 
 ## Requirements
 
@@ -32,8 +33,15 @@ Astro prints the local URL. Draft content is visible during local development
 and is labelled as a draft where it appears.
 
 The site uses no client-side JavaScript for its core navigation or content.
+Small, progressively enhanced scripts are limited to optional hero motion and
+ambient-audio controls; the complete site remains useful when JavaScript is
+unavailable.
 
 ## Build and validation
+
+Validate the asset manifest and every active local media path:
+
+    npm run assets:check
 
 Run Astro's type and content checks:
 
@@ -43,8 +51,8 @@ Create the production output:
 
     npm run build
 
-Verify the generated routes, draft exclusion, CNAME, semantic shell, and
-no-remote-media baseline after building:
+Verify the generated routes, draft exclusion, CNAME, semantic shell, licensed
+media fallbacks, and no-remote-media baseline after building:
 
     npm test
 
@@ -98,29 +106,36 @@ exclude all draft notes from indexes and generated detail routes.
 
 ## Media policy
 
-This phase contains no third-party images, video, audio, or remote fonts. The
-hero placeholder, inline geometry, notation motif, and favicon are original
-repository-authored SVG/CSS.
+Every third-party asset must be registered in `src/data/assets.yml` before it
+can appear on a production page. An active entry records its original source,
+exact compatible license, display-ready attribution, verification and retrieval
+dates, every local derivative, actual modifications, pages used, and rights
+notes. Proposed entries are not production approvals and may not have local
+files.
 
-Do not add third-party media until its original source, exact license,
-attribution, local files, modifications, and pages used are recorded through
-the asset-manifest workflow described in AGENTS.md and the design brief.
+Run `npm run assets:check` before committing media. The check rejects missing
+manifest fields, unapproved licenses, remote production paths, missing local
+files, oversized hero video, and unregistered files under `public/media/`.
+`npm run build` runs this gate automatically.
 
-## Future optional ambience
+Approved derivatives live under stable IDs in `public/media/`. Responsive
+AVIF and WebP files are pre-generated locally because Astro does not transform
+files in `public/`; the source page and transformation record remain in the
+manifest. Production pages use `LicensedImage.astro`, `LicensedVideo.astro`,
+and `AmbientAudio.astro` rather than raw media paths. Remote fonts and remote
+media requests remain prohibited.
 
-No audio ships in this phase. If a later release adds ambience, it remains a
-secondary preserved-memory or transmission layer: the site must keep its full
-identity when silent, playback stays off by default, and it starts only after
-an explicit user action. Use plain-language play, pause, mute, and volume
-controls; set `preload="none"`; pause when the page is hidden; and never turn a
-remembered preference into autoplay.
+## Optional ambience
 
-One restrained track is the maximum. It cannot enter `public/media/audio/`
-until its original source, exact allowed license, attribution, retrieval date,
-local files, modifications, pages used, and rights notes are recorded and pass
-the future asset check. Commercial soundtracks, rips, unknown licenses, NC,
-ND, and unreviewed SA remain blocked. Reduced-motion mode uses a static label
-or waveform rather than animated audio visualization.
+The single ambient track is a secondary preserved-memory or transmission
+layer. The site keeps its full identity when silent. Playback is off by default,
+uses `preload="none"`, begins only after an explicit user gesture, and pauses
+when the document is hidden. Plain-language play/pause, mute, and volume
+controls are keyboard accessible. Only the listener's volume and mute choices
+are remembered; a prior play action never becomes autoplay.
+
+Commercial soundtracks, rips, unknown licenses, NC, ND, and unreviewed SA
+remain blocked. Reduced-motion mode keeps all audio UI static.
 
 ## Deployment
 
@@ -160,4 +175,6 @@ index.html plus root CNAME. DNS should not be changed for this rollback.
   Wallpaper and Zontex
 - Decision on how pjsk-tier-maker and score-calculator should appear in Works
 - Owner-written notes and publication metadata
-- Verified media candidates and the later asset-rights pipeline
+- Editorial assignments for the three quarantined note-cover candidates; no
+  cover is downloaded until a published note provides a truthful `used_on`
+  destination

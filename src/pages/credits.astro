@@ -1,5 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getIntegratedAssets, type AssetKind } from "../lib/assets";
+
+const assets = getIntegratedAssets();
+const groups: { kind: AssetKind; title: string }[] = [
+  { kind: "video", title: "Video" },
+  { kind: "image", title: "Images" },
+  { kind: "audio", title: "Audio" },
+];
 ---
 
 <BaseLayout
@@ -11,20 +19,77 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <p class="eyebrow">04 / Credits</p>
       <h1>Credits</h1>
       <p class="lede">
-        Sources, licenses, and modifications will be recorded here before any
-        third-party media is published.
+        Every published media file is self-hosted and connected to its original
+        source, license, attribution, and recorded modifications.
       </p>
     </header>
 
-    <section class="pending-panel" aria-labelledby="media-credits">
-      <h2 id="media-credits">Third-party media</h2>
-      <p>
-        None. This foundation uses only local CSS and repository-authored
-        SVG graphics.
-      </p>
-    </section>
+    <div class="credit-index" data-asset-manifest>
+      {
+        groups.map(({ kind, title }) => {
+          const entries = assets.filter((asset) => asset.kind === kind);
+          if (entries.length === 0) return null;
 
-    <section class="pending-panel" aria-labelledby="software-credits">
+          return (
+            <section class="credit-group" aria-labelledby={`credits-${kind}`}>
+              <header class="credit-group__heading">
+                <p class="eyebrow">Manifest / {kind}</p>
+                <h2 id={`credits-${kind}`}>{title}</h2>
+              </header>
+              <div class="credit-records">
+                {entries.map((asset) => (
+                  <article class="credit-record">
+                    <div class="credit-record__registration">
+                      <span>{asset.id}</span>
+                      <span>Retrieved {asset.retrieved_on}</span>
+                    </div>
+                    <div class="credit-record__body">
+                      <h3>{asset.title}</h3>
+                      <p class="credit-record__attribution">{asset.attribution}</p>
+                      <dl>
+                        <div>
+                          <dt>Creator / institution</dt>
+                          <dd>{asset.creator}</dd>
+                        </div>
+                        <div>
+                          <dt>License</dt>
+                          <dd><a href={asset.license_url}>{asset.license}</a></dd>
+                        </div>
+                        <div>
+                          <dt>Record</dt>
+                          <dd>
+                            <a href={asset.source_page}>Original source page</a>
+                            {asset.original_file && (
+                              <> · <a href={asset.original_file}>Original file</a></>
+                            )}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Used on</dt>
+                          <dd>{asset.used_on.join(", ")}</dd>
+                        </div>
+                      </dl>
+                      <div class="credit-record__notes">
+                        <h4>Changes</h4>
+                        <ul>
+                          {asset.modifications.map((modification) => (
+                            <li>{modification}</li>
+                          ))}
+                        </ul>
+                        <h4>Rights review</h4>
+                        <p>{asset.rights_notes}</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })
+      }
+    </div>
+
+    <section class="pending-panel software-credit" aria-labelledby="software-credits">
       <h2 id="software-credits">Software</h2>
       <p>
         The site is built with Astro and TypeScript. Exact dependency versions

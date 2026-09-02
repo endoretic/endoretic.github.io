@@ -1,0 +1,101 @@
+---
+import {
+  getAsset,
+  getResponsiveImageFiles,
+  toSrcSet,
+} from "../lib/assets";
+
+interface Props {
+  assetId: string;
+  alt: string;
+  width: number;
+  height: number;
+  sizes?: string;
+  loading?: "eager" | "lazy";
+  decoding?: "async" | "sync" | "auto";
+  fetchPriority?: "high" | "low" | "auto";
+  class?: string;
+  imageClass?: string;
+  showAttribution?: boolean;
+}
+
+const {
+  assetId,
+  alt,
+  width,
+  height,
+  sizes = "100vw",
+  loading = "lazy",
+  decoding = "async",
+  fetchPriority = "auto",
+  class: className,
+  imageClass,
+  showAttribution = false,
+} = Astro.props;
+
+if (typeof alt !== "string" || (alt.length > 0 && alt.trim().length === 0)) {
+  throw new Error(
+    `LicensedImage ${assetId} needs meaningful alt text or alt="" when decorative.`,
+  );
+}
+
+if (!(width > 0) || !(height > 0)) {
+  throw new Error(`LicensedImage ${assetId} needs positive width and height.`);
+}
+
+const asset = getAsset(assetId, "image");
+const files = getResponsiveImageFiles(assetId);
+const avifSrcSet = toSrcSet(files.avif);
+const webpSrcSet = toSrcSet(files.webp);
+---
+
+<picture
+  class:list={["licensed-image", className]}
+  data-asset-id={assetId}
+  style={`aspect-ratio: ${width} / ${height}`}
+>
+  {avifSrcSet && <source type="image/avif" srcset={avifSrcSet} sizes={sizes} />}
+  {webpSrcSet && <source type="image/webp" srcset={webpSrcSet} sizes={sizes} />}
+  <img
+    class={imageClass}
+    src={files.fallback.path}
+    width={width}
+    height={height}
+    alt={alt}
+    loading={loading}
+    decoding={decoding}
+    fetchpriority={fetchPriority}
+  />
+</picture>
+
+{
+  showAttribution && (
+    <small class="licensed-media-attribution">
+      <span>{asset.attribution}</span>{" "}
+      <a href={asset.source_page}>Original source</a>
+    </small>
+  )
+}
+
+<style>
+  .licensed-image {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .licensed-image :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .licensed-media-attribution {
+    display: block;
+    margin-top: var(--space-2, 0.75rem);
+    color: var(--ash-500, #858982);
+    font-family: var(--font-meta, monospace);
+    font-size: var(--type-meta, 0.75rem);
+    line-height: 1.5;
+  }
+</style>
