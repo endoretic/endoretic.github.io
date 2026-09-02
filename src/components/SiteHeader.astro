@@ -1,4 +1,5 @@
 ---
+import NotationMotif from "./NotationMotif.astro";
 import { SITE } from "../data/site";
 
 const currentPath = Astro.url.pathname;
@@ -9,7 +10,7 @@ const isCurrent = (href: string) =>
 <header class="site-header">
   <div class="shell site-header__inner">
     <a class="site-mark" href="/" aria-label="endoretic home">
-      <span aria-hidden="true" class="site-mark__symbol">◌</span>
+      <NotationMotif />
       <span>{SITE.name}</span>
     </a>
 

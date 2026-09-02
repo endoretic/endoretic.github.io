@@ -17,18 +17,43 @@ const formattedDate = note.data.publishedAt
       timeZone: "UTC",
     }).format(note.data.publishedAt)
   : null;
+const recordId = "N / " + note.id.toUpperCase();
 ---
 
 <article class="note-card" lang={note.data.lang}>
-  <p class="eyebrow">
-    Note
-    {note.data.draft && <span> / draft preview</span>}
-  </p>
-  <Heading>
-    <a href={noteHref}>{note.data.title}</a>
-  </Heading>
-  <p>{note.data.description}</p>
-  {formattedDate && <time datetime={note.data.publishedAt?.toISOString()}>{formattedDate}</time>}
+  <div class="note-card__meta">
+    <p class="eyebrow">{recordId}</p>
+    <dl>
+      <div>
+        <dt>Language</dt>
+        <dd>{note.data.lang}</dd>
+      </div>
+      {note.data.draft && (
+        <div>
+          <dt>State</dt>
+          <dd>Draft preview</dd>
+        </div>
+      )}
+      {formattedDate && (
+        <div>
+          <dt>Date</dt>
+          <dd><time datetime={note.data.publishedAt?.toISOString()}>{formattedDate}</time></dd>
+        </div>
+      )}
+      {note.data.tags.length > 0 && (
+        <div>
+          <dt>Tags</dt>
+          <dd>{note.data.tags.join(", ")}</dd>
+        </div>
+      )}
+    </dl>
+  </div>
+  <div class="note-card__copy">
+    <Heading>
+      <a href={noteHref}>{note.data.title}</a>
+    </Heading>
+    <p>{note.data.description}</p>
+  </div>
   <a class="text-link" href={noteHref}>
     Read note <span aria-hidden="true">→</span>
   </a>

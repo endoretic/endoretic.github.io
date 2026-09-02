@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import NotationMotif from "../components/NotationMotif.astro";
 ---
 
 <BaseLayout
@@ -9,11 +10,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   shareable={false}
 >
   <div class="shell not-found">
-    <p class="eyebrow">404 / Missing record</p>
-    <h1>Signal not found</h1>
-    <p>The requested record is absent from this archive.</p>
-    <a class="text-link" href="/">
-      Return home <span aria-hidden="true">→</span>
-    </a>
+    <span class="not-found__register" aria-hidden="true">404</span>
+    <div class="not-found__copy">
+      <NotationMotif />
+      <p class="eyebrow">404 / Missing record</p>
+      <h1>Signal not found</h1>
+      <p>The requested record is absent from this archive.</p>
+      <a class="text-link" href="/">
+        Return home <span aria-hidden="true">→</span>
+      </a>
+    </div>
   </div>
 </BaseLayout>
