@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Signal not found"
+  description="The requested page is not present in this archive."
+  indexable={false}
+  shareable={false}
+>
+  <div class="shell not-found">
+    <p class="eyebrow">404 / Missing record</p>
+    <h1>Signal not found</h1>
+    <p>The requested record is absent from this archive.</p>
+    <a class="text-link" href="/">
+      Return home <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</BaseLayout>

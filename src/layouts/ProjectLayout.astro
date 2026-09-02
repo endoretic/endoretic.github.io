@@ -1,0 +1,73 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+const metadataDescription = data.placeholder
+  ? "Project record is being assembled."
+  : data.summary;
+---
+
+<BaseLayout title={data.title} description={metadataDescription} lang={data.lang}>
+  <div class="shell page-shell">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/works/">Works</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{data.title}</span>
+    </nav>
+
+    <article class="record-page">
+      <header class="record-page__header">
+        <p class="eyebrow">
+          Project record
+          {data.placeholder && <span> / details pending</span>}
+        </p>
+        <h1>{data.title}</h1>
+        <p class="lede">{data.summary}</p>
+
+        {
+          (data.status || data.year || data.tags.length > 0) && (
+            <dl class="record-metadata">
+              {data.status && (
+                <>
+                  <dt>Status</dt>
+                  <dd>{data.status}</dd>
+                </>
+              )}
+              {data.year && (
+                <>
+                  <dt>Year</dt>
+                  <dd>{data.year}</dd>
+                </>
+              )}
+              {data.tags.length > 0 && (
+                <>
+                  <dt>Tags</dt>
+                  <dd>{data.tags.join(", ")}</dd>
+                </>
+              )}
+            </dl>
+          )
+        }
+      </header>
+
+      <div class="prose">
+        <slot />
+      </div>
+
+      {
+        (data.repo || data.demo) && (
+          <footer class="record-page__links">
+            {data.repo && <a href={data.repo}>Repository</a>}
+            {data.demo && <a href={data.demo}>Demo</a>}
+          </footer>
+        )
+      }
+    </article>
+  </div>
+</BaseLayout>

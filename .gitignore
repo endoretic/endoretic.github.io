@@ -1,2 +1,9 @@
 AGENTS.md
 docs/
+node_modules/
+dist/
+.astro/
+.npm/
+.env
+.env.*
+!.env.example

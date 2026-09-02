@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  note: CollectionEntry<"notes">;
+  headingLevel?: "h2" | "h3";
+}
+
+const { note, headingLevel = "h2" } = Astro.props;
+const Heading = headingLevel;
+const noteHref = "/notes/" + note.id + "/";
+const formattedDate = note.data.publishedAt
+  ? new Intl.DateTimeFormat(note.data.lang, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(note.data.publishedAt)
+  : null;
+---
+
+<article class="note-card" lang={note.data.lang}>
+  <p class="eyebrow">
+    Note
+    {note.data.draft && <span> / draft preview</span>}
+  </p>
+  <Heading>
+    <a href={noteHref}>{note.data.title}</a>
+  </Heading>
+  <p>{note.data.description}</p>
+  {formattedDate && <time datetime={note.data.publishedAt?.toISOString()}>{formattedDate}</time>}
+  <a class="text-link" href={noteHref}>
+    Read note <span aria-hidden="true">→</span>
+  </a>
+</article>

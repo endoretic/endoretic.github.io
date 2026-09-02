@@ -1,0 +1,26 @@
+---
+import ProjectCard from "../../components/ProjectCard.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getVisibleProjects } from "../../lib/content";
+
+const projects = await getVisibleProjects();
+---
+
+<BaseLayout
+  title="Works"
+  description="Project records in the endoretic archive."
+>
+  <div class="shell page-shell">
+    <header class="page-header">
+      <p class="eyebrow">01 / Works</p>
+      <h1>Works</h1>
+      <p class="lede">
+        Project records are listed with only the facts currently available.
+      </p>
+    </header>
+
+    <div class="card-grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </div>
+</BaseLayout>

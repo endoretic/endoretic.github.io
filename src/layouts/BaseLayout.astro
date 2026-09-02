@@ -1,0 +1,64 @@
+---
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import { SITE, type SiteLanguage } from "../data/site";
+import "../styles/global.css";
+import "../styles/prose.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: SiteLanguage;
+  indexable?: boolean;
+  shareable?: boolean;
+}
+
+const {
+  title,
+  description = SITE.description,
+  lang = SITE.defaultLang,
+  indexable = true,
+  shareable = true,
+} = Astro.props;
+const documentTitle = title ? title + " — " + SITE.name : SITE.name;
+const canonical = new URL(Astro.url.pathname, SITE.url);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="baidu-site-verification"
+      content={SITE.baiduVerification}
+    />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    {!indexable && <meta name="robots" content="noindex, nofollow" />}
+    {
+      shareable && (
+        <>
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content={documentTitle} />
+          <meta property="og:description" content={description} />
+          <meta property="og:url" content={canonical} />
+          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:title" content={documentTitle} />
+          <meta name="twitter:description" content={description} />
+        </>
+      )
+    }
+    {indexable && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{documentTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <SiteHeader />
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

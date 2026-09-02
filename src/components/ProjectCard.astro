@@ -1,0 +1,51 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  headingLevel?: "h2" | "h3";
+}
+
+const { project, headingLevel = "h2" } = Astro.props;
+const Heading = headingLevel;
+const projectHref = "/works/" + project.id + "/";
+---
+
+<article class="record-card" lang={project.data.lang}>
+  <div class="record-card__diagram" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="record-card__body">
+    <p class="eyebrow">
+      Project record
+      {project.data.placeholder && <span> / pending</span>}
+    </p>
+    <Heading>
+      <a href={projectHref}>{project.data.title}</a>
+    </Heading>
+    <p>{project.data.summary}</p>
+    {
+      (project.data.status || project.data.year) && (
+        <dl class="metadata-row">
+          {project.data.status && (
+            <>
+              <dt>Status</dt>
+              <dd>{project.data.status}</dd>
+            </>
+          )}
+          {project.data.year && (
+            <>
+              <dt>Year</dt>
+              <dd>{project.data.year}</dd>
+            </>
+          )}
+        </dl>
+      )
+    }
+    <a class="text-link" href={projectHref}>
+      Open record <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>

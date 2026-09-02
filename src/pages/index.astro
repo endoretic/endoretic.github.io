@@ -1,0 +1,118 @@
+---
+import NoteCard from "../components/NoteCard.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { SITE } from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getVisibleNotes, getVisibleProjects } from "../lib/content";
+
+const projects = await getVisibleProjects();
+const notes = await getVisibleNotes();
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="shell hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">Personal archive / foundation record</p>
+        <h1>ENDORETIC</h1>
+        <p class="hero__lede">{SITE.description}</p>
+        <a class="text-link" href="/works/">
+          Browse works <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="hero__diagram" aria-hidden="true">
+        <svg viewBox="0 0 640 420" focusable="false">
+          <g fill="none" vector-effect="non-scaling-stroke">
+            <circle cx="355" cy="206" r="126"></circle>
+            <circle cx="355" cy="206" r="64"></circle>
+            <path d="M40 206h528M355 30v352"></path>
+            <path d="M106 112l421 188M135 332L515 91"></path>
+            <path d="M82 63h115v46H82zM489 296h92v61h-92z"></path>
+          </g>
+          <g class="hero__diagram-points">
+            <circle cx="355" cy="206" r="6"></circle>
+            <circle cx="197" cy="206" r="4"></circle>
+            <circle cx="489" cy="296" r="4"></circle>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="section shell section--split" aria-labelledby="identity-title">
+    <div>
+      <p class="eyebrow">Identity / awaiting source</p>
+      <h2 id="identity-title">About this archive</h2>
+    </div>
+    <div class="pending-copy">
+      <p>[TODO: owner-supplied introduction, interests, and current work]</p>
+      <a class="text-link" href="/about/">
+        About <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="works-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Initial records</p>
+        <h2 id="works-title">Works</h2>
+      </div>
+      <a class="text-link" href="/works/">View all works</a>
+    </div>
+    <div class="card-grid">
+      {
+        projects.map((project) => (
+          <ProjectCard project={project} headingLevel="h3" />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section shell" aria-labelledby="notes-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Recent records</p>
+        <h2 id="notes-title">Notes</h2>
+      </div>
+      <a class="text-link" href="/notes/">View notes</a>
+    </div>
+    {
+      notes.length > 0 ? (
+        <div class="note-list">
+          {notes.slice(0, 3).map((note) => (
+            <NoteCard note={note} headingLevel="h3" />
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">
+          No published notes yet. Draft templates remain outside the production
+          archive.
+        </p>
+      )
+    }
+  </section>
+
+  <section class="section shell" aria-labelledby="links-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Carried forward from the current site</p>
+        <h2 id="links-title">Existing links</h2>
+      </div>
+    </div>
+    <div class="link-records">
+      {
+        SITE.existingLinks.map((item) => (
+          <article>
+            <h3>{item.name}</h3>
+            <ul>
+              <li><a href={item.repository}>Repository</a></li>
+              <li><a href={item.website}>Website</a></li>
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
