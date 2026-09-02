@@ -1,0 +1,51 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  note: CollectionEntry<"notes">;
+}
+
+const { note } = Astro.props;
+const { data } = note;
+const formattedDate = data.publishedAt
+  ? new Intl.DateTimeFormat(data.lang, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(data.publishedAt)
+  : null;
+---
+
+<BaseLayout title={data.title} description={data.description} lang={data.lang}>
+  <div class="shell page-shell">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/notes/">Notes</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{data.title}</span>
+    </nav>
+
+    <article class:list={["note-page", "note-page--" + data.readingMode]}>
+      <header class="record-page__header">
+        <p class="eyebrow">
+          Note
+          {data.draft && <span> / local draft preview</span>}
+        </p>
+        <h1>{data.title}</h1>
+        <p class="lede">{data.description}</p>
+        {
+          formattedDate && (
+            <time datetime={data.publishedAt?.toISOString()}>
+              {formattedDate}
+            </time>
+          )
+        }
+      </header>
+
+      <div class="prose">
+        <slot />
+      </div>
+    </article>
+  </div>
+</BaseLayout>

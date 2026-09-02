@@ -1,0 +1,35 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Credits"
+  description="Media and software credits for endoretic.cc."
+>
+  <div class="shell page-shell page-shell--narrow">
+    <header class="page-header">
+      <p class="eyebrow">04 / Credits</p>
+      <h1>Credits</h1>
+      <p class="lede">
+        Sources, licenses, and modifications will be recorded here before any
+        third-party media is published.
+      </p>
+    </header>
+
+    <section class="pending-panel" aria-labelledby="media-credits">
+      <h2 id="media-credits">Third-party media</h2>
+      <p>
+        None. This foundation uses only local CSS and repository-authored
+        SVG graphics.
+      </p>
+    </section>
+
+    <section class="pending-panel" aria-labelledby="software-credits">
+      <h2 id="software-credits">Software</h2>
+      <p>
+        The site is built with Astro and TypeScript. Exact dependency versions
+        are recorded in the package lockfile.
+      </p>
+    </section>
+  </div>
+</BaseLayout>

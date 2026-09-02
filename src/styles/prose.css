@@ -1,0 +1,67 @@
+.prose {
+  max-width: var(--text);
+  color: var(--paper-200);
+  font-size: 1.05rem;
+}
+
+.prose > * + * {
+  margin-top: 1.25em;
+}
+
+.prose h2,
+.prose h3 {
+  margin-top: 2em;
+  color: var(--paper-100);
+}
+
+.prose h2 {
+  font-size: clamp(1.55rem, 3vw, 2.2rem);
+}
+
+.prose h3 {
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--signal-500);
+  color: var(--paper-300);
+}
+
+.prose code {
+  font-family: var(--font-meta);
+  font-size: 0.9em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: var(--ink-950);
+}
+
+.note-page--paper .prose {
+  padding: clamp(1.25rem, 4vw, 3rem);
+  color: #242625;
+  background: var(--paper-100);
+}
+
+.note-page--paper .prose h2,
+.note-page--paper .prose h3,
+.note-page--paper .prose a {
+  color: #151817;
+}
+
+.note-page--paper .prose pre {
+  color: var(--paper-100);
+}
