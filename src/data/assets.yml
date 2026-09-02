@@ -1,0 +1,158 @@
+# PROPOSED CANDIDATES ONLY.
+# No media file has been downloaded, generated, approved for production, or
+# placed on a page. `retrieved_on`, `local_files`, `modifications`, and
+# `used_on` must remain empty until a later approved implementation phase.
+
+- id: hero-radio-array-01
+  status: proposed
+  kind: video
+  title: "Satellite Antennas in a Grassland"
+  creator: "Matthias Groeneveld"
+  source_page: "https://www.pexels.com/video/satellite-antennas-in-a-grassland-6420489/"
+  original_file: "https://videos.pexels.com/video-files/6420489/6420489-hd_1920_1080_24fps.mp4"
+  license: "Pexels License"
+  license_url: "https://www.pexels.com/license/"
+  attribution: "Satellite Antennas in a Grassland by Matthias Groeneveld via Pexels; edited for endoretic.cc."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "/"
+  planned_modifications:
+    - "Retain the 11.22-second source or trim only after loop review."
+    - "Downsample to 1280x720 at 24 fps and encode self-hosted WebM and MP4 below 3 MB."
+    - "Remove any audio track and apply a restrained low-saturation grade."
+  notes: "SHORTLIST ONLY; not downloaded. The 8,370,705-byte source cannot ship unoptimized. Inspected beginning, middle, and ending frames showed no visible person, logo, trademark, artwork, or readable sign. A small facility building is incidental; do not imply endorsement by Westerbork, the creator, or Pexels."
+
+- id: hero-radio-array-01-poster
+  status: proposed
+  kind: image
+  title: "Poster frame derived from Satellite Antennas in a Grassland"
+  creator: "Matthias Groeneveld"
+  source_page: "https://www.pexels.com/video/satellite-antennas-in-a-grassland-6420489/"
+  original_file: "https://videos.pexels.com/video-files/6420489/6420489-hd_1920_1080_24fps.mp4"
+  license: "Pexels License"
+  license_url: "https://www.pexels.com/license/"
+  attribution: "Poster frame from Satellite Antennas in a Grassland by Matthias Groeneveld via Pexels; cropped and graded for endoretic.cc."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "/"
+  planned_modifications:
+    - "Extract a frame around 00:00.5-00:01.0 from the locally retrieved licensed MP4."
+    - "Crop to 16:9, apply the video grade, and encode responsive WebP/AVIF derivatives."
+  notes: "SHORTLIST ONLY; no poster has been extracted. This must be a local derivative of the licensed source video, not a hotlinked Pexels delivery-preview JPEG."
+
+- id: identity-reac-01
+  status: proposed
+  kind: image
+  title: "Reeves Electronic analog computer (REAC), Ames' first electronic computing machine"
+  creator: "National Advisory Committee for Aeronautics (NACA); NASA Ames Research Center archive"
+  source_page: "https://images.nasa.gov/details/ARC-1949-A-14505"
+  original_file: "https://images-assets.nasa.gov/image/ARC-1949-A-14505/ARC-1949-A-14505~orig.jpg"
+  license: "U.S. Government work; NASA Images and Media Usage Guidelines"
+  license_url: "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+  attribution: "Reeves Electronic analog computer (REAC), NACA / NASA Ames Research Center (ARC-1949-A-14505)."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "/"
+  planned_modifications:
+    - "Crop to a 4:3 or 5:4 view of the relay and patch-panel field."
+    - "Apply a restrained warm-neutral grade while retaining the monochrome source."
+  notes: "SHORTLIST ONLY; not downloaded. NASA metadata identifies NACA as photographer. No visible person or insignia was observed. Acknowledge NASA/NACA and do not imply endorsement."
+
+- id: note-cover-cray1-01
+  status: proposed
+  kind: image
+  title: "Computer, Super, Cray-1, CPU"
+  creator: "National Air and Space Museum, Smithsonian Institution"
+  source_page: "https://airandspace.si.edu/collection-objects/computer-super-cray-1-cpu/nasm_A19880565000"
+  original_file: "https://ids.si.edu/ids/deliveryService?id=NASM-2006-937"
+  license: "CC0 1.0"
+  license_url: "https://creativecommons.org/publicdomain/zero/1.0/"
+  attribution: "Computer, Super, Cray-1, CPU, National Air and Space Museum, Smithsonian Institution (CC0)."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "[TODO: note slug]"
+  planned_modifications:
+    - "Crop to the wired inner circle and columns, excluding the CRAY badge, gallery rails, and screens."
+    - "Desaturate to warm charcoal."
+  notes: "SHORTLIST ONLY; not downloaded. The selected media is explicitly CC0 and contains no person. The final crop must remove visible manufacturer branding and modern exhibition context before use."
+
+- id: note-cover-saturn-iu-01
+  status: proposed
+  kind: image
+  title: "Saturn Apollo Program"
+  creator: "NASA Marshall Space Flight Center"
+  source_page: "https://images.nasa.gov/details/0100806"
+  original_file: "https://images-assets.nasa.gov/image/0100806/0100806~orig.jpg"
+  license: "NASA-owned U.S. Government work; NASA Images and Media Usage Guidelines"
+  license_url: "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+  attribution: "Saturn IB/V Instrument Unit chart, NASA Marshall Space Flight Center (0100806)."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "[TODO: note slug]"
+  planned_modifications:
+    - "Crop to the instrument-unit ring and index while preserving factual context."
+    - "Apply a restrained warm-paper balance."
+  notes: "SHORTLIST ONLY; not downloaded. NASA describes this undated chart as an MSFC-designed Saturn IB/V Instrument Unit overview. No person or NASA insignia was observed; the small USA marking is part of the depicted vehicle."
+
+- id: note-cover-hadley-delta-01
+  status: proposed
+  kind: image
+  title: "View of Hadley Delta from top hatch of Apollo 15 Lunar Module after landing"
+  creator: "NASA Johnson Space Center; photograph by David R. Scott"
+  source_page: "https://images.nasa.gov/details/as15-87-11748"
+  original_file: "https://images-assets.nasa.gov/image/as15-87-11748/as15-87-11748~orig.jpg"
+  license: "NASA-owned U.S. Government work; NASA Images and Media Usage Guidelines"
+  license_url: "https://www.nasa.gov/nasa-brand-center/images-and-media/"
+  attribution: "Hadley Delta from Apollo 15, NASA Johnson Space Center; photograph by David R. Scott (AS15-87-11748)."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "[TODO: note slug]"
+  planned_modifications:
+    - "Retain the near-square composition and reduce contrast only slightly."
+  notes: "SHORTLIST ONLY; not downloaded. No visible person, logo, or mark was observed. Use a factual caption, acknowledge NASA/JSC and Scott, and do not imply endorsement."
+
+- id: ambient-cylinder-seven-01
+  status: proposed
+  kind: audio
+  title: "Cylinder Seven"
+  creator: "Chris Zabriskie"
+  source_page: "https://www.chriszabriskie.com/cylinders/"
+  original_file: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Music_for_Video/Chris_Zabriskie/Cylinders/Chris_Zabriskie_-_07_-_Cylinder_Seven.mp3"
+  license: "CC BY 4.0"
+  license_url: "https://creativecommons.org/licenses/by/4.0/"
+  attribution: "Cylinder Seven by Chris Zabriskie, from Cylinders, licensed under CC BY 4.0. Source: https://www.chriszabriskie.com/cylinders/."
+  rights_verified_on: "2026-09-03"
+  retrieved_on: null
+  local_files: []
+  modifications: []
+  used_on: []
+  planned_for:
+    - "[TODO: confirm ambient-audio placement]"
+  planned_modifications:
+    - "Audition before adoption and prefer the complete track unless a documented edit is necessary."
+    - "Transcode for the web, strip separately credited album artwork and irrelevant embedded metadata, and record every actual change."
+  notes: "SHORTLIST ONLY; not downloaded. The creator's page states that Chris Zabriskie wrote, produced, and performed the music and licenses Cylinders under CC BY 4.0. Artwork by Patrick Scott Bell is separately credited and is not cleared here. Playback must remain opt-in, off by default, preload=none, and nonessential."
