@@ -12,18 +12,6 @@ export const SITE = {
     { href: "/about/", label: "About", index: "03" },
     { href: "/credits/", label: "Credits", index: "04" },
   ],
-  existingLinks: [
-    {
-      name: "pjsk-tier-maker",
-      repository: "https://github.com/endoretic/pjsk-tier-maker",
-      website: "https://endoretic.cc/pjsk-tier-maker/",
-    },
-    {
-      name: "score-calculator",
-      repository: "https://github.com/endoretic/score-calculator",
-      website: "https://endoretic.cc/score-calculator/",
-    },
-  ],
 } as const;
 
 export type SiteLanguage = "en" | "zh-CN";

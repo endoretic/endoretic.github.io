@@ -78,22 +78,32 @@ test("generated pages keep a semantic progressive-enhancement shell", () => {
   }
 });
 
-test("project placeholders are explicit and contain no invented links", () => {
-  for (const slug of ["zotero-wallpaper", "zontex"]) {
-    const html = readFileSync(
-      join(dist, "works", slug, "index.html"),
-      "utf8",
-    );
+test("project records state real facts and link only to verified sources", () => {
+  const slugs = ["zotero-wallpaper", "zontex", "score-calculator"];
 
-    assert.match(html, /Project record is being assembled/);
-    assert.match(html, /TODO: owner-supplied factual description/);
+  for (const slug of slugs) {
+    const html = readFileSync(join(dist, "works", slug, "index.html"), "utf8");
+    const main = html.match(/<main[\s\S]*?<\/main>/i)?.[0];
+    assert.ok(main, "Missing project main content in " + slug);
+
+    // A record that still says TODO in its body or its summary is not a
+    // record. Placeholder wording belongs to unwritten entries only.
+    assert.doesNotMatch(main, /TODO/, "Unresolved placeholder in " + slug);
+    assert.doesNotMatch(main, /Project record is being assembled/);
     assert.doesNotMatch(
       html,
-      /<meta\b[^>]*(?:name|property)=["'](?:description|og:description|twitter:description)["'][^>]*content=["'][^"']*TODO/i,
+      /<meta[^>]*(?:name|property)=["'](?:description|og:description|twitter:description)["'][^>]*content=["'][^"']*TODO/i,
     );
-    const main = html.match(/<main\b[\s\S]*?<\/main>/i)?.[0];
-    assert.ok(main, "Missing project main content");
-    assert.doesNotMatch(main, /<a\b[^>]*href="https?:\/\//i);
+
+    // Outbound links must point somewhere the record actually came from, so a
+    // fabricated repository or demo URL cannot slip in unnoticed.
+    for (const [, href] of main.matchAll(/<a[^>]*href="(https?:\/\/[^"]+)"/gi)) {
+      assert.match(
+        href,
+        /^https:\/\/(?:github\.com\/endoretic\/|endoretic\.cc\/)/,
+        "Unverified outbound link in " + slug + ": " + href,
+      );
+    }
   }
 });
 
