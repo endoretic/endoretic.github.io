@@ -159,6 +159,10 @@ test("project cards use slug-derived signal signatures rather than unrelated art
     join(sourceRoot, "components/RecordLocator.astro"),
     "utf8",
   );
+  const signal = readFileSync(
+    join(sourceRoot, "components/WorkSignal.astro"),
+    "utf8",
+  );
   const globalCss = readFileSync(
     join(repositoryRoot, "src/styles/global.css"),
     "utf8",
@@ -175,6 +179,10 @@ test("project cards use slug-derived signal signatures rather than unrelated art
   assert.doesNotMatch(component, /RecordArtwork|SceneVignette|WorkSeal|sceneForRecord/);
   assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
   assert.match(globalCss, /\.work-signal\s*\{[\s\S]*position:\s*absolute/);
+  assert.match(signal, /stableIndex\(`\$\{seed\}:signal:/);
+  assert.match(signal, /class="work-signal__axis"/);
+  assert.match(signal, /class="work-signal__ticks"/);
+  assert.match(signal, /<svg[\s\S]*aria-hidden="true"/);
   assert.doesNotMatch(globalCss, /\.record-artwork\s*\{/);
   assert.match(globalCss, /\.record-locator\s*\{[\s\S]*right:\s*0\.8rem[\s\S]*bottom:\s*0\.75rem/);
   assert.match(locator, /<a[\s\S]*href=\{href\}[\s\S]*aria-label=\{label\}/);
