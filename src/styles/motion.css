@@ -17,7 +17,9 @@
   .record-locator,
   .record-locator__corners,
   .record-locator__gate,
-  .record-locator__signal {
+  .record-locator__signal,
+  .work-signal__trace,
+  .work-signal__index {
     transition:
       opacity 180ms ease,
       transform 180ms ease;
@@ -27,6 +29,12 @@
   .record-locator__gate,
   .record-locator__signal {
     transform-box: view-box;
+    transform-origin: center;
+  }
+
+  .work-signal__trace,
+  .work-signal__index {
+    transform-box: fill-box;
     transform-origin: center;
   }
 
@@ -60,6 +68,14 @@
 
     .record-locator:hover .record-locator__signal {
       transform: scaleX(1.18);
+    }
+
+    .record-card:hover .work-signal__trace {
+      transform: translateY(-1.5px);
+    }
+
+    .record-card:hover .work-signal__index {
+      transform: translateY(-1.5px) scale(1.2);
     }
   }
 

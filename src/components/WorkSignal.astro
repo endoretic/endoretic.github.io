@@ -1,0 +1,40 @@
+---
+import { stableIndex } from "../lib/hash";
+
+interface Props {
+  seed: string;
+  class?: string;
+}
+
+const { seed, class: className } = Astro.props;
+const anchorCount = 7;
+const anchors = Array.from({ length: anchorCount }, (_, index) => ({
+  x: index * 60,
+  y: 75 + stableIndex(`${seed}:signal:${index}`, 71) - 35,
+}));
+const trace = anchors.slice(1).reduce((path, point, index) => {
+  const previous = anchors[index];
+  return `${path} C${previous.x + 22} ${previous.y} ${point.x - 22} ${point.y} ${point.x} ${point.y}`;
+}, `M${anchors[0].x} ${anchors[0].y}`);
+const signalIndex = 1 + stableIndex(`${seed}:signal:index`, anchorCount - 2);
+const signalPoint = anchors[signalIndex];
+---
+
+<!-- Decorative record signature derived from the project slug, not telemetry. -->
+<svg
+  class:list={["work-signal", className]}
+  viewBox="0 0 360 150"
+  aria-hidden="true"
+  focusable="false"
+  data-signal-seed={seed}
+>
+  <path class="work-signal__baseline" d="M0 75h360" />
+  <path class="work-signal__echo" d={trace} pathLength="1" />
+  <path class="work-signal__trace" d={trace} pathLength="1" />
+  <circle
+    class="work-signal__index"
+    cx={signalPoint.x}
+    cy={signalPoint.y}
+    r="3"
+  />
+</svg>
