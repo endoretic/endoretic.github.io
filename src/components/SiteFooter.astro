@@ -12,12 +12,14 @@ import { SITE } from "../data/site";
         <span class="site-footer__mark"><NotationMotif /> {SITE.name}</span>
       </p>
       <p class="site-footer__note">
-        Static and silent by default. Optional sound begins only when enabled.
+        One recording is kept here. It stays silent until you play it.
       </p>
     </div>
     <AmbientAudio
       assetId="ambient-cylinder-seven-01"
-      label="Optional archive ambience"
+      label="Retained recording"
+      recordId="A / 01"
+      duration="8:52"
       initialVolume={0.15}
       class="site-footer__audio"
       showAttribution={true}
