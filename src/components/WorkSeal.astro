@@ -1,0 +1,26 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<!-- Original collection mark: one repeated seal identifies every Works record. -->
+<svg
+  class:list={["work-seal", className]}
+  viewBox="0 0 180 260"
+  aria-hidden="true"
+  focusable="false"
+>
+  <g class="work-seal__body">
+    <path d="M89 24C52 24 28 53 28 91v78c0 38 24 67 61 67" />
+    <path d="M97 24c35 3 55 31 55 67v78c0 36-20 64-55 67" />
+    <path d="M88 65c-20 0-34 17-34 39v51c0 22 14 39 34 40" />
+    <path d="M99 65c18 3 28 19 28 39v51c0 20-10 36-28 40" />
+    <path d="M90 25v42m0 23v81m0 24v41" />
+    <path d="M28 113h26m73 0h25M28 151h26m73 0h25" />
+  </g>
+  <path class="work-seal__signal" d="M75 82h30" />
+  <circle class="work-seal__index" cx="90" cy="181" r="4" />
+</svg>
