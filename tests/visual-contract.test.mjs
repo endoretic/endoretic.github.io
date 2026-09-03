@@ -36,6 +36,10 @@ const generatedArt = [
     `media/generated/record-art-${artwork}-01-1024.avif`,
     `media/generated/record-art-${artwork}-01-1024.webp`,
   ]),
+  ...[640, 1024].flatMap((width) => [
+    `media/generated/spine-archive-study-01-${width}.avif`,
+    `media/generated/spine-archive-study-01-${width}.webp`,
+  ]),
 ];
 
 function collectFiles(directory) {

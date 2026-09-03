@@ -136,8 +136,9 @@ the site into `public/media/generated/`.
 User-supplied photographic inputs are retained separately under
 `assets/source/original/`. The current `spine-city-viaduct-source.jpg` input and
 its canonical `spine-archive-study-01-source.png` stylized master are cleared
-for this project by the site owner's confirmed authorization and contract. They
-remain source-only until a page placement and responsive exports are selected.
+for this project by the site owner's confirmed authorization and contract. Its
+responsive AVIF/WebP exports are used by the first published note,
+`/notes/liuzhou-pingshan-bridge/`.
 
 ## Optional ambience
 

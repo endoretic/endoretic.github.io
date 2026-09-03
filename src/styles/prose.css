@@ -139,6 +139,19 @@
   color: var(--paper-ink);
 }
 
+.note-page__fiction-notice {
+  justify-self: start;
+  margin-top: calc(-1 * var(--space-2));
+  padding: 0.34rem 0.65rem;
+  border-left: 0.16rem solid var(--signal-500);
+  color: var(--paper-muted);
+  background: rgb(92 67 57 / 0.055);
+  font-family: var(--font-meta);
+  font-size: clamp(0.7rem, 0.67rem + 0.1vw, 0.77rem);
+  letter-spacing: 0.035em;
+  line-height: 1.55;
+}
+
 .note-page--paper .note-page__header .eyebrow,
 .note-page--paper .note-page__metadata dt {
   color: var(--paper-muted);
@@ -214,6 +227,11 @@
 .note-page--dark .prose,
 .note-page--dark .lede {
   color: var(--surface-3);
+}
+
+.note-page--dark .note-page__fiction-notice {
+  color: var(--surface-3);
+  background: rgb(233 228 207 / 0.06);
 }
 
 .note-page--dark h1,
