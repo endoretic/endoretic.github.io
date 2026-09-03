@@ -19,25 +19,54 @@ body {
   min-height: 100vh;
   margin: 0;
   color: var(--bone-100);
+  /*
+   * Painted dusk rather than a flat dark surface: a cool zenith, a violet
+   * mid-band, and a warm band low on the page, so scrolling reads as moving
+   * down through atmosphere toward a horizon.
+   */
   background:
-    radial-gradient(ellipse at 82% 2%, rgb(132 150 150 / 0.1), transparent 36rem),
-    radial-gradient(ellipse at 8% 48%, rgb(184 115 104 / 0.06), transparent 34rem),
-    linear-gradient(152deg, var(--carbon-975), var(--carbon-925) 62%, #101520);
+    radial-gradient(ellipse 80% 42% at 78% -6%, var(--glow-cool), transparent 70%),
+    radial-gradient(ellipse 120% 38% at 50% 46%, rgb(63 63 104 / 0.28), transparent 72%),
+    radial-gradient(ellipse 140% 30% at 40% 88%, var(--glow-warm), transparent 74%),
+    linear-gradient(
+      178deg,
+      var(--carbon-975) 0%,
+      var(--indigo-700) 34%,
+      #1a1c33 62%,
+      var(--carbon-925) 84%,
+      var(--carbon-975) 100%
+    );
+  background-attachment: fixed;
   font-size: var(--type-body);
 }
 
+/* A single warm horizon band, fixed low in the viewport, as light not surface. */
+body::after {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  height: 42vh;
+  background: linear-gradient(0deg, var(--glow-horizon), transparent 88%);
+  content: "";
+  pointer-events: none;
+}
+
+/*
+ * Fine grain, closer to a scanned cel than to a halftone screen. Two layers at
+ * coprime sizes and different offsets so no regular lattice is perceptible.
+ */
 body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: radial-gradient(
-    circle,
-    rgb(226 221 207 / 0.2) 0 0.45px,
-    transparent 0.65px
-  );
-  background-size: 13px 17px;
+  background-image:
+    radial-gradient(circle at 30% 40%, rgb(229 223 210 / 0.5) 0 0.4px, transparent 0.9px),
+    radial-gradient(circle at 70% 20%, rgb(160 180 200 / 0.4) 0 0.35px, transparent 0.8px);
+  background-size: 37px 41px, 23px 29px;
   content: "";
-  opacity: 0.12;
+  opacity: 0.11;
   pointer-events: none;
 }
 
@@ -121,6 +150,25 @@ time {
   margin-inline: auto;
 }
 
+/*
+ * Separators read as a band of light that falls off at both ends rather than
+ * as a ruled line of uniform weight. Applied to the full-width separators
+ * only; short local borders inside cards keep their plain hairline.
+ */
+.rule-soft {
+  border-style: solid;
+  border-color: transparent;
+  border-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--rule) 12%,
+      var(--rule-strong) 46%,
+      var(--rule) 82%,
+      transparent 100%
+    )
+    1;
+}
+
 .skip-link {
   position: fixed;
   top: var(--space-3);
@@ -150,8 +198,9 @@ time {
 .site-header {
   position: relative;
   z-index: 10;
-  border-bottom: 1px solid var(--rule);
-  background: rgb(13 16 24 / 0.94);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent 0%, var(--rule) 12%, var(--rule-strong) 46%, var(--rule) 82%, transparent 100%) 1;
+  background: rgb(11 14 24 / 0.9);
   backdrop-filter: blur(10px);
 }
 
@@ -239,7 +288,8 @@ main {
 .hero {
   position: relative;
   overflow: clip;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent 0%, var(--rule) 12%, var(--rule-strong) 46%, var(--rule) 82%, transparent 100%) 1;
 }
 
 .hero__grid {
@@ -386,7 +436,8 @@ main {
 
 .section {
   padding-block: var(--space-7);
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent 0%, var(--rule) 12%, var(--rule-strong) 46%, var(--rule) 82%, transparent 100%) 1;
 }
 
 .section--split,
@@ -930,7 +981,8 @@ main {
 }
 
 .site-footer {
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent 0%, var(--rule) 12%, var(--rule-strong) 46%, var(--rule) 82%, transparent 100%) 1;
 }
 
 .site-footer__inner {
