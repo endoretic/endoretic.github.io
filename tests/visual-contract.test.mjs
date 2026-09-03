@@ -144,13 +144,13 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
   assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
-  assert.match(html, /class="work-seal record-card__seal"/i);
+  assert.match(html, /class="work-signal record-card__signal"/i);
   assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
   assert.match(html, /foreground-artifact--megastructure/i);
   assert.match(html, /class="site-background-art"/i);
 });
 
-test("project cards share one purposeful collection seal rather than unrelated art", () => {
+test("project cards use slug-derived signal signatures rather than unrelated art", () => {
   const component = readFileSync(
     join(sourceRoot, "components/ProjectCard.astro"),
     "utf8",
@@ -168,13 +168,13 @@ test("project cards share one purposeful collection seal rather than unrelated a
     "utf8",
   );
 
-  assert.match(component, /WorkSeal/);
+  assert.match(component, /WorkSignal/);
   assert.match(component, /RecordLocator/);
   assert.match(component, /href=\{projectHref\}/);
   assert.match(component, /label=\{`Open \$\{project\.data\.title\} record`\}/);
-  assert.doesNotMatch(component, /RecordArtwork|SceneVignette|sceneForRecord/);
+  assert.doesNotMatch(component, /RecordArtwork|SceneVignette|WorkSeal|sceneForRecord/);
   assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
-  assert.match(globalCss, /\.work-seal\s*\{[\s\S]*position:\s*absolute/);
+  assert.match(globalCss, /\.work-signal\s*\{[\s\S]*position:\s*absolute/);
   assert.doesNotMatch(globalCss, /\.record-artwork\s*\{/);
   assert.match(globalCss, /\.record-locator\s*\{[\s\S]*right:\s*0\.8rem[\s\S]*bottom:\s*0\.75rem/);
   assert.match(locator, /<a[\s\S]*href=\{href\}[\s\S]*aria-label=\{label\}/);

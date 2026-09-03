@@ -2,7 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import NotationMotif from "./NotationMotif.astro";
 import RecordLocator from "./RecordLocator.astro";
-import WorkSeal from "./WorkSeal.astro";
+import WorkSignal from "./WorkSignal.astro";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -58,7 +58,7 @@ const recordId = "W / " + project.id.toUpperCase();
       {project.data.demo && <a href={project.data.demo}>Demo</a>}
     </div>
   </div>
-  <WorkSeal class="record-card__seal" />
+  <WorkSignal seed={project.id} class="record-card__signal" />
   <RecordLocator
     href={projectHref}
     label={`Open ${project.data.title} record`}

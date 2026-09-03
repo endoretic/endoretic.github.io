@@ -707,37 +707,47 @@ main {
   white-space: nowrap;
 }
 
-.work-seal {
+.work-signal {
   position: absolute;
   z-index: 0;
-  right: 2.4%;
-  bottom: -14%;
-  width: 38%;
-  height: 104%;
+  right: 0;
+  bottom: 2.35rem;
+  width: 66%;
+  height: 42%;
   color: var(--ink-650);
-  opacity: 0.095;
+  opacity: 0.16;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 26%, #000 100%);
   user-select: none;
 }
 
-.work-seal__body,
-.work-seal__signal {
+.work-signal path {
   fill: none;
   vector-effect: non-scaling-stroke;
 }
 
-.work-seal__body {
+.work-signal__baseline {
   stroke: currentColor;
-  stroke-width: 1.15;
+  stroke-width: 0.75;
+  opacity: 0.36;
 }
 
-.work-seal__signal {
-  stroke: var(--signal-500);
-  stroke-width: 2;
+.work-signal__echo {
+  stroke: var(--surface-2);
+  stroke-width: 4.5;
+  opacity: 0.72;
 }
 
-.work-seal__index {
-  fill: currentColor;
+.work-signal__trace {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+}
+
+.work-signal__index {
+  fill: var(--signal-500);
 }
 
 .record-locator {
@@ -1308,12 +1318,11 @@ main {
     padding-block: var(--space-4);
   }
 
-  .work-seal {
-    right: 1.5%;
-    bottom: -10%;
-    width: 44%;
-    height: 94%;
-    opacity: 0.08;
+  .work-signal {
+    bottom: 2.1rem;
+    width: 76%;
+    height: 38%;
+    opacity: 0.13;
   }
 
   .record-locator {
