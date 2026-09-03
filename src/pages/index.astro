@@ -1,6 +1,5 @@
 ---
 import HeroMedia from "../components/HeroMedia.astro";
-import LicensedImage from "../components/LicensedImage.astro";
 import NoteCard from "../components/NoteCard.astro";
 import NotationMotif from "../components/NotationMotif.astro";
 import ProjectCard from "../components/ProjectCard.astro";
@@ -35,22 +34,16 @@ const notes = await getVisibleNotes();
       <p class="eyebrow">H.01 / Introduction · awaiting source</p>
       <h2 id="identity-title">About this archive</h2>
     </div>
-    <figure class="identity-section__media">
-      <LicensedImage
-        assetId="identity-reac-01"
-        alt="A room-sized analog computer cabinet with rows of dials, patch cords, meters, and control panels."
-        width={1440}
-        height={1152}
-        sizes="(min-width: 52rem) 42vw, 100vw"
-        showAttribution={true}
-      />
-      <figcaption>Archival reference image / not biographical documentation</figcaption>
-    </figure>
     <div class="pending-copy">
       <p>[TODO: owner-supplied introduction, interests, and current work]</p>
       <a class="text-link" href="/about/">
         About <span aria-hidden="true">→</span>
       </a>
+    </div>
+    <div class="identity-section__horizon" aria-hidden="true">
+      <span class="identity-section__moon"></span>
+      <span class="identity-section__shore"></span>
+      <span class="identity-section__reflection"></span>
     </div>
   </section>
 

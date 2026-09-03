@@ -3,7 +3,7 @@
 # entries remain research records, not approval to download or publish.
 
 - id: hero-radio-array-01
-  status: active
+  status: proposed
   kind: video
   title: "Satellite Antennas in a Grassland"
   creator: "Matthias Groeneveld"
@@ -13,26 +13,16 @@
   license_url: "https://www.pexels.com/license/"
   attribution: "Satellite Antennas in a Grassland by Matthias Groeneveld via Pexels; edited for endoretic.cc."
   rights_verified_on: "2026-09-03"
-  retrieved_on: "2026-09-03"
+  retrieved_on: null
   source_sha256: "ce14eae5363cbd9f6792bc010a17ed4377fc03a66f4a8b4c0e8dc2235ff3418e"
-  local_files:
-    - "/media/video/hero-radio-array-01.webm"
-    - "/media/video/hero-radio-array-01.mp4"
-  local_sha256:
-    "/media/video/hero-radio-array-01.webm": "8ba85b6ed300ff40dec3b637a3138200698e408f474e62edca895f9bf6821012"
-    "/media/video/hero-radio-array-01.mp4": "82fc1c3e94ed79aeb49e08beeeb2bc7f448991d6749efb09400dbddbc55eccad"
-  modifications:
-    - "Retained the complete 11.22-second source and removed its audio stream."
-    - "Downsampled from 1920x1080 to 1280x720 at 23.976 fps with Lanczos scaling."
-    - "Applied saturation 0.60, contrast 0.92, and brightness -0.02; stripped source metadata."
-    - "Encoded H.264 MP4 at CRF 28 with fast-start and VP9 WebM at CRF 35; both variants are below 3 MB."
-  used_on:
-    - "/"
+  local_files: []
+  modifications: []
+  used_on: []
   rights_notes: "All retained frames were reviewed in contact sheets. No visible person, logo, trademark, artwork, or readable sign was found. A small facility building remains incidental at far right. Credit the creator and Pexels; do not imply endorsement by Westerbork, the creator, or Pexels."
-  notes: "Original: 8,370,705-byte H.264/AAC MP4, 1920x1080, 23.976 fps, 11.220 seconds. Production derivatives contain video only and decode cleanly. Original source retained only in the temporary review workspace, not in public/."
+  notes: "Previously integrated, then removed from production and from public/media on 2026-09-03 because documentary engineering imagery no longer matches the primary visual direction. Rights and source research are retained as a historical record only."
 
 - id: hero-radio-array-01-poster
-  status: active
+  status: proposed
   kind: image
   title: "Poster frame derived from Satellite Antennas in a Grassland"
   creator: "Matthias Groeneveld"
@@ -42,31 +32,16 @@
   license_url: "https://www.pexels.com/license/"
   attribution: "Poster frame from Satellite Antennas in a Grassland by Matthias Groeneveld via Pexels; cropped and graded for endoretic.cc."
   rights_verified_on: "2026-09-03"
-  retrieved_on: "2026-09-03"
+  retrieved_on: null
   source_sha256: "ce14eae5363cbd9f6792bc010a17ed4377fc03a66f4a8b4c0e8dc2235ff3418e"
-  local_files:
-    - "/media/images/hero-radio-array-01-poster-640.avif"
-    - "/media/images/hero-radio-array-01-poster-640.webp"
-    - "/media/images/hero-radio-array-01-poster-1280.avif"
-    - "/media/images/hero-radio-array-01-poster-1280.webp"
-    - "/media/images/hero-radio-array-01-poster-1280.jpg"
-  local_sha256:
-    "/media/images/hero-radio-array-01-poster-640.avif": "679edef573ae45c0d98e274eb7427e96df53e4bd089d63474ffc72e6dd64b423"
-    "/media/images/hero-radio-array-01-poster-640.webp": "1430cfaab4daae812082d4d99c7693ccc133924fae609681a0d152a6e53c0ea1"
-    "/media/images/hero-radio-array-01-poster-1280.avif": "29143cdde286ac0ae5cea772f9bf8db299053394349fb76ab1f6ee0623e8c4e4"
-    "/media/images/hero-radio-array-01-poster-1280.webp": "e2e4463222988a55cece67559c65cc1a748b18d2fbf9715508fcec6fc21f8e0b"
-    "/media/images/hero-radio-array-01-poster-1280.jpg": "ad2989e31fb4392b961bd6d59ed6a5a1a7c025263d911b44ab05986f9be3c602"
-  modifications:
-    - "Extracted the frame at 00:00.75 from the locally retrieved licensed MP4."
-    - "Applied the same 16:9 crop and restrained grade as the production video."
-    - "Generated 640px and 1280px AVIF/WebP derivatives plus a 1280px JPEG fallback."
-  used_on:
-    - "/"
+  local_files: []
+  modifications: []
+  used_on: []
   rights_notes: "This is a local derivative of the licensed source video, not a Pexels preview hotlink. The selected frame contains no visible person, logo, trademark, artwork, or readable sign. A small facility building is incidental; do not imply endorsement."
-  notes: "Poster is the mandatory fallback for mobile, Save-Data, reduced-motion, failed autoplay, unsupported video, or missing video sources."
+  notes: "Previously integrated, then removed from production and from public/media on 2026-09-03 with its source video. Rights and source research are retained as a historical record only."
 
 - id: identity-reac-01
-  status: active
+  status: proposed
   kind: image
   title: "Reeves Electronic analog computer (REAC), Ames' first electronic computing machine"
   creator: "National Advisory Committee for Aeronautics (NACA); NASA Ames Research Center archive"
@@ -76,32 +51,13 @@
   license_url: "https://www.nasa.gov/nasa-brand-center/images-and-media/"
   attribution: "Reeves Electronic analog computer (REAC), NACA / NASA Ames Research Center (ARC-1949-A-14505)."
   rights_verified_on: "2026-09-03"
-  retrieved_on: "2026-09-03"
+  retrieved_on: null
   source_sha256: "575f8448700adf7d8d9a1ca3201961e8c7f6c73bcb43528b4023a4f4dd93003e"
-  local_files:
-    - "/media/images/identity-reac-01-480.avif"
-    - "/media/images/identity-reac-01-480.webp"
-    - "/media/images/identity-reac-01-960.avif"
-    - "/media/images/identity-reac-01-960.webp"
-    - "/media/images/identity-reac-01-1440.avif"
-    - "/media/images/identity-reac-01-1440.webp"
-    - "/media/images/identity-reac-01-1440.jpg"
-  local_sha256:
-    "/media/images/identity-reac-01-480.avif": "0f3116b1017ecfa983bd53d0790f75724541bdf4d26812ebf2fa86e3d640826f"
-    "/media/images/identity-reac-01-480.webp": "30c17be013ba20889aaf9616b604a8c2e97b6d9d6b28c540b2ee2704297f52bf"
-    "/media/images/identity-reac-01-960.avif": "ac397e10b8f897fe73f024ebb5ab18e3090796d0c0960720f16f2f7384664910"
-    "/media/images/identity-reac-01-960.webp": "91db70909cb78654bcf66b4cd37e24a0b8434efa2865ee10dc55268ffd2eb991"
-    "/media/images/identity-reac-01-1440.avif": "5bccfbe20f9313223028de9f8cf7ce8cd50c67aab4407cd2b739dafb865d32ee"
-    "/media/images/identity-reac-01-1440.webp": "7b35f7493c279df82dea7f679201327cdf803d9e42d88e2bc22923198802849f"
-    "/media/images/identity-reac-01-1440.jpg": "e454c5f4991e7f5637692d6cfeb294872bf68b1d6f188f5ba85cc6ae9d09ff92"
-  modifications:
-    - "Cropped the 3072x2048 source to a 5:4 frame from left 256, top 0, width 2560, height 2048."
-    - "Retained grayscale and applied modest contrast compression (linear 0.94, offset +6)."
-    - "Generated 480px, 960px, and 1440px AVIF/WebP derivatives plus a 1440px JPEG fallback."
-  used_on:
-    - "/"
+  local_files: []
+  modifications: []
+  used_on: []
   rights_notes: "NASA metadata identifies NACA as photographer and NASA Ames Research Center as the archive. The final crop contains no person or NASA insignia; only factual machine labels and the REAC plate remain. Acknowledge NASA/NACA and do not imply endorsement."
-  notes: "NASA record ARC-1949-A-14505 identifies the REAC as Ames' first electronic computing machine and dates the photograph 1949-09-27. Used as an explicitly labelled archival reference image, not biographical documentation."
+  notes: "NASA record ARC-1949-A-14505 identifies the REAC as Ames' first electronic computing machine and dates the photograph 1949-09-27. Historical review found no person or NASA insignia in the former crop and required non-endorsement. Previously integrated, then removed from production and from public/media on 2026-09-03 because close-up engineering imagery no longer matches the primary emotional register."
 
 - id: note-cover-cray1-01
   status: proposed

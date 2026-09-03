@@ -1,26 +1,27 @@
 :root {
   color-scheme: dark;
 
-  /* Material palette: oxidized machinery beside a warm archival surface. */
-  --carbon-975: #0b0d0c;
-  --carbon-925: #111412;
-  --carbon-875: #171a18;
-  --carbon-825: #1d211e;
-  --bone-100: #e2ddcf;
-  --bone-200: #c9c3b5;
-  --bone-300: #aaa598;
-  --ash-500: #858982;
-  --oxide-500: #a8644e;
-  --paper-surface: #ded6c6;
-  --paper-ink: #292a25;
-  --paper-muted: #5f5e55;
-  --rule: rgb(226 221 207 / 0.16);
-  --rule-strong: rgb(226 221 207 / 0.3);
-  --rule-paper: rgb(41 42 37 / 0.22);
+  /* Dusk palette: deep sky, flooded stone, fog paper, and one faded horizon. */
+  --carbon-975: #0d1018;
+  --carbon-925: #131722;
+  --carbon-875: #1b2130;
+  --carbon-825: #242b38;
+  --bone-100: #e5dfd2;
+  --bone-200: #cec7b9;
+  --bone-300: #aaa89f;
+  --ash-500: #818894;
+  --oxide-500: #b87368;
+  --sea-500: #849696;
+  --paper-surface: #e0d9ca;
+  --paper-ink: #282b31;
+  --paper-muted: #62636a;
+  --rule: rgb(229 223 210 / 0.13);
+  --rule-strong: rgb(229 223 210 / 0.26);
+  --rule-paper: rgb(40 43 49 / 0.2);
 
   --font-display:
-    Bahnschrift, "Avenir Next Condensed", "Arial Narrow", "Noto Sans",
-    "PingFang SC", "Microsoft YaHei", sans-serif;
+    "Iowan Old Style", Baskerville, "Palatino Linotype", "Noto Serif CJK SC",
+    "Songti SC", SimSun, serif;
   --font-body:
     Aptos, "Segoe UI Variable", "Segoe UI", "Noto Sans", "PingFang SC",
     "Microsoft YaHei", sans-serif;

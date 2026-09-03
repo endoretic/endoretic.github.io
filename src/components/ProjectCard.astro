@@ -10,7 +10,7 @@ const { project, headingLevel = "h2" } = Astro.props;
 const Heading = headingLevel;
 const projectHref = "/works/" + project.id + "/";
 const recordId = "W / " + project.id.toUpperCase();
-const diagramVariant = project.id === "zontex" ? "offset" : "return";
+const landscapeVariant = project.id === "zontex" ? "tower" : "causeway";
 ---
 
 <article class="record-card" lang={project.data.lang}>
@@ -56,14 +56,18 @@ const diagramVariant = project.id === "zontex" ? "offset" : "return";
       {project.data.demo && <a href={project.data.demo}>Demo</a>}
     </div>
   </div>
-  <div class="record-card__diagram" data-variant={diagramVariant} aria-hidden="true">
+  <div class="record-card__diagram" data-variant={landscapeVariant} aria-hidden="true">
     <svg viewBox="0 0 560 150" focusable="false">
-      <path class="record-card__trace" d={diagramVariant === "offset" ? "M0 94h76c28 0 31-41 59-41s33 25 61 25 31-14 59-14 33 38 61 38 31-58 59-58 33 29 61 29 31-13 59-13 33 34 61 34h64" : "M0 82h92c24 0 31-30 55-30s31 46 55 46 31-21 55-21 31 9 55 9 31-44 55-44 31 60 55 60 31-31 55-31 31 11 55 11h52"} />
-      <circle cx="150" cy="74" r="31" />
-      <circle cx="403" cy="74" r="22" />
-      <path d="M12 22h92M456 124h92M281 25v98" />
-      <circle class="record-card__signal" cx="281" cy="74" r="4" />
+      <path class="record-card__sky" d="M0 0h560v150H0z" />
+      <path class="record-card__horizon" d="M0 98c75-8 126 3 188-2 73-6 111-20 184-13 68 7 105 3 188-8v75H0z" />
+      <path
+        class="record-card__ruin"
+        d={landscapeVariant === "tower"
+          ? "M377 82h10V38h18v44h12v7h-40zM393 38l3-16 4 16M278 90h67l18-8h22"
+          : "M155 91h220l20-9h88v8h-91l-20 8H155zM428 82V51h12v31M433 51l4-12 3 12"}
+      />
+      <path class="record-card__reflection" d="M300 108c46 3 82 1 126-4M341 118c33 2 61 0 95-3M125 127c89-4 167-3 235 1" />
     </svg>
-    <span>Generated placeholder / {project.id}</span>
+    <span>Image pending / {project.id}</span>
   </div>
 </article>
