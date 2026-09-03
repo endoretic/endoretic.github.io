@@ -68,5 +68,9 @@ const artwork = artworkByScene[scene];
     </div>
   </div>
   <RecordArtwork variant={artwork} class="record-card__artwork" />
-  <RecordLocator class="record-card__locator" />
+  <RecordLocator
+    href={projectHref}
+    label={`Open ${project.data.title} record`}
+    class="record-card__locator"
+  />
 </article>

@@ -155,18 +155,32 @@ test("project artwork is a masked underlay rather than a banner row", () => {
     join(sourceRoot, "components/ProjectCard.astro"),
     "utf8",
   );
+  const locator = readFileSync(
+    join(sourceRoot, "components/RecordLocator.astro"),
+    "utf8",
+  );
   const globalCss = readFileSync(
     join(repositoryRoot, "src/styles/global.css"),
+    "utf8",
+  );
+  const motionCss = readFileSync(
+    join(repositoryRoot, "src/styles/motion.css"),
     "utf8",
   );
 
   assert.match(component, /RecordArtwork/);
   assert.match(component, /RecordLocator/);
+  assert.match(component, /href=\{projectHref\}/);
+  assert.match(component, /label=\{`Open \$\{project\.data\.title\} record`\}/);
   assert.doesNotMatch(component, /SceneVignette/);
   assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
   assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*position:\s*absolute/);
   assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*mask-image:/);
   assert.match(globalCss, /\.record-locator\s*\{[\s\S]*right:\s*0\.8rem[\s\S]*bottom:\s*0\.75rem/);
+  assert.match(locator, /<a[\s\S]*href=\{href\}[\s\S]*aria-label=\{label\}/);
+  assert.match(locator, /<svg[\s\S]*aria-hidden="true"/);
+  assert.match(globalCss, /\.record-locator:focus-visible\s*\{[\s\S]*outline:/);
+  assert.match(motionCss, /\.record-locator:hover \.record-locator__corners/);
 });
 
 test("the monument is a document background and the hero rail stays record-sized", () => {
@@ -187,7 +201,8 @@ test("the monument is a document background and the hero rail stays record-sized
   assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*right:\s*0[\s\S]*bottom:\s*0/);
   assert.doesNotMatch(globalCss, /body > \.site-background-art\s*\{[\s\S]*top:\s*clamp/);
   assert.doesNotMatch(globalCss, /\.hero__grid::before/);
-  assert.match(globalCss, /\.hero__copy::before\s*\{[\s\S]*height:\s*5\.75rem/);
+  assert.match(globalCss, /\.hero h1::before\s*\{[\s\S]*height:\s*1em/);
+  assert.match(globalCss, /\.hero__lede::before\s*\{[\s\S]*background:\s*var\(--signal-500\)/);
 });
 
 test("the owner-directed pale interface remains the primary visual surface", () => {

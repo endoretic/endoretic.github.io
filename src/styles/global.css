@@ -52,7 +52,7 @@ body > .site-background-art {
   width: clamp(28rem, 40vw, 44rem);
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  opacity: 0.12;
+  opacity: 0.16;
   filter: grayscale(0.32) sepia(0.12) contrast(0.76);
   mix-blend-mode: multiply;
   pointer-events: none;
@@ -320,13 +320,13 @@ main {
 }
 
 /* The rail belongs to record 00; it no longer spans the full hero. */
-.hero__copy::before {
+.hero h1::before {
   position: absolute;
   top: 50%;
-  left: 0;
+  left: calc(-1 * var(--space-4));
   width: 0.28rem;
-  height: 5.75rem;
-  background: linear-gradient(to bottom, var(--ink-950) 0 62%, transparent 62% 74%, var(--signal-500) 74% 100%);
+  height: 1em;
+  background: var(--ink-950);
   content: "";
   transform: translateY(-50%);
 }
@@ -344,6 +344,7 @@ main {
 }
 
 .hero h1 {
+  position: relative;
   margin-block: var(--space-4) var(--space-5);
   font-size: clamp(3.1rem, 5.2vw, 5.2rem);
   font-weight: 620;
@@ -362,8 +363,19 @@ main {
 }
 
 .hero__lede {
+  position: relative;
   max-width: 31rem;
   margin-bottom: var(--space-5);
+}
+
+.hero__lede::before {
+  position: absolute;
+  top: 0.2em;
+  left: calc(-1 * var(--space-4));
+  width: 0.28rem;
+  height: 1.35em;
+  background: var(--signal-500);
+  content: "";
 }
 
 .hero-media {
@@ -739,13 +751,25 @@ main {
   height: 3.25rem;
   color: var(--ink-650);
   opacity: 0.58;
-  pointer-events: none;
+  text-decoration: none;
+  touch-action: manipulation;
 }
 
-.record-locator path,
-.record-locator circle {
+.record-locator__glyph {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.record-locator__glyph path,
+.record-locator__glyph circle {
   fill: none;
   vector-effect: non-scaling-stroke;
+}
+
+.record-locator:focus-visible {
+  outline: 2px solid var(--signal-500);
+  outline-offset: 0.2rem;
 }
 
 .record-locator__corners {
@@ -1269,7 +1293,7 @@ main {
     bottom: 0;
     width: min(31rem, 122vw);
     aspect-ratio: 2 / 3;
-    opacity: 0.09;
+    opacity: 0.12;
   }
 
   .record-card {

@@ -14,6 +14,22 @@
     transition: transform 180ms ease;
   }
 
+  .record-locator,
+  .record-locator__corners,
+  .record-locator__gate,
+  .record-locator__signal {
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+  .record-locator__corners,
+  .record-locator__gate,
+  .record-locator__signal {
+    transform-box: view-box;
+    transform-origin: center;
+  }
+
   @media (hover: hover) {
     .text-link:hover > span[aria-hidden="true"] {
       transform: translateX(0.2rem);
@@ -29,6 +45,26 @@
       color: var(--surface-1);
       background-color: var(--ink-950);
     }
+
+    .record-locator:hover {
+      opacity: 0.9;
+    }
+
+    .record-locator:hover .record-locator__corners {
+      transform: scale(1.055);
+    }
+
+    .record-locator:hover .record-locator__gate {
+      transform: translate(-1px, 1px);
+    }
+
+    .record-locator:hover .record-locator__signal {
+      transform: scaleX(1.18);
+    }
+  }
+
+  .record-locator:focus-visible {
+    opacity: 1;
   }
 
   .record-card:focus-within,
