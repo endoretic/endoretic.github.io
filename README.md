@@ -133,6 +133,11 @@ the static build, and uses the same stable ID as its production derivatives
 with a `-source.png` suffix. Export only the responsive files actually used by
 the site into `public/media/generated/`.
 
+User-supplied photographic inputs are retained separately under
+`assets/source/original/`. The current `spine-city-viaduct-source.jpg` input and
+its `spine-archive-study-01-source.png` stylized master remain non-production
+assets until the photograph's authorship or reuse permission is confirmed.
+
 ## Optional ambience
 
 The single ambient track is a secondary preserved-memory or transmission
