@@ -28,7 +28,14 @@ const signalPoint = anchors[signalIndex];
   focusable="false"
   data-signal-seed={seed}
 >
-  <path class="work-signal__baseline" d="M0 75h360" />
+  <g class="work-signal__scale">
+    <path class="work-signal__axis" d="M18 20v108h342" />
+    <path
+      class="work-signal__ticks"
+      d="M14 43h8M14 75h8M14 107h8M60 124v8M120 124v8M180 124v8M240 124v8M300 124v8"
+    />
+  </g>
+  <path class="work-signal__baseline" d="M18 75h342" />
   <path class="work-signal__echo" d={trace} pathLength="1" />
   <path class="work-signal__trace" d={trace} pathLength="1" />
   <circle
