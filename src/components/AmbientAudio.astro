@@ -1,5 +1,6 @@
 ---
 import { getAsset, getAudioSources } from "../lib/assets";
+import { stableIndex } from "../lib/hash";
 
 interface Props {
   assetId: string;
@@ -7,6 +8,10 @@ interface Props {
   initialVolume?: number;
   class?: string;
   showAttribution?: boolean;
+  /* Archive register line. Presentational only; never the accessible name. */
+  recordId?: string;
+  /* Human-readable running time, e.g. "8:52". */
+  duration?: string;
 }
 
 const {
@@ -15,6 +20,8 @@ const {
   initialVolume = 0.15,
   class: className,
   showAttribution = true,
+  recordId,
+  duration,
 } = Astro.props;
 
 if (initialVolume < 0 || initialVolume > 1) {
@@ -23,6 +30,27 @@ if (initialVolume < 0 || initialVolume > 1) {
 
 const asset = getAsset(assetId, "audio");
 const sources = getAudioSources(assetId);
+
+/*
+ * A static waveform, so the track reads as a retained recording rather than a
+ * feature toggle. It is derived deterministically from the asset id: it is an
+ * emblem of a stored signal, not an analysis of this file, and it is decorative
+ * and marked aria-hidden. Drawing a real waveform would mean decoding the audio
+ * at build time and shipping the peaks, which is a lot of machinery for a mark
+ * nobody reads quantitatively. Nothing animates, so reduced-motion needs no
+ * special case.
+ */
+const WAVE_BARS = 96;
+const waveform = Array.from({ length: WAVE_BARS }, (_, index) => {
+  const seed = stableIndex(`${assetId}:${index}`, 1000) / 1000;
+  // Two slow envelopes so the shape swells and settles like a field recording
+  // rather than sitting at a constant height.
+  const envelope =
+    0.42 +
+    0.34 * Math.sin((index / WAVE_BARS) * Math.PI * 2.2) ** 2 +
+    0.18 * Math.sin((index / WAVE_BARS) * Math.PI * 7.4) ** 2;
+  return Math.max(0.06, Math.min(1, envelope * (0.55 + seed * 0.75)));
+});
 const settingsKey = `endoretic:audio:${assetId}:settings`;
 ---
 
@@ -40,10 +68,37 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
     <span class="ambient-audio__status" data-audio-status role="status">Off</span>
   </div>
 
+  <p class="ambient-audio__register">
+    {recordId && <span>{recordId}</span>}
+    <span>{asset.title}</span>
+    {duration && <span>{duration}</span>}
+  </p>
+
+  <svg
+    class="ambient-audio__waveform"
+    viewBox={`0 0 ${WAVE_BARS * 3} 40`}
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false"
+    data-audio-waveform
+  >
+    {
+      waveform.map((height, index) => (
+        <rect
+          x={index * 3}
+          y={20 - (height * 36) / 2}
+          width="1.6"
+          height={height * 36}
+          rx="0.8"
+        />
+      ))
+    }
+  </svg>
+
   <audio preload="none" hidden></audio>
 
   <div class="ambient-audio__controls">
-    <button type="button" data-audio-enable>Enable ambience</button>
+    <button type="button" data-audio-enable>Play recording</button>
     <button type="button" data-audio-toggle aria-pressed="false" disabled>Play</button>
     <button type="button" data-audio-mute aria-pressed="false" disabled>Mute</button>
     <label class="ambient-audio__volume">
@@ -60,7 +115,7 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
     </label>
   </div>
 
-  <noscript><p>Ambience remains off because JavaScript is unavailable.</p></noscript>
+  <noscript><p>This recording needs JavaScript to play. Everything else on the page works without it.</p></noscript>
 
   {
     showAttribution && (
@@ -273,6 +328,28 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
   .ambient-audio__status,
   .ambient-audio__attribution {
     color: var(--ash-500, #858982);
+  }
+
+  .ambient-audio__register {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1, 0.375rem) var(--space-3, 1rem);
+    margin: 0;
+    color: var(--ash-500, #858982);
+    font-family: var(--font-meta, monospace);
+    font-size: var(--type-meta, 0.75rem);
+    letter-spacing: 0.04em;
+  }
+
+  .ambient-audio__register span:nth-child(2) {
+    color: var(--bone-200, #c9c3b5);
+  }
+
+  .ambient-audio__waveform {
+    width: 100%;
+    height: 2.6rem;
+    fill: var(--sea-500, #8fa8ac);
+    opacity: 0.5;
   }
 
   .ambient-audio__controls {
