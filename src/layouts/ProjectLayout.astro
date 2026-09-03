@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
+import NotationMotif from "../components/NotationMotif.astro";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -23,7 +24,11 @@ const metadataDescription = data.placeholder
 
     <article class="record-page">
       <div class="record-page__registration">
-        <span>W / {project.id.toUpperCase()}</span>
+        <span>
+          <NotationMotif seed={project.id} class="notation-motif--inline" />W / {
+            project.id.toUpperCase()
+          }
+        </span>
         <span>{data.lang}</span>
       </div>
       <header class="record-page__header">

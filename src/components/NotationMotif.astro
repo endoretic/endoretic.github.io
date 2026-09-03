@@ -1,14 +1,70 @@
-<!--
-  Original endoretic.cc interval mark: three square-ended strokes and one
-  offset point on a 72 x 18 grid. It has no semantic or linguistic meaning.
--->
+---
+/*
+ * Original endoretic.cc interval mark.
+ *
+ * Twelve glyphs on a shared 72 x 18 grid, built from short strokes, arcs, and
+ * offset points. They are wholly original: they have no translation, grammar,
+ * phonetics, fictional-language name, or semantic content, and they are not
+ * modelled on any existing writing system, real or fictional.
+ *
+ * A set rather than a single mark. One mark repeated everywhere reads as a
+ * logo, which is the opposite of the intent; a small family assigned per
+ * record reads as an index, and suggests that a larger notation once
+ * surrounded these records.
+ *
+ * Selection is deterministic, so a record keeps its glyph across builds.
+ *
+ * Every instance is decorative: aria-hidden, never labelled, and never a
+ * replacement for navigation, headings, status, metadata, or body text.
+ */
+
+import { stableIndex } from "../lib/hash";
+
+interface Props {
+  /* Any stable string. The same seed always yields the same glyph. */
+  seed?: string;
+  class?: string;
+}
+
+const { seed, class: className } = Astro.props;
+
+/*
+ * Each glyph is three characters. A character is a short head-bar with one to
+ * three descenders hanging from it: straight, curved, hooked, or diagonal,
+ * plus at most one offset point per glyph.
+ *
+ * The construction is deliberate. An earlier set built from free-standing
+ * strokes kept resolving into Latin letterforms, so the marks read as broken
+ * text rather than as notation. Hanging everything from a bar removes that
+ * reading. Bar lengths and character gaps vary so the row does not resolve
+ * into a continuous head-line either, which is what would invite it to be
+ * mistaken for a real script rather than an invented one.
+ */
+const GLYPHS: { d: string; point?: [number, number] }[] = [
+  { d: "M3 4h15M5 4V16M12 4q0 7 6 8M27 4h11M31 4V11M37 4V16M51 4h8M54 4V12q0 4 4 4", point: [66, 13] },
+  { d: "M3 4h9M6 4q0 7 6 8M27 4h15M30 4V16M35 4V11M40 4V16M51 4h13M63 4l-4 12" },
+  { d: "M3 4h14M5 4V12q0 4 4 4M15 4V16M27 4h7M30 4l4 12M51 4h15M56 4V16M64 4q0 7-6 8", point: [22, 14] },
+  { d: "M3 4h15M6 4V11M11 4V11M16 4V11M27 4h14M40 4V12q0 4-4 4M51 4h10M58 4V16M53 4q0 7 6 8", point: [47, 12] },
+  { d: "M3 4h12M14 4q0 7-6 8M27 4h11M29 4V16M36 4V12q0 4 4 4M51 4h12M56 4V11M61 4V16" },
+  { d: "M3 4h10M7 4V16M12 4l4 12M27 4h8M29 4q0 7 6 8M51 4h15M54 4V16M60 4V11M65 4V12q0 4-4 4", point: [68, 15] },
+  { d: "M3 4h9M10 4V12q0 4 4 4M27 4h14M40 4V16M33 4q0 7-6 8M51 4h10M53 4V11M59 4l4 12", point: [26, 13] },
+  { d: "M3 4h15M5 4V16M16 4V16M27 4h10M36 4l-4 12M51 4h13M55 4q0 7 6 8M63 4V11" },
+  { d: "M3 4h12M5 4l4 12M14 4V11M27 4h14M32 4V12q0 4 4 4M40 4V16M51 4h10M60 4q0 7-6 8", point: [3, 14] },
+  { d: "M3 4h13M9 4V11M15 4q0 7 6 8M27 4h6M31 4V16M51 4h15M53 4V16M59 4V12q0 4 4 4M65 4V11" },
+  { d: "M3 4h11M12 4V12q0 4-4 4M5 4V11M27 4h9M35 4V16M29 4l4 12M51 4h14M64 4V16M57 4V11", point: [43, 15] },
+  { d: "M3 4h15M9 4V16M17 4q0 7-6 8M27 4h12M30 4V11M37 4V12q0 4 4 4M51 4h8M56 4q0 7 6 8", point: [62, 12] },
+];
+
+const glyph = GLYPHS[seed ? stableIndex(seed, GLYPHS.length) : 0];
+---
+
 <svg
-  class="notation-motif"
+  class:list={["notation-motif", className]}
   viewBox="0 0 72 18"
   aria-hidden="true"
   focusable="false"
   data-notation-motif
 >
-  <path d="M1 15V3h13v7h8M29 3v12m0-9h12v9h10M56 15V8h15" />
-  <circle cx="62" cy="3" r="1.6" />
+  <path d={glyph.d} />
+  {glyph.point && <circle cx={glyph.point[0]} cy={glyph.point[1]} r="1.6" />}
 </svg>

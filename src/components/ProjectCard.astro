@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import NotationMotif from "./NotationMotif.astro";
 import SceneVignette from "./SceneVignette.astro";
 import { sceneForRecord } from "../lib/scene";
 
@@ -17,7 +18,7 @@ const scene = project.data.coverScene ?? sceneForRecord(project.id);
 
 <article class="record-card" lang={project.data.lang}>
   <header class="record-card__registration">
-    <p>{recordId}</p>
+    <p><NotationMotif seed={project.id} class="notation-motif--inline" />{recordId}</p>
     {project.data.placeholder && <p>Record incomplete</p>}
   </header>
   <div class="record-card__body">

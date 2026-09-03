@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import NotationMotif from "./NotationMotif.astro";
 
 interface Props {
   note: CollectionEntry<"notes">;
@@ -22,7 +23,9 @@ const recordId = "N / " + note.id.toUpperCase();
 
 <article class="note-card" lang={note.data.lang}>
   <div class="note-card__meta">
-    <p class="eyebrow">{recordId}</p>
+    <p class="eyebrow">
+      <NotationMotif seed={note.id} class="notation-motif--inline" />{recordId}
+    </p>
     <dl>
       <div>
         <dt>Language</dt>
