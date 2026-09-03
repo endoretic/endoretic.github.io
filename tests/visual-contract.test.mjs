@@ -9,7 +9,7 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const publicRoot = join(repositoryRoot, "public");
 const sourceRoot = join(repositoryRoot, "src");
 const distRoot = join(repositoryRoot, "dist");
-const generatedHero = [
+const generatedArt = [
   "media/generated/hero-afterlight-01-640.avif",
   "media/generated/hero-afterlight-01-640.webp",
   "media/generated/hero-afterlight-01-1280.avif",
@@ -17,6 +17,13 @@ const generatedHero = [
   "media/generated/hero-afterlight-01-1600.avif",
   "media/generated/hero-afterlight-01-1600.webp",
   "media/generated/hero-afterlight-01-1600.jpg",
+  ...["relay", "console", "hall", "coast"].flatMap((scene) => [
+    `media/generated/scene-${scene}-01-640.avif`,
+    `media/generated/scene-${scene}-01-640.webp`,
+    `media/generated/scene-${scene}-01-1280.avif`,
+    `media/generated/scene-${scene}-01-1280.webp`,
+    `media/generated/scene-${scene}-01-1600.jpg`,
+  ]),
 ];
 
 function collectFiles(directory) {
@@ -40,7 +47,7 @@ test("the public asset inventory contains only generated or manifest-approved fi
   const expected = [
     "CNAME",
     "favicon.svg",
-    ...generatedHero,
+    ...generatedArt,
     ...approvedMedia,
   ].sort();
 
@@ -90,8 +97,8 @@ test("unreviewed bundled media and data payloads cannot enter source", () => {
   }
 });
 
-test("the original hero illustration has compact responsive local derivatives", () => {
-  for (const file of generatedHero) {
+test("the original illustrations have compact responsive local derivatives", () => {
+  for (const file of generatedArt) {
     const sourcePath = join(publicRoot, file);
     const outputPath = join(distRoot, file);
 
@@ -114,6 +121,7 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.match(heroArt, /\/media\/generated\/hero-afterlight-01-1600\.webp 1600w/i);
   assert.match(heroArt, /\bwidth="1600"[^>]*\bheight="900"/i);
   assert.match(heroArt, /\balt="[^"]+"/i);
+  assert.doesNotMatch(html, /STILL \/ 01|>16:9</i);
   assert.doesNotMatch(html, /<video\b/i);
   assert.doesNotMatch(html, /hero-radio-array-01|identity-reac-01/i);
 
@@ -122,6 +130,20 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
   assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
+  assert.match(html, /data-scene-mode="image"/i);
+  assert.match(html, /\/media\/generated\/scene-hall-01-1280\.avif/i);
+});
+
+test("raster scenes retain their inline SVG loading fallback", () => {
+  const component = readFileSync(
+    join(sourceRoot, "components/SceneVignette.astro"),
+    "utf8",
+  );
+
+  assert.match(component, /mode\s*=\s*"image"/);
+  assert.match(component, /class="scene-vignette__image"/);
+  assert.match(component, /class="scene-vignette__fallback"/);
+  assert.match(component, /onerror="this\.closest\('picture'\)\.hidden=true"/);
 });
 
 test("optional media controllers preserve poster and user-gesture fallbacks", () => {

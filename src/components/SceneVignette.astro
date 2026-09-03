@@ -27,9 +27,18 @@ interface Props {
   variant: SceneVariant;
   caption?: string;
   class?: string;
+  mode?: "image" | "svg";
+  sizes?: string;
 }
 
-const { variant, caption, class: className } = Astro.props;
+const {
+  variant,
+  caption,
+  class: className,
+  mode = "image",
+  sizes = "(min-width: 52rem) 42vw, 100vw",
+} = Astro.props;
+const imageBase = `/media/generated/scene-${variant}-01`;
 
 // Gradient ids must be unique per instance so that several vignettes can share
 // a page without one instance's <defs> capturing another's fill references.
@@ -45,8 +54,37 @@ const captions: Record<SceneVariant, string> = {
 const captionText = caption ?? captions[variant];
 ---
 
-<figure class:list={["scene-vignette", `scene-vignette--${variant}`, className]}>
+<figure
+  class:list={["scene-vignette", `scene-vignette--${variant}`, className]}
+  data-scene-mode={mode}
+>
+  {
+    mode === "image" && (
+      <picture class="scene-vignette__image">
+        <source
+          type="image/avif"
+          srcset={`${imageBase}-640.avif 640w, ${imageBase}-1280.avif 1280w`}
+          sizes={sizes}
+        />
+        <source
+          type="image/webp"
+          srcset={`${imageBase}-640.webp 640w, ${imageBase}-1280.webp 1280w`}
+          sizes={sizes}
+        />
+        <img
+          src={`${imageBase}-1600.jpg`}
+          alt=""
+          width="1600"
+          height="900"
+          loading="lazy"
+          decoding="async"
+          onerror="this.closest('picture').hidden=true"
+        />
+      </picture>
+    )
+  }
   <svg
+    class="scene-vignette__fallback"
     viewBox="0 0 560 210"
     preserveAspectRatio="xMidYMid slice"
     aria-hidden="true"
