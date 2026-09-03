@@ -3,6 +3,7 @@ import HeroMedia from "../components/HeroMedia.astro";
 import NoteCard from "../components/NoteCard.astro";
 import NotationMotif from "../components/NotationMotif.astro";
 import ProjectCard from "../components/ProjectCard.astro";
+import SceneVignette from "../components/SceneVignette.astro";
 import { SITE } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getVisibleNotes, getVisibleProjects } from "../lib/content";
@@ -40,11 +41,7 @@ const notes = await getVisibleNotes();
         About <span aria-hidden="true">→</span>
       </a>
     </div>
-    <div class="identity-section__horizon" aria-hidden="true">
-      <span class="identity-section__moon"></span>
-      <span class="identity-section__shore"></span>
-      <span class="identity-section__reflection"></span>
-    </div>
+    <SceneVignette variant="hall" class="identity-section__scene" />
   </section>
 
   <section class="section shell" aria-labelledby="works-title">

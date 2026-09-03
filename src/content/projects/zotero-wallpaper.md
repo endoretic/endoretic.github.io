@@ -2,6 +2,7 @@
 title: "Zotero Wallpaper"
 summary: "[TODO: owner-supplied factual description]"
 lang: "en"
+coverScene: "console"
 placeholder: true
 draft: false
 ---

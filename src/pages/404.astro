@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NotationMotif from "../components/NotationMotif.astro";
+import SceneVignette from "../components/SceneVignette.astro";
 ---
 
 <BaseLayout
@@ -10,6 +11,7 @@ import NotationMotif from "../components/NotationMotif.astro";
   shareable={false}
 >
   <div class="shell not-found">
+    <SceneVignette variant="coast" class="not-found__scene" />
     <span class="not-found__register" aria-hidden="true">404</span>
     <div class="not-found__copy">
       <NotationMotif />

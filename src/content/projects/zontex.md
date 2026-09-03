@@ -2,6 +2,7 @@
 title: "Zontex"
 summary: "[TODO: owner-supplied factual description]"
 lang: "en"
+coverScene: "relay"
 placeholder: true
 draft: false
 ---

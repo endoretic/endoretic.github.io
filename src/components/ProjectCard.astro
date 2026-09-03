@@ -1,5 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import SceneVignette from "./SceneVignette.astro";
+import { sceneForRecord } from "../lib/scene";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -10,7 +12,7 @@ const { project, headingLevel = "h2" } = Astro.props;
 const Heading = headingLevel;
 const projectHref = "/works/" + project.id + "/";
 const recordId = "W / " + project.id.toUpperCase();
-const landscapeVariant = project.id === "zontex" ? "tower" : "causeway";
+const scene = project.data.coverScene ?? sceneForRecord(project.id);
 ---
 
 <article class="record-card" lang={project.data.lang}>
@@ -56,18 +58,5 @@ const landscapeVariant = project.id === "zontex" ? "tower" : "causeway";
       {project.data.demo && <a href={project.data.demo}>Demo</a>}
     </div>
   </div>
-  <div class="record-card__diagram" data-variant={landscapeVariant} aria-hidden="true">
-    <svg viewBox="0 0 560 150" focusable="false">
-      <path class="record-card__sky" d="M0 0h560v150H0z" />
-      <path class="record-card__horizon" d="M0 98c75-8 126 3 188-2 73-6 111-20 184-13 68 7 105 3 188-8v75H0z" />
-      <path
-        class="record-card__ruin"
-        d={landscapeVariant === "tower"
-          ? "M377 82h10V38h18v44h12v7h-40zM393 38l3-16 4 16M278 90h67l18-8h22"
-          : "M155 91h220l20-9h88v8h-91l-20 8H155zM428 82V51h12v31M433 51l4-12 3 12"}
-      />
-      <path class="record-card__reflection" d="M300 108c46 3 82 1 126-4M341 118c33 2 61 0 95-3M125 127c89-4 167-3 235 1" />
-    </svg>
-    <span>Image pending / {project.id}</span>
-  </div>
+  <SceneVignette variant={scene} class="record-card__scene" />
 </article>
