@@ -20,19 +20,18 @@ body {
   margin: 0;
   color: var(--bone-100);
   /*
-   * Painted dusk rather than a flat dark surface: a cool zenith, a violet
-   * mid-band, and a warm band low on the page, so scrolling reads as moving
-   * down through atmosphere toward a horizon.
+   * Aged cel stock rather than a flat dark surface: cool oxidised air above,
+   * a faded khaki memory in the middle, and restrained warmth near the ground.
    */
   background:
     radial-gradient(ellipse 80% 42% at 78% -6%, var(--glow-cool), transparent 70%),
-    radial-gradient(ellipse 120% 38% at 50% 46%, rgb(63 63 104 / 0.14), transparent 72%),
+    radial-gradient(ellipse 120% 38% at 50% 46%, rgb(103 95 69 / 0.07), transparent 72%),
     radial-gradient(ellipse 140% 26% at 40% 72%, var(--glow-warm), transparent 74%),
     linear-gradient(
       178deg,
       var(--carbon-975) 0%,
       var(--indigo-700) 34%,
-      #181a30 62%,
+      #20221d 62%,
       var(--carbon-925) 84%,
       var(--carbon-975) 100%
     );
@@ -50,8 +49,8 @@ body::before {
   inset: 0;
   z-index: -1;
   background-image:
-    radial-gradient(circle at 30% 40%, rgb(229 223 210 / 0.5) 0 0.4px, transparent 0.9px),
-    radial-gradient(circle at 70% 20%, rgb(160 180 200 / 0.4) 0 0.35px, transparent 0.8px);
+    radial-gradient(circle at 30% 40%, rgb(226 220 203 / 0.5) 0 0.4px, transparent 0.9px),
+    radial-gradient(circle at 70% 20%, rgb(151 165 151 / 0.36) 0 0.35px, transparent 0.8px);
   background-size: 37px 41px, 23px 29px;
   content: "";
   opacity: 0.11;
@@ -313,8 +312,8 @@ main {
   max-width: 42rem;
   margin-bottom: clamp(3rem, 7vh, 5.5rem);
   padding: clamp(1.25rem, 3.5vw, 3.25rem);
-  background: linear-gradient(90deg, rgb(13 16 24 / 0.9), rgb(13 16 24 / 0.58) 72%, transparent);
-  text-shadow: 0 1px 18px rgb(4 8 18 / 0.6);
+  background: linear-gradient(90deg, rgb(15 17 15 / 0.91), rgb(15 17 15 / 0.58) 72%, transparent);
+  text-shadow: 0 1px 18px rgb(4 6 5 / 0.62);
 }
 
 .hero__index-line {
@@ -354,7 +353,9 @@ main {
   position: absolute;
   inset: clamp(2rem, 5vw, 4.5rem) 0;
   z-index: 0;
-  display: block;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--space-2);
   min-width: 0;
   margin: 0;
 }
@@ -366,11 +367,10 @@ main {
 .hero-media__plate {
   position: relative;
   overflow: hidden;
-  height: 100%;
   min-height: 0;
-  background: transparent;
-  -webkit-mask-image: radial-gradient(ellipse 96% 88% at 58% 48%, #000 54%, transparent 100%);
-  mask-image: radial-gradient(ellipse 96% 88% at 58% 48%, #000 54%, transparent 100%);
+  border: 1px solid var(--rule-strong);
+  background: var(--carbon-925);
+  box-shadow: 0 2rem 5rem rgb(2 4 3 / 0.32);
 }
 
 .hero-media__plate::after {
@@ -378,9 +378,8 @@ main {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgb(9 13 23 / 0.7), transparent 56%),
-    linear-gradient(0deg, rgb(9 13 23 / 0.28), transparent 42%),
-    radial-gradient(ellipse at 74% 48%, transparent 44%, rgb(9 13 23 / 0.22) 100%);
+    linear-gradient(90deg, rgb(12 14 12 / 0.66), transparent 52%),
+    linear-gradient(0deg, rgb(12 14 12 / 0.38), transparent 36%);
   content: "";
   pointer-events: none;
 }
@@ -389,6 +388,40 @@ main {
 .hero-media__art img {
   width: 100%;
   height: 100%;
+}
+
+.hero-media__coordinate {
+  position: absolute;
+  z-index: 3;
+  color: var(--ash-500);
+  font-family: var(--font-meta);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+}
+
+.hero-media__coordinate--start {
+  bottom: var(--space-2);
+  left: var(--space-3);
+}
+
+.hero-media__coordinate--end {
+  top: var(--space-2);
+  right: var(--space-3);
+}
+
+.hero-media figcaption {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  padding-inline: var(--space-1);
+  color: var(--ash-500);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+}
+
+.hero-media figcaption strong {
+  color: var(--bone-200);
+  font-weight: 500;
 }
 
 .hero-media__art img {
@@ -434,7 +467,7 @@ main {
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(90deg, rgb(12 15 27 / 0.94) 0 34%, rgb(12 15 27 / 0.48) 62%, transparent 88%);
+  background: linear-gradient(90deg, rgb(16 17 15 / 0.95) 0 34%, rgb(16 17 15 / 0.54) 62%, transparent 88%);
   content: "";
   pointer-events: none;
 }
@@ -442,7 +475,30 @@ main {
 .identity-section__heading,
 .identity-section .pending-copy {
   position: relative;
+  z-index: 3;
+}
+
+.foreground-artifact {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.foreground-artifact img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.identity-section__artifact {
+  position: absolute;
   z-index: 2;
+  right: clamp(-9rem, -7vw, -4rem);
+  bottom: clamp(-8rem, -6vw, -4rem);
+  width: min(40rem, 43vw);
+  height: 118%;
+  opacity: 0.66;
+  filter: saturate(0.72) sepia(0.08) contrast(0.93);
 }
 
 .section-heading {
@@ -488,8 +544,8 @@ main {
   min-height: 33rem;
   grid-template-rows: auto 1fr 8.75rem;
   border: 1px solid var(--rule);
-  background: rgb(19 23 34 / 0.68);
-  box-shadow: 0 1.5rem 4rem rgb(3 6 14 / 0.12);
+  background: rgb(24 26 22 / 0.74);
+  box-shadow: 0 1.5rem 4rem rgb(3 5 4 / 0.14);
 }
 
 .record-card__registration {
@@ -756,16 +812,15 @@ main {
   .hero-media {
     position: relative;
     inset: auto;
+    grid-template-rows: auto auto;
   }
 
   .hero-media__plate {
     aspect-ratio: 16 / 9;
-    -webkit-mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
   }
 
   .hero-media__plate::after {
-    background: linear-gradient(0deg, rgb(9 13 23 / 0.24), transparent 38%);
+    background: linear-gradient(0deg, rgb(12 14 12 / 0.24), transparent 38%);
   }
 
   .section-heading > .text-link {
@@ -788,6 +843,14 @@ main {
     opacity: 0.9;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 84%, transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 84%, transparent 100%);
+  }
+
+  .identity-section__artifact {
+    right: -14%;
+    bottom: -8%;
+    width: min(25rem, 66vw);
+    height: 58%;
+    opacity: 0.5;
   }
 
   .note-card {
@@ -858,6 +921,15 @@ main {
     margin-block: var(--space-3) var(--space-4);
     font-size: clamp(2.25rem, 11.5vw, 4.1rem);
     line-height: 0.92;
+  }
+
+  .hero-media__plate {
+    box-shadow: 0 1rem 3rem rgb(2 4 3 / 0.26);
+  }
+
+  .hero-media figcaption {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
   }
 
   .section {

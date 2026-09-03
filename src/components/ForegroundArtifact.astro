@@ -1,0 +1,36 @@
+---
+export type ForegroundVariant = "megastructure" | "relic";
+
+interface Props {
+  variant: ForegroundVariant;
+  class?: string;
+}
+
+const { variant, class: className } = Astro.props;
+const imageBase = `/media/generated/foreground-${variant}-01`;
+---
+
+<picture
+  class:list={["foreground-artifact", `foreground-artifact--${variant}`, className]}
+  aria-hidden="true"
+>
+  <source
+    type="image/avif"
+    srcset={`${imageBase}-640.avif 640w, ${imageBase}-1024.avif 1024w`}
+    sizes="(min-width: 52rem) 38vw, 62vw"
+  />
+  <source
+    type="image/webp"
+    srcset={`${imageBase}-640.webp 640w, ${imageBase}-1024.webp 1024w`}
+    sizes="(min-width: 52rem) 38vw, 62vw"
+  />
+  <img
+    src={`${imageBase}-1024.webp`}
+    alt=""
+    width="1024"
+    height="1536"
+    loading="lazy"
+    decoding="async"
+    onerror="this.closest('picture').hidden=true"
+  />
+</picture>

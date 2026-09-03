@@ -24,6 +24,12 @@ const generatedArt = [
     `media/generated/scene-${scene}-01-1280.webp`,
     `media/generated/scene-${scene}-01-1600.jpg`,
   ]),
+  ...["megastructure", "relic"].flatMap((artifact) => [
+    `media/generated/foreground-${artifact}-01-640.avif`,
+    `media/generated/foreground-${artifact}-01-640.webp`,
+    `media/generated/foreground-${artifact}-01-1024.avif`,
+    `media/generated/foreground-${artifact}-01-1024.webp`,
+  ]),
 ];
 
 function collectFiles(directory) {
@@ -121,7 +127,9 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.match(heroArt, /\/media\/generated\/hero-afterlight-01-1600\.webp 1600w/i);
   assert.match(heroArt, /\bwidth="1600"[^>]*\bheight="900"/i);
   assert.match(heroArt, /\balt="[^"]+"/i);
-  assert.doesNotMatch(html, /STILL \/ 01|>16:9</i);
+  assert.match(html, /STILL \/ 01/i);
+  assert.match(html, />16:9</i);
+  assert.match(html, /Afterlight study/i);
   assert.doesNotMatch(html, /<video\b/i);
   assert.doesNotMatch(html, /hero-radio-array-01|identity-reac-01/i);
 
@@ -132,6 +140,8 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.match(html, /data-notation-motif/);
   assert.match(html, /data-scene-mode="image"/i);
   assert.match(html, /\/media\/generated\/scene-hall-01-1280\.avif/i);
+  assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
+  assert.match(html, /foreground-artifact--megastructure/i);
 });
 
 test("raster scenes retain their inline SVG loading fallback", () => {

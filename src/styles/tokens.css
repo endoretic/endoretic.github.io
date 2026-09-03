@@ -2,34 +2,34 @@
   color-scheme: dark;
 
   /*
-   * Dusk atmosphere, read from the top of the sky down to the horizon:
-   * prussian blue, violet, coral, then cream. Chroma belongs to the
-   * atmosphere; text colours stay neutral enough to hold AA contrast.
+   * A future remembered through old cel stock: soot, smoked olive, worn
+   * ivory, oxidised red, and a trace of cool grey-green. The quieter ground
+   * lets painted scenes carry the chroma instead of turning the UI neon.
    */
-  --carbon-975: #0b0e18;
-  --carbon-925: #121728;
-  --carbon-875: #1c2338;
-  --carbon-825: #262e46;
-  --indigo-700: #151b34;
-  --bone-100: #e5dfd2;
-  --bone-200: #cec7b9;
-  --bone-300: #aaa89f;
-  --ash-500: #9ea4b7;
-  --oxide-500: #c2786a;
-  --sea-500: #8fa8ac;
+  --carbon-975: #10110f;
+  --carbon-925: #191a17;
+  --carbon-875: #242621;
+  --carbon-825: #31332c;
+  --indigo-700: #1d211e;
+  --bone-100: #e2dccb;
+  --bone-200: #c9c2ad;
+  --bone-300: #aaa793;
+  --ash-500: #9ea090;
+  --oxide-500: #ae6658;
+  --sea-500: #879a94;
 
   /*
    * Light, not surfaces. These sit behind page text, so their alpha is bounded
    * by contrast rather than by taste: the warm layers lighten the ground the
    * most, and muted body copy still has to clear WCAG AA on top of them.
    */
-  --glow-warm: rgb(198 132 106 / 0.09);
-  --glow-cool: rgb(122 152 176 / 0.1);
-  --paper-surface: #e0d9ca;
-  --paper-ink: #282b31;
-  --paper-muted: #62636a;
-  --rule: rgb(229 223 210 / 0.13);
-  --rule-strong: rgb(229 223 210 / 0.26);
+  --glow-warm: rgb(177 126 93 / 0.08);
+  --glow-cool: rgb(119 143 135 / 0.08);
+  --paper-surface: #ded7c6;
+  --paper-ink: #292b27;
+  --paper-muted: #62645b;
+  --rule: rgb(226 220 203 / 0.13);
+  --rule-strong: rgb(226 220 203 / 0.28);
   --rule-paper: rgb(40 43 49 / 0.2);
 
   --font-display:
