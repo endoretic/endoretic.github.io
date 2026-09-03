@@ -10,21 +10,24 @@
   --carbon-925: #121728;
   --carbon-875: #1c2338;
   --carbon-825: #262e46;
-  --indigo-700: #1b2444;
+  --indigo-700: #151b34;
   --violet-600: #3f3f68;
   --dusk-500: #6a5f7e;
   --bone-100: #e5dfd2;
   --bone-200: #cec7b9;
   --bone-300: #aaa89f;
-  --ash-500: #8a90a4;
+  --ash-500: #9ea4b7;
   --oxide-500: #c2786a;
   --sea-500: #8fa8ac;
   --signal-cyan: #9fd0d4;
 
-  /* Light, not surfaces. Used for bloom, horizon bands, and falloff. */
-  --glow-warm: rgb(198 132 106 / 0.22);
-  --glow-cool: rgb(122 152 176 / 0.16);
-  --glow-horizon: rgb(226 168 138 / 0.3);
+  /*
+   * Light, not surfaces. These sit behind page text, so their alpha is bounded
+   * by contrast rather than by taste: the warm layers lighten the ground the
+   * most, and muted body copy still has to clear WCAG AA on top of them.
+   */
+  --glow-warm: rgb(198 132 106 / 0.09);
+  --glow-cool: rgb(122 152 176 / 0.1);
   --paper-surface: #e0d9ca;
   --paper-ink: #282b31;
   --paper-muted: #62636a;

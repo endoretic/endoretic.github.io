@@ -26,13 +26,13 @@ body {
    */
   background:
     radial-gradient(ellipse 80% 42% at 78% -6%, var(--glow-cool), transparent 70%),
-    radial-gradient(ellipse 120% 38% at 50% 46%, rgb(63 63 104 / 0.28), transparent 72%),
-    radial-gradient(ellipse 140% 30% at 40% 88%, var(--glow-warm), transparent 74%),
+    radial-gradient(ellipse 120% 38% at 50% 46%, rgb(63 63 104 / 0.14), transparent 72%),
+    radial-gradient(ellipse 140% 26% at 40% 72%, var(--glow-warm), transparent 74%),
     linear-gradient(
       178deg,
       var(--carbon-975) 0%,
       var(--indigo-700) 34%,
-      #1a1c33 62%,
+      #181a30 62%,
       var(--carbon-925) 84%,
       var(--carbon-975) 100%
     );
@@ -40,18 +40,6 @@ body {
   font-size: var(--type-body);
 }
 
-/* A single warm horizon band, fixed low in the viewport, as light not surface. */
-body::after {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-  height: 42vh;
-  background: linear-gradient(0deg, var(--glow-horizon), transparent 88%);
-  content: "";
-  pointer-events: none;
-}
 
 /*
  * Fine grain, closer to a scanned cel than to a halftone screen. Two layers at
