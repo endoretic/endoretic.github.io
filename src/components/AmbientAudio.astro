@@ -299,8 +299,8 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
     display: grid;
     gap: var(--space-3, 1rem);
     padding: var(--space-4, 1.5rem);
-    border: 1px solid var(--rule, rgb(226 221 207 / 0.16));
-    background: rgb(17 20 18 / 0.7);
+    border: 1px solid var(--line-strong, rgb(48 49 44 / 0.48));
+    background: rgb(233 228 207 / 0.46);
   }
 
   .ambient-audio__heading {
@@ -320,14 +320,14 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
   }
 
   .ambient-audio__label {
-    color: var(--bone-200, #c9c3b5);
+    color: var(--ink-950, #292a26);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .ambient-audio__status,
   .ambient-audio__attribution {
-    color: var(--ash-500, #858982);
+    color: var(--ink-500, #66685f);
   }
 
   .ambient-audio__register {
@@ -335,21 +335,21 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
     flex-wrap: wrap;
     gap: var(--space-1, 0.375rem) var(--space-3, 1rem);
     margin: 0;
-    color: var(--ash-500, #858982);
+    color: var(--ink-500, #66685f);
     font-family: var(--font-meta, monospace);
     font-size: var(--type-meta, 0.75rem);
     letter-spacing: 0.04em;
   }
 
   .ambient-audio__register span:nth-child(2) {
-    color: var(--bone-200, #c9c3b5);
+    color: var(--ink-950, #292a26);
   }
 
   .ambient-audio__waveform {
     width: 100%;
     height: 2.6rem;
-    fill: var(--sea-500, #8fa8ac);
-    opacity: 0.5;
+    fill: var(--cold-500, #6d7b75);
+    opacity: 0.66;
   }
 
   .ambient-audio__controls {
@@ -362,15 +362,15 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
   .ambient-audio button {
     min-height: 2.75rem;
     padding: 0.55rem 0.8rem;
-    border: 1px solid var(--rule-strong, rgb(226 221 207 / 0.3));
-    color: var(--bone-100, #e2ddcf);
-    background: transparent;
+    border: 1px solid var(--line-strong, rgb(48 49 44 / 0.48));
+    color: var(--ink-950, #292a26);
+    background: var(--surface-1, #e9e4cf);
     font: inherit;
     cursor: pointer;
   }
 
   .ambient-audio button:disabled {
-    color: var(--ash-500, #858982);
+    color: var(--ink-500, #66685f);
     cursor: default;
     opacity: 0.7;
   }
@@ -385,11 +385,11 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
 
   .ambient-audio__volume input {
     width: min(10rem, 30vw);
-    accent-color: var(--oxide-500, #a8644e);
+    accent-color: var(--signal-500, #865247);
   }
 
   .ambient-audio noscript p {
-    color: var(--ash-500, #858982);
+    color: var(--ink-500, #66685f);
     font-size: var(--type-meta, 0.75rem);
   }
 

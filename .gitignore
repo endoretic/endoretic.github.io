@@ -3,6 +3,7 @@ docs/
 node_modules/
 dist/
 .astro/
+.codex-remote-attachments/
 .npm/
 .env
 .env.*
