@@ -13,6 +13,7 @@ const requiredFiles = [
   "works/zotero-wallpaper/index.html",
   "works/zontex/index.html",
   "notes/index.html",
+  "notes/liuzhou-pingshan-bridge/index.html",
   "about/index.html",
   "credits/index.html",
   "404.html",
@@ -51,6 +52,24 @@ test("draft notes are excluded from production", () => {
 
   assert.doesNotMatch(output, /TODO：随笔标题/);
   assert.doesNotMatch(output, /未发布模板/);
+});
+
+test("the first published note keeps its source clear and serves responsive local art", () => {
+  const html = readFileSync(
+    join(dist, "notes/liuzhou-pingshan-bridge/index.html"),
+    "utf8",
+  );
+
+  assert.match(html, /<html lang="zh-CN">/);
+  assert.match(html, /柳州屏山大桥/);
+  assert.match(html, /记录来源/);
+  assert.match(html, /陈先生/);
+  assert.match(html, /虚实结合：本文以真实影像为基础/);
+  assert.match(html, /现场观察 \/ 文学性重构/);
+  assert.match(html, /spine-archive-study-01-640\.avif 640w/);
+  assert.match(html, /spine-archive-study-01-1024\.webp 1024w/);
+  assert.match(html, /alt="从高处纵向望向柳州城区[^"<>]+"/);
+  assert.doesNotMatch(html, /https?:\/\/[^"']+\.(?:avif|jpe?g|png|webp)/i);
 });
 
 test("generated pages keep a semantic progressive-enhancement shell", () => {

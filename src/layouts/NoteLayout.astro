@@ -38,6 +38,11 @@ const recordId = "N / " + note.id.toUpperCase();
           {data.draft && <span> / local draft preview</span>}
         </p>
         <h1>{data.title}</h1>
+        {data.fictionalized && (
+          <p class="note-page__fiction-notice">
+            虚实结合：本文以真实影像为基础，含虚构整理与想象性叙述，不代表实际情况。
+          </p>
+        )}
         <p class="lede">{data.description}</p>
         <dl class="note-page__metadata">
           <div>

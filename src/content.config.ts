@@ -44,6 +44,7 @@ const notes = defineCollection({
       updatedAt: z.coerce.date().optional(),
       coverAssetId: z.string().min(1).optional(),
       readingMode: z.enum(["paper", "dark"]).default("paper"),
+      fictionalized: z.boolean().default(false),
     })
     .superRefine((entry, context) => {
       if (!entry.draft && !entry.publishedAt) {
