@@ -563,15 +563,29 @@ main {
 }
 
 .record-card {
+  position: relative;
   display: grid;
+  isolation: isolate;
+  overflow: hidden;
   min-width: 0;
-  min-height: 28rem;
-  grid-template-rows: auto 1fr 7.75rem;
+  min-height: 25rem;
+  grid-template-rows: auto 1fr;
   border: 1px solid var(--line-strong);
   background: rgb(233 228 207 / 0.5);
 }
 
+.record-card::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(233 228 207 / 0.97) 0 40%, rgb(233 228 207 / 0.76) 68%, transparent 100%);
+  content: "";
+  pointer-events: none;
+}
+
 .record-card__registration {
+  position: relative;
+  z-index: 3;
   display: flex;
   min-width: 0;
   align-items: center;
@@ -580,19 +594,21 @@ main {
   padding: 0.52rem var(--space-4);
   border-bottom: 1px solid var(--line-strong);
   color: var(--ink-650);
-  background: var(--surface-2);
+  background: rgb(207 202 180 / 0.88);
   font-size: var(--type-meta);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .record-card__body {
+  position: relative;
+  z-index: 2;
   display: flex;
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-5);
+  gap: clamp(0.68rem, 1.4vw, 0.85rem);
+  padding: clamp(1rem, 2vw, 1.35rem);
 }
 
 .record-card__body > p:not(.eyebrow) {
@@ -611,7 +627,7 @@ main {
   width: 100%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2) var(--space-4);
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
   font-size: var(--type-meta);
 }
 
@@ -679,10 +695,39 @@ main {
   white-space: nowrap;
 }
 
-.record-card__scene {
-  overflow: hidden;
-  border-top: 1px solid var(--line);
-  filter: grayscale(0.2) sepia(0.08) saturate(0.65) contrast(0.88);
+.record-artwork {
+  position: absolute;
+  z-index: 0;
+  right: -6%;
+  bottom: -12%;
+  width: 58%;
+  height: 105%;
+  opacity: 0.2;
+  filter: grayscale(0.2) sepia(0.08) saturate(0.72) contrast(0.82) brightness(1.05);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 82% 88% at 70% 55%, #000 18%, rgb(0 0 0 / 0.82) 52%, transparent 88%);
+  mask-image: radial-gradient(ellipse 82% 88% at 70% 55%, #000 18%, rgb(0 0 0 / 0.82) 52%, transparent 88%);
+  user-select: none;
+}
+
+.record-artwork img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: right bottom;
+}
+
+.record-artwork--vessel {
+  right: -9%;
+  bottom: -4%;
+  width: 76%;
+  height: 82%;
+}
+
+.record-artwork--automaton {
+  right: -4%;
+  width: 52%;
 }
 
 .note-list {
@@ -1190,7 +1235,7 @@ main {
 
   .record-card {
     min-height: 0;
-    grid-template-rows: auto 1fr 7rem;
+    grid-template-rows: auto 1fr;
   }
 
   .record-card__registration,
@@ -1202,8 +1247,22 @@ main {
     padding-block: var(--space-4);
   }
 
+  .record-artwork {
+    right: -8%;
+    width: 68%;
+    opacity: 0.16;
+  }
+
+  .record-artwork--vessel {
+    width: 82%;
+  }
+
   .record-card__meta {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .record-card__meta div:last-child {
+    grid-column: 1 / -1;
   }
 
   .page-shell {

@@ -30,6 +30,12 @@ const generatedArt = [
     `media/generated/foreground-${artifact}-01-1024.avif`,
     `media/generated/foreground-${artifact}-01-1024.webp`,
   ]),
+  ...["monument", "vessel", "automaton"].flatMap((artwork) => [
+    `media/generated/record-art-${artwork}-01-640.avif`,
+    `media/generated/record-art-${artwork}-01-640.webp`,
+    `media/generated/record-art-${artwork}-01-1024.avif`,
+    `media/generated/record-art-${artwork}-01-1024.webp`,
+  ]),
 ];
 
 function collectFiles(directory) {
@@ -138,10 +144,27 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
   assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
-  assert.match(html, /data-scene-mode="image"/i);
+  assert.match(html, /record-artwork--(?:monument|vessel|automaton)/i);
   assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
   assert.match(html, /foreground-artifact--megastructure/i);
   assert.match(html, /class="site-background-art"/i);
+});
+
+test("project artwork is a masked underlay rather than a banner row", () => {
+  const component = readFileSync(
+    join(sourceRoot, "components/ProjectCard.astro"),
+    "utf8",
+  );
+  const globalCss = readFileSync(
+    join(repositoryRoot, "src/styles/global.css"),
+    "utf8",
+  );
+
+  assert.match(component, /RecordArtwork/);
+  assert.doesNotMatch(component, /SceneVignette/);
+  assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
+  assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*position:\s*absolute/);
+  assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*mask-image:/);
 });
 
 test("the monument is a document background and the hero rail stays record-sized", () => {
