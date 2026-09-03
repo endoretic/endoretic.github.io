@@ -43,6 +43,34 @@ body > * {
   z-index: 1;
 }
 
+/* A document-bound illustration: it belongs to the page, not to a section. */
+body > .site-background-art {
+  position: absolute;
+  z-index: 0;
+  top: clamp(34rem, 66vh, 46rem);
+  right: 0;
+  width: clamp(34rem, 48vw, 52rem);
+  height: clamp(62rem, 92vw, 88rem);
+  overflow: hidden;
+  opacity: 0.13;
+  filter: grayscale(0.32) sepia(0.12) contrast(0.76);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 82%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 82%, transparent);
+}
+
+.site-background-art .foreground-artifact,
+.site-background-art img {
+  width: 100%;
+  height: 100%;
+}
+
+.site-background-art img {
+  object-fit: contain;
+  object-position: center top;
+}
+
 ::selection {
   color: var(--surface-1);
   background: var(--ink-950);
@@ -278,27 +306,16 @@ main {
 .hero__grid {
   position: relative;
   display: grid;
-  min-height: clamp(35rem, 72vh, 48rem);
+  min-height: clamp(29rem, 58vh, 38rem);
   grid-template-columns: minmax(18rem, 0.75fr) minmax(28rem, 1.25fr);
   align-items: center;
-  gap: clamp(2rem, 5vw, 5rem);
-  padding-block: clamp(2.5rem, 6vw, 5.5rem);
-}
-
-.hero__grid::before {
-  position: absolute;
-  top: var(--space-5);
-  bottom: var(--space-5);
-  left: 0;
-  width: 0.36rem;
-  background: linear-gradient(to bottom, var(--ink-950) 0 22%, transparent 22% 34%, var(--ink-650) 34% 68%, transparent 68% 78%, var(--signal-500) 78% 100%);
-  content: "";
+  gap: clamp(2rem, 4vw, 4rem);
+  padding-block: clamp(2rem, 4vw, 3.5rem);
 }
 
 .hero__copy {
   position: relative;
   z-index: 2;
-  padding-left: clamp(1.25rem, 2.5vw, 2.5rem);
 }
 
 .hero__index-line {
@@ -354,7 +371,7 @@ main {
 .hero-media__plate {
   position: relative;
   overflow: hidden;
-  min-height: clamp(22rem, 40vw, 34rem);
+  min-height: clamp(18rem, 32vw, 27rem);
   border: 1px solid var(--line-strong);
   background: var(--surface-2);
 }
@@ -458,31 +475,22 @@ main {
   isolation: isolate;
   display: grid;
   overflow: hidden;
-  min-height: 29rem;
-  grid-template-columns: minmax(13rem, 0.62fr) minmax(18rem, 1.1fr);
+  min-height: 0;
+  grid-template-columns: minmax(13rem, 0.62fr) minmax(18rem, 1.38fr);
   align-items: center;
-  gap: clamp(2rem, 6vw, 6rem);
-  padding-inline: clamp(1.5rem, 4vw, 4rem) min(31vw, 24rem);
-  background: var(--surface-1);
+  gap: clamp(2rem, 5vw, 5rem);
+  padding: clamp(2.75rem, 4vw, 4rem) clamp(1.5rem, 4vw, 4rem);
+  background: rgb(233 228 207 / 0.58);
 }
 
 .identity-section::before {
   left: clamp(1.5rem, 4vw, 4rem);
 }
 
-.identity-section::after {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  background: linear-gradient(90deg, var(--surface-1) 0 38%, rgb(233 228 207 / 0.78) 56%, transparent 88%);
-  content: "";
-  pointer-events: none;
-}
-
 .identity-section__heading,
 .identity-section .pending-copy {
   position: relative;
-  z-index: 3;
+  z-index: 1;
 }
 
 .foreground-artifact {
@@ -495,30 +503,6 @@ main {
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.identity-section__artifact {
-  position: absolute;
-  z-index: 2;
-  right: clamp(-8rem, -5vw, -3rem);
-  bottom: clamp(-7rem, -5vw, -3rem);
-  width: min(38rem, 40vw);
-  height: 116%;
-  opacity: 0.52;
-  filter: grayscale(0.28) sepia(0.16) contrast(0.82);
-  mix-blend-mode: multiply;
-}
-
-.identity-section__scene {
-  position: absolute;
-  z-index: 0;
-  inset: var(--space-5) -4% var(--space-5) 36%;
-  overflow: hidden;
-  opacity: 0.48;
-  filter: grayscale(0.35) sepia(0.16) contrast(0.78) brightness(1.18);
-  mix-blend-mode: multiply;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 30%, #000 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 30%, #000 100%);
 }
 
 .section-heading {
@@ -1066,33 +1050,13 @@ main {
   }
 
   .identity-section {
-    min-height: 34rem;
     align-content: start;
-    padding: var(--space-6) var(--space-5) 17rem;
+    gap: var(--space-4);
+    padding: var(--space-5);
   }
 
   .identity-section::before {
     left: var(--space-5);
-  }
-
-  .identity-section::after {
-    background: linear-gradient(to bottom, var(--surface-1) 0 42%, rgb(233 228 207 / 0.75) 60%, transparent 100%);
-  }
-
-  .identity-section__scene {
-    inset: auto -8% 0 10%;
-    min-height: 19rem;
-    opacity: 0.56;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
-  }
-
-  .identity-section__artifact {
-    right: -12%;
-    bottom: -10%;
-    width: min(28rem, 68vw);
-    height: 62%;
-    opacity: 0.48;
   }
 
   .note-card {
@@ -1161,15 +1125,6 @@ main {
     padding-inline: 0.6rem;
   }
 
-  .hero__grid::before {
-    top: var(--space-4);
-    bottom: var(--space-4);
-  }
-
-  .hero__copy {
-    padding-left: var(--space-4);
-  }
-
   .hero h1 {
     margin-block: var(--space-3) var(--space-4);
     font-size: clamp(2.25rem, 11.5vw, 3.5rem);
@@ -1201,6 +1156,14 @@ main {
 
   .identity-section::before {
     left: 1.5rem;
+  }
+
+  body > .site-background-art {
+    top: 46rem;
+    right: 0;
+    width: min(38rem, 135vw);
+    height: 62rem;
+    opacity: 0.1;
   }
 
   .record-card {
