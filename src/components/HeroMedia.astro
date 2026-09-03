@@ -1,33 +1,30 @@
----
-import LicensedVideo from "./LicensedVideo.astro";
-import { getAsset } from "../lib/assets";
-
-const heroAsset = getAsset("hero-radio-array-01", "video");
----
-
 <figure class="hero-media">
   <div class="hero-media__plate">
-    <LicensedVideo
-      assetId="hero-radio-array-01"
-      posterAssetId="hero-radio-array-01-poster"
-      posterAlt="A line of wire-frame radio telescope dishes crosses a misty grassland beneath a low sun."
-      width={1280}
-      height={720}
-      sizes="(min-width: 64rem) 58vw, (min-width: 52rem) 52vw, 100vw"
-      showAttribution={false}
-    />
-    <span class="hero-media__coordinate hero-media__coordinate--start" aria-hidden="true">
-      00.00
-    </span>
-    <span class="hero-media__coordinate hero-media__coordinate--end" aria-hidden="true">
-      11.22
-    </span>
+    <picture class="hero-media__art">
+      <source
+        type="image/avif"
+        srcset="/media/generated/hero-afterlight-01-640.avif 640w, /media/generated/hero-afterlight-01-1280.avif 1280w, /media/generated/hero-afterlight-01-1600.avif 1600w"
+        sizes="(min-width: 80rem) 78rem, (min-width: 52rem) calc(100vw - 2.5rem), calc(100vw - 1.5rem)"
+      />
+      <source
+        type="image/webp"
+        srcset="/media/generated/hero-afterlight-01-640.webp 640w, /media/generated/hero-afterlight-01-1280.webp 1280w, /media/generated/hero-afterlight-01-1600.webp 1600w"
+        sizes="(min-width: 80rem) 78rem, (min-width: 52rem) calc(100vw - 2.5rem), calc(100vw - 1.5rem)"
+      />
+      <img
+        src="/media/generated/hero-afterlight-01-1600.jpg"
+        alt="A painted dusk landscape with shallow reflective water, a distant weathered tower and broken causeway, and one small solitary figure beneath an immense sky."
+        width="1600"
+        height="900"
+        fetchpriority="high"
+        decoding="async"
+      />
+    </picture>
+    <span class="hero-media__coordinate hero-media__coordinate--start" aria-hidden="true">STILL / 01</span>
+    <span class="hero-media__coordinate hero-media__coordinate--end" aria-hidden="true">16:9</span>
   </div>
   <figcaption>
-    <span>
-      <strong>Signal 00</strong> / {heroAsset.attribution}
-      {" · "}<a href={heroAsset.source_page}>Source</a>
-    </span>
-    <span>Motion: desktop only · poster otherwise</span>
+    <span><strong>Afterlight study</strong> / original site illustration</span>
+    <span>Local still · no third-party media</span>
   </figcaption>
 </figure>

@@ -9,7 +9,15 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const publicRoot = join(repositoryRoot, "public");
 const sourceRoot = join(repositoryRoot, "src");
 const distRoot = join(repositoryRoot, "dist");
-const generatedPlaceholder = "media/generated/hero-memory-transport.svg";
+const generatedHero = [
+  "media/generated/hero-afterlight-01-640.avif",
+  "media/generated/hero-afterlight-01-640.webp",
+  "media/generated/hero-afterlight-01-1280.avif",
+  "media/generated/hero-afterlight-01-1280.webp",
+  "media/generated/hero-afterlight-01-1600.avif",
+  "media/generated/hero-afterlight-01-1600.webp",
+  "media/generated/hero-afterlight-01-1600.jpg",
+];
 
 function collectFiles(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -32,7 +40,7 @@ test("the public asset inventory contains only generated or manifest-approved fi
   const expected = [
     "CNAME",
     "favicon.svg",
-    generatedPlaceholder,
+    ...generatedHero,
     ...approvedMedia,
   ].sort();
 
@@ -82,42 +90,32 @@ test("unreviewed bundled media and data payloads cannot enter source", () => {
   }
 });
 
-test("the hero placeholder is small, inert, and explicitly repository-authored", () => {
-  const sourcePath = join(publicRoot, generatedPlaceholder);
-  const outputPath = join(distRoot, generatedPlaceholder);
+test("the original hero illustration has compact responsive local derivatives", () => {
+  for (const file of generatedHero) {
+    const sourcePath = join(publicRoot, file);
+    const outputPath = join(distRoot, file);
 
-  assert.equal(existsSync(sourcePath), true);
-  assert.equal(existsSync(outputPath), true);
-  assert.ok(statSync(sourcePath).size > 0);
-  assert.ok(statSync(sourcePath).size < 100 * 1024);
-
-  const svg = readFileSync(sourcePath, "utf8");
-  assert.match(svg, /Repository-authored placeholder for endoretic\.cc/);
-  assert.doesNotMatch(svg, /<(?:script|foreignObject|image)\b/i);
-  assert.doesNotMatch(svg, /\b(?:href|src)\s*=\s*["']/i);
+    assert.equal(existsSync(sourcePath), true, "Missing public/" + file);
+    assert.equal(existsSync(outputPath), true, "Missing dist/" + file);
+    assert.ok(statSync(sourcePath).size > 0, "Empty public/" + file);
+    assert.ok(statSync(sourcePath).size < 200 * 1024, "Oversized public/" + file);
+  }
 });
 
-test("the home page is poster-first and defers optional media downloads", () => {
+test("the home page uses responsive original art and defers optional audio", () => {
   const html = readFileSync(join(distRoot, "index.html"), "utf8");
-  const poster = html.match(
-    /<picture\b[^>]*licensed-video__poster[\s\S]*?<\/picture>/i,
+  const heroArt = html.match(
+    /<picture\b[^>]*hero-media__art[\s\S]*?<\/picture>/i,
   )?.[0];
-  const video = html.match(/<video\b[^>]*>[\s\S]*?<\/video>/i)?.[0];
   const audio = html.match(/<audio\b[^>]*>[\s\S]*?<\/audio>/i)?.[0];
 
-  assert.ok(poster, "Missing local hero poster");
-  assert.match(poster, /\/media\/images\/hero-radio-array-01-poster-640\.avif 640w/i);
-  assert.match(poster, /\/media\/images\/hero-radio-array-01-poster-1280\.webp 1280w/i);
-  assert.match(poster, /\bwidth="1280"[^>]*\bheight="720"/i);
-  assert.match(poster, /\balt="[^"]+"/i);
-
-  assert.ok(video, "Missing optional hero video element");
-  assert.match(video, /\bmuted\b/i);
-  assert.match(video, /\bloop\b/i);
-  assert.match(video, /\bplaysinline\b/i);
-  assert.match(video, /\bpreload="none"/i);
-  assert.doesNotMatch(video, /\bsrc\s*=|<source\b/i);
-  assert.match(html, /data-sources="[^\"]*\/media\/video\/hero-radio-array-01\.webm/i);
+  assert.ok(heroArt, "Missing local original hero illustration");
+  assert.match(heroArt, /\/media\/generated\/hero-afterlight-01-640\.avif 640w/i);
+  assert.match(heroArt, /\/media\/generated\/hero-afterlight-01-1600\.webp 1600w/i);
+  assert.match(heroArt, /\bwidth="1600"[^>]*\bheight="900"/i);
+  assert.match(heroArt, /\balt="[^"]+"/i);
+  assert.doesNotMatch(html, /<video\b/i);
+  assert.doesNotMatch(html, /hero-radio-array-01|identity-reac-01/i);
 
   assert.ok(audio, "Missing optional ambient audio element");
   assert.match(audio, /\bpreload="none"/i);

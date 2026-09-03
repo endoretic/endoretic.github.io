@@ -121,9 +121,11 @@ files, oversized hero video, and unregistered files under `public/media/`.
 Approved derivatives live under stable IDs in `public/media/`. Responsive
 AVIF and WebP files are pre-generated locally because Astro does not transform
 files in `public/`; the source page and transformation record remain in the
-manifest. Production pages use `LicensedImage.astro`, `LicensedVideo.astro`,
-and `AmbientAudio.astro` rather than raw media paths. Remote fonts and remote
-media requests remain prohibited.
+manifest. Third-party production media uses `LicensedImage.astro`,
+`LicensedVideo.astro`, and `AmbientAudio.astro` rather than raw media paths.
+Repository-original generated art lives under `public/media/generated/` and may
+be referenced directly; it must still be responsive, local, and documented in
+the visual report. Remote fonts and remote media requests remain prohibited.
 
 ## Optional ambience
 
