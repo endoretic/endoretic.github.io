@@ -15,8 +15,7 @@ const notes = await getVisibleNotes();
       <p class="eyebrow">02 / Notes</p>
       <h1>Notes</h1>
       <p class="lede">
-        Essays, observations, and technical notes will appear here when they are
-        ready for publication.
+        Essays, observations, and technical notes.
       </p>
     </header>
 
@@ -26,10 +25,7 @@ const notes = await getVisibleNotes();
           {notes.map((note) => <NoteCard note={note} />)}
         </div>
       ) : (
-        <p class="empty-state">
-          No published notes yet. The collection is ready for owner-supplied
-          writing.
-        </p>
+        <p class="empty-state">Nothing published here yet.</p>
       )
     }
   </div>
