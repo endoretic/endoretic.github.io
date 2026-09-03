@@ -20,7 +20,7 @@
     .record-card:hover,
     .note-card:hover {
       border-color: var(--rule-strong);
-      background-color: rgb(23 26 24 / 0.9);
+      background-color: rgb(30 31 26 / 0.92);
     }
   }
 

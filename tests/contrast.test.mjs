@@ -70,21 +70,21 @@ const alphaOf = (name) => {
  * one point. Passing here means the real page has margin in hand.
  */
 test("muted text keeps WCAG AA over the page atmosphere", () => {
-  const violet = Number.parseFloat(
-    globalCss.match(/rgb\(63 63 104 \/ ([\d.]+)\)/)?.[1] ?? "1",
+  const khaki = Number.parseFloat(
+    globalCss.match(/rgb\(103 95 69 \/ ([\d.]+)\)/)?.[1] ?? "1",
   );
   const grounds = [
     token("--carbon-975"),
     token("--indigo-700"),
-    hex("#181a30"),
+    hex("#20221d"),
     token("--carbon-925"),
   ];
   const texts = ["--ash-500", "--bone-300", "--bone-200", "--bone-100"];
 
   for (const ground of grounds) {
-    let background = composite(ground, [63, 63, 104], violet);
-    background = composite(background, [198, 132, 106], alphaOf("--glow-warm"));
-    background = composite(background, [122, 152, 176], alphaOf("--glow-cool"));
+    let background = composite(ground, [103, 95, 69], khaki);
+    background = composite(background, [177, 126, 93], alphaOf("--glow-warm"));
+    background = composite(background, [119, 143, 135], alphaOf("--glow-cool"));
 
     for (const name of texts) {
       const ratio = contrast(token(name), background);
