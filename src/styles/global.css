@@ -707,39 +707,37 @@ main {
   white-space: nowrap;
 }
 
-.record-artwork {
+.work-seal {
   position: absolute;
   z-index: 0;
-  right: -6%;
-  bottom: -12%;
-  width: 58%;
-  height: 105%;
-  opacity: 0.2;
-  filter: grayscale(0.2) sepia(0.08) saturate(0.72) contrast(0.82) brightness(1.05);
-  mix-blend-mode: multiply;
+  right: 2.4%;
+  bottom: -14%;
+  width: 38%;
+  height: 104%;
+  color: var(--ink-650);
+  opacity: 0.095;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse 82% 88% at 70% 55%, #000 18%, rgb(0 0 0 / 0.82) 52%, transparent 88%);
-  mask-image: radial-gradient(ellipse 82% 88% at 70% 55%, #000 18%, rgb(0 0 0 / 0.82) 52%, transparent 88%);
   user-select: none;
 }
 
-.record-artwork img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: right bottom;
+.work-seal__body,
+.work-seal__signal {
+  fill: none;
+  vector-effect: non-scaling-stroke;
 }
 
-.record-artwork--vessel {
-  right: -9%;
-  bottom: -4%;
-  width: 76%;
-  height: 82%;
+.work-seal__body {
+  stroke: currentColor;
+  stroke-width: 1.15;
 }
 
-.record-artwork--automaton {
-  right: -4%;
-  width: 52%;
+.work-seal__signal {
+  stroke: var(--signal-500);
+  stroke-width: 2;
+}
+
+.work-seal__index {
+  fill: currentColor;
 }
 
 .record-locator {
@@ -1310,14 +1308,12 @@ main {
     padding-block: var(--space-4);
   }
 
-  .record-artwork {
-    right: -8%;
-    width: 68%;
-    opacity: 0.16;
-  }
-
-  .record-artwork--vessel {
-    width: 82%;
+  .work-seal {
+    right: 1.5%;
+    bottom: -10%;
+    width: 44%;
+    height: 94%;
+    opacity: 0.08;
   }
 
   .record-locator {

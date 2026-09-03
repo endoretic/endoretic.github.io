@@ -1,9 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import NotationMotif from "./NotationMotif.astro";
-import RecordArtwork from "./RecordArtwork.astro";
 import RecordLocator from "./RecordLocator.astro";
-import { sceneForRecord } from "../lib/scene";
+import WorkSeal from "./WorkSeal.astro";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -14,14 +13,6 @@ const { project, headingLevel = "h2" } = Astro.props;
 const Heading = headingLevel;
 const projectHref = "/works/" + project.id + "/";
 const recordId = "W / " + project.id.toUpperCase();
-const scene = project.data.coverScene ?? sceneForRecord(project.id);
-const artworkByScene = {
-  relay: "monument",
-  console: "automaton",
-  hall: "vessel",
-  coast: "vessel",
-} as const;
-const artwork = artworkByScene[scene];
 ---
 
 <article class="record-card" lang={project.data.lang}>
@@ -67,7 +58,7 @@ const artwork = artworkByScene[scene];
       {project.data.demo && <a href={project.data.demo}>Demo</a>}
     </div>
   </div>
-  <RecordArtwork variant={artwork} class="record-card__artwork" />
+  <WorkSeal class="record-card__seal" />
   <RecordLocator
     href={projectHref}
     label={`Open ${project.data.title} record`}

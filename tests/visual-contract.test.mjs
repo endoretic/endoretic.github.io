@@ -144,13 +144,13 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
   assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
-  assert.match(html, /record-artwork--(?:monument|vessel|automaton)/i);
+  assert.match(html, /class="work-seal record-card__seal"/i);
   assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
   assert.match(html, /foreground-artifact--megastructure/i);
   assert.match(html, /class="site-background-art"/i);
 });
 
-test("project artwork is a masked underlay rather than a banner row", () => {
+test("project cards share one purposeful collection seal rather than unrelated art", () => {
   const component = readFileSync(
     join(sourceRoot, "components/ProjectCard.astro"),
     "utf8",
@@ -168,14 +168,14 @@ test("project artwork is a masked underlay rather than a banner row", () => {
     "utf8",
   );
 
-  assert.match(component, /RecordArtwork/);
+  assert.match(component, /WorkSeal/);
   assert.match(component, /RecordLocator/);
   assert.match(component, /href=\{projectHref\}/);
   assert.match(component, /label=\{`Open \$\{project\.data\.title\} record`\}/);
-  assert.doesNotMatch(component, /SceneVignette/);
+  assert.doesNotMatch(component, /RecordArtwork|SceneVignette|sceneForRecord/);
   assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
-  assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*position:\s*absolute/);
-  assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*mask-image:/);
+  assert.match(globalCss, /\.work-seal\s*\{[\s\S]*position:\s*absolute/);
+  assert.doesNotMatch(globalCss, /\.record-artwork\s*\{/);
   assert.match(globalCss, /\.record-locator\s*\{[\s\S]*right:\s*0\.8rem[\s\S]*bottom:\s*0\.75rem/);
   assert.match(locator, /<a[\s\S]*href=\{href\}[\s\S]*aria-label=\{label\}/);
   assert.match(locator, /<svg[\s\S]*aria-hidden="true"/);
