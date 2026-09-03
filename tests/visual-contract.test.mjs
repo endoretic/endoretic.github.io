@@ -195,6 +195,46 @@ test("the notation motif is original, decorative, and never a text replacement",
   assert.doesNotMatch(component, /aria-label|role="img"/);
 });
 
+test("the notation is a set of glyphs rather than one repeated mark", () => {
+  const component = readFileSync(
+    join(repositoryRoot, "src/components/NotationMotif.astro"),
+    "utf8",
+  );
+  const glyphs = component.match(/\{ d: "/g) ?? [];
+
+  // A single repeated mark reads as a logo, which is the opposite of the
+  // intent: the set exists to imply a larger surrounding index.
+  assert.ok(
+    glyphs.length >= 8,
+    `Expected at least 8 glyphs, found ${glyphs.length}`,
+  );
+
+  const html = readFileSync(join(distRoot, "index.html"), "utf8");
+  const rendered = new Set(
+    [...html.matchAll(/data-notation-motif><path d="([^"]+)"/g)].map(
+      (match) => match[1],
+    ),
+  );
+  assert.ok(
+    rendered.size >= 2,
+    "Records should not all render the same notation glyph",
+  );
+});
+
+test("record bucket selection is stable, in range, and well spread", () => {
+  const source = readFileSync(join(sourceRoot, "lib/hash.ts"), "utf8");
+
+  // `^=` produces a signed 32-bit result. Without normalising before the
+  // modulo, the returned index goes negative and every lookup is undefined.
+  assert.match(source, /\(hash \^ \(hash >>> 16\)\) >>> 0/);
+
+  // FNV-1a on its own mixes its low bits poorly for short slugs, and the
+  // modulo reads exactly those bits, which collapsed most real project slugs
+  // onto one bucket. The finalizer must survive.
+  assert.match(source, /0x7feb352d/);
+  assert.match(source, /0x846ca68b/);
+});
+
 test("the note reading surface protects measure, overflow, and paper contrast", () => {
   const layout = readFileSync(
     join(repositoryRoot, "src/layouts/NoteLayout.astro"),

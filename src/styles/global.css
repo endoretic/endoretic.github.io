@@ -188,11 +188,29 @@ time {
   width: 3.25rem;
   height: auto;
   flex: 0 0 auto;
-  fill: var(--oxide-500);
   stroke: var(--bone-300);
-  stroke-linecap: square;
-  stroke-linejoin: miter;
+  /* Round joins and caps, so the marks read as written rather than drafted. */
+  stroke-linecap: round;
+  stroke-linejoin: round;
   stroke-width: 1.4;
+}
+
+/* Several glyphs contain closed shapes, which a blanket fill would flood. */
+.notation-motif path {
+  fill: none;
+}
+
+.notation-motif circle {
+  fill: var(--oxide-500);
+  stroke: none;
+}
+
+/* Inline register glyph: sits on the metadata baseline, never on its own. */
+.notation-motif--inline {
+  width: 2.1rem;
+  margin-right: 0.55rem;
+  vertical-align: -0.32em;
+  opacity: 0.72;
 }
 
 .site-header {
