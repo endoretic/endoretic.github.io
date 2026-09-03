@@ -1,40 +1,48 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /*
-   * A future remembered through old cel stock: soot, smoked olive, worn
-   * ivory, oxidised red, and a trace of cool grey-green. The quieter ground
-   * lets painted scenes carry the chroma instead of turning the UI neon.
+   * A low-contrast display surface: warm phosphor paper, graphite controls,
+   * fogged green-grey and one oxidised signal. Dark values indicate state;
+   * they are not the page atmosphere.
    */
-  --carbon-975: #10110f;
-  --carbon-925: #191a17;
-  --carbon-875: #242621;
-  --carbon-825: #31332c;
-  --indigo-700: #1d211e;
-  --bone-100: #e2dccb;
-  --bone-200: #c9c2ad;
-  --bone-300: #aaa793;
-  --ash-500: #9ea090;
-  --oxide-500: #ae6658;
-  --sea-500: #879a94;
+  --surface-0: #d8d3bd;
+  --surface-1: #e9e4cf;
+  --surface-2: #c8c3ad;
+  --surface-3: #b5b29f;
+  --ink-950: #292a26;
+  --ink-800: #3b3c36;
+  --ink-650: #44463f;
+  --ink-500: #505149;
+  --signal-500: #704239;
+  --cold-500: #6d7b75;
+  --line: rgb(48 49 44 / 0.22);
+  --line-strong: rgb(48 49 44 / 0.48);
+  --line-faint: rgb(48 49 44 / 0.1);
+  --shadow: rgb(42 43 38 / 0.16);
 
-  /*
-   * Light, not surfaces. These sit behind page text, so their alpha is bounded
-   * by contrast rather than by taste: the warm layers lighten the ground the
-   * most, and muted body copy still has to clear WCAG AA on top of them.
-   */
-  --glow-warm: rgb(177 126 93 / 0.08);
-  --glow-cool: rgb(119 143 135 / 0.08);
-  --paper-surface: #ded7c6;
-  --paper-ink: #292b27;
-  --paper-muted: #62645b;
-  --rule: rgb(226 220 203 / 0.13);
-  --rule-strong: rgb(226 220 203 / 0.28);
-  --rule-paper: rgb(40 43 49 / 0.2);
+  /* Compatibility aliases used by the manifest-backed media components. */
+  --carbon-975: var(--ink-950);
+  --carbon-925: var(--ink-800);
+  --carbon-875: var(--ink-650);
+  --carbon-825: var(--ink-500);
+  --indigo-700: var(--surface-2);
+  --bone-100: var(--surface-1);
+  --bone-200: var(--surface-0);
+  --bone-300: var(--surface-3);
+  --ash-500: var(--ink-500);
+  --oxide-500: var(--signal-500);
+  --sea-500: var(--cold-500);
+  --paper-surface: var(--surface-1);
+  --paper-ink: var(--ink-950);
+  --paper-muted: var(--ink-500);
+  --rule: var(--line);
+  --rule-strong: var(--line-strong);
+  --rule-paper: var(--line);
 
   --font-display:
-    "Iowan Old Style", Baskerville, "Palatino Linotype", "Noto Serif CJK SC",
-    "Songti SC", SimSun, serif;
+    "Arial Narrow", "Aptos Narrow", "Roboto Condensed", "Segoe UI Variable",
+    "Segoe UI", "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-body:
     Aptos, "Segoe UI Variable", "Segoe UI", "Noto Sans", "PingFang SC",
     "Microsoft YaHei", sans-serif;
@@ -44,13 +52,13 @@
   --font-meta:
     "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
-  --type-meta: clamp(0.7rem, 0.67rem + 0.12vw, 0.78rem);
-  --type-body: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
-  --type-lede: clamp(1.14rem, 1.04rem + 0.46vw, 1.42rem);
-  --type-h3: clamp(1.28rem, 1.12rem + 0.72vw, 1.75rem);
-  --type-h2: clamp(2rem, 1.56rem + 1.9vw, 3.45rem);
-  --type-page: clamp(2.8rem, 2.15rem + 3vw, 5.4rem);
-  --type-hero: clamp(3.45rem, 2.15rem + 6.4vw, 8.8rem);
+  --type-meta: clamp(0.68rem, 0.65rem + 0.12vw, 0.76rem);
+  --type-body: clamp(0.98rem, 0.95rem + 0.16vw, 1.07rem);
+  --type-lede: clamp(1.08rem, 1.02rem + 0.32vw, 1.28rem);
+  --type-h3: clamp(1.18rem, 1.08rem + 0.48vw, 1.48rem);
+  --type-h2: clamp(1.62rem, 1.38rem + 1.05vw, 2.35rem);
+  --type-page: clamp(2.35rem, 1.9rem + 2vw, 3.9rem);
+  --type-hero: clamp(3.1rem, 2.1rem + 4.7vw, 6.6rem);
 
   --space-1: 0.375rem;
   --space-2: 0.75rem;

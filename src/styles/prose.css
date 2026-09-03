@@ -1,6 +1,6 @@
 .prose {
   max-width: var(--text);
-  color: var(--bone-200);
+  color: var(--ink-800);
   font-size: var(--type-body);
   line-height: 1.78;
   overflow-wrap: anywhere;
@@ -13,15 +13,17 @@
 .prose h2,
 .prose h3 {
   margin-top: 2.25em;
-  color: var(--bone-100);
+  color: var(--ink-950);
 }
 
 .prose h2 {
-  font-size: clamp(1.65rem, 1.4rem + 1.1vw, 2.35rem);
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--line-strong);
+  font-size: clamp(1.45rem, 1.3rem + 0.7vw, 1.95rem);
 }
 
 .prose h3 {
-  font-size: clamp(1.25rem, 1.12rem + 0.55vw, 1.6rem);
+  font-size: clamp(1.18rem, 1.08rem + 0.42vw, 1.45rem);
 }
 
 .prose ul,
@@ -35,9 +37,10 @@
 
 .prose blockquote {
   margin-inline: 0;
-  padding: 0.25rem 0 0.25rem 1.25rem;
-  border-left: 2px solid var(--oxide-500);
-  color: var(--bone-300);
+  padding: 0.55rem 1rem;
+  border-left: 0.3rem solid var(--signal-500);
+  color: var(--ink-650);
+  background: rgb(59 60 54 / 0.045);
 }
 
 .prose code {
@@ -46,12 +49,18 @@
   overflow-wrap: anywhere;
 }
 
+.prose code:not(pre code) {
+  padding: 0.08em 0.28em;
+  background: rgb(41 42 38 / 0.08);
+}
+
 .prose pre {
   max-width: 100%;
   overflow-x: auto;
   padding: 1rem;
-  border: 1px solid var(--rule);
-  background: var(--carbon-975);
+  border: 1px solid var(--line-strong);
+  color: var(--surface-1);
+  background: var(--ink-950);
   white-space: pre;
 }
 
@@ -70,15 +79,16 @@
 .prose th,
 .prose td {
   padding: 0.65rem 0.8rem;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
 }
 
 .prose th {
+  background: rgb(59 60 54 / 0.07);
   font-family: var(--font-meta);
   font-size: var(--type-meta);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .prose figure {
@@ -93,7 +103,7 @@
 
 .prose figcaption {
   margin-top: var(--space-2);
-  color: var(--ash-500);
+  color: var(--ink-500);
   font-family: var(--font-meta);
   font-size: var(--type-meta);
 }
@@ -101,23 +111,21 @@
 .prose hr {
   margin-block: var(--space-6);
   border: 0;
-  border-top: 1px solid var(--rule);
+  border-top: 1px solid var(--line-strong);
 }
 
+/* Reading mode remains warmer and more book-like than the UI around it. */
 .note-page--paper {
   color: var(--paper-ink);
   background:
-    radial-gradient(circle at 8% 12%, rgb(168 100 78 / 0.045), transparent 18rem),
-    radial-gradient(circle at 92% 84%, rgb(41 42 37 / 0.04), transparent 23rem),
+    linear-gradient(90deg, rgb(41 42 38 / 0.024) 1px, transparent 1px),
     var(--paper-surface);
-  border: 1px solid rgb(226 221 207 / 0.28);
-  box-shadow: 0 2rem 5rem rgb(0 0 0 / 0.28);
+  background-size: 3.5rem 100%;
 }
 
 .note-page--paper .note-page__registration {
-  padding-inline: clamp(1.25rem, 5vw, 4rem);
-  border-color: var(--rule-paper);
-  color: var(--paper-muted);
+  color: var(--surface-1);
+  background: var(--ink-950);
 }
 
 .note-page--paper .note-page__header {
@@ -142,8 +150,7 @@
 
 .note-page--paper .prose {
   max-width: none;
-  padding: clamp(2.25rem, 7vw, 5rem) clamp(1.25rem, 5vw, 4rem)
-    clamp(3.5rem, 9vw, 7rem);
+  padding: clamp(2.25rem, 7vw, 5rem) clamp(1.25rem, 5vw, 4rem) clamp(3.5rem, 9vw, 7rem);
   color: var(--paper-ink);
   font-family: var(--font-reading);
   font-size: clamp(1.04rem, 1rem + 0.2vw, 1.16rem);
@@ -159,11 +166,7 @@
 .note-page--paper .prose h2,
 .note-page--paper .prose h3,
 .note-page--paper .prose a {
-  color: #181a17;
-}
-
-.note-page--paper .prose a {
-  text-decoration-color: var(--oxide-500);
+  color: var(--paper-ink);
 }
 
 .note-page--paper :focus-visible {
@@ -172,7 +175,7 @@
 }
 
 .note-page--paper .prose blockquote {
-  border-color: var(--oxide-500);
+  border-color: var(--signal-500);
   color: #48483f;
 }
 
@@ -180,12 +183,8 @@
   color: var(--paper-muted);
 }
 
-.note-page--paper .prose code:not(pre code) {
-  background: rgb(41 42 37 / 0.08);
-}
-
 .note-page--paper .prose pre {
-  color: var(--bone-100);
+  color: var(--surface-1);
   background: var(--paper-ink);
 }
 
@@ -195,9 +194,33 @@
 }
 
 .note-page--dark {
-  padding: clamp(1.25rem, 4vw, 3rem);
-  border: 1px solid var(--rule);
-  background: rgb(17 20 18 / 0.72);
+  color: var(--surface-1);
+  background: var(--ink-950);
+}
+
+.note-page--dark .note-page__registration {
+  border-color: rgb(233 228 207 / 0.18);
+  background: #1f201d;
+}
+
+.note-page--dark .note-page__header,
+.note-page--dark .note-page__metadata,
+.note-page--dark .note-page__metadata div {
+  border-color: rgb(233 228 207 / 0.18);
+}
+
+.note-page--dark .eyebrow,
+.note-page--dark .note-page__metadata dt,
+.note-page--dark .prose,
+.note-page--dark .lede {
+  color: var(--surface-3);
+}
+
+.note-page--dark h1,
+.note-page--dark .prose h2,
+.note-page--dark .prose h3,
+.note-page--dark .prose a {
+  color: var(--surface-1);
 }
 
 @media (max-width: 38rem) {
@@ -206,14 +229,13 @@
   }
 
   .note-shell > .breadcrumb {
-    width: calc(100% - 1.5rem);
+    width: calc(100% - 1.25rem);
     margin-inline: auto;
   }
 
-  .note-page--paper {
+  .note-page {
     border-right: 0;
     border-left: 0;
-    box-shadow: none;
   }
 
   .note-page--paper .note-page__registration,

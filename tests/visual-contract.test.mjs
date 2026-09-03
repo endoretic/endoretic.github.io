@@ -144,6 +144,30 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.match(html, /foreground-artifact--megastructure/i);
 });
 
+test("the owner-directed pale interface remains the primary visual surface", () => {
+  const tokens = readFileSync(
+    join(repositoryRoot, "src/styles/tokens.css"),
+    "utf8",
+  );
+  const globalCss = readFileSync(
+    join(repositoryRoot, "src/styles/global.css"),
+    "utf8",
+  );
+
+  assert.match(tokens, /color-scheme:\s*light/);
+  assert.match(tokens, /--surface-0:\s*#d8d3bd/);
+  assert.match(tokens, /--ink-950:\s*#292a26/);
+  assert.match(globalCss, /body\s*\{[\s\S]*var\(--surface-0\)/);
+  assert.match(
+    globalCss,
+    /\.site-nav a\[aria-current="page"\][\s\S]*background:\s*var\(--ink-950\)/,
+  );
+  assert.match(
+    globalCss,
+    /@media \(max-width:\s*38rem\)[\s\S]*\.site-nav\s*\{[\s\S]*grid-template-columns:\s*repeat\(6/,
+  );
+});
+
 test("raster scenes retain their inline SVG loading fallback", () => {
   const component = readFileSync(
     join(sourceRoot, "components/SceneVignette.astro"),

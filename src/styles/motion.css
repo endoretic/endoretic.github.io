@@ -1,7 +1,9 @@
 @media (prefers-reduced-motion: no-preference) {
   a,
   .record-card,
-  .note-card {
+  .note-card,
+  .record-card__registration,
+  .site-nav a {
     transition:
       color 180ms ease,
       border-color 220ms ease,
@@ -20,13 +22,23 @@
     .record-card:hover,
     .note-card:hover {
       border-color: var(--rule-strong);
-      background-color: rgb(30 31 26 / 0.92);
+      background-color: rgb(233 228 207 / 0.78);
+    }
+
+    .record-card:hover .record-card__registration {
+      color: var(--surface-1);
+      background-color: var(--ink-950);
     }
   }
 
   .record-card:focus-within,
   .note-card:focus-within {
-    border-color: var(--oxide-500);
+    border-color: var(--signal-500);
+  }
+
+  .record-card:focus-within .record-card__registration {
+    color: var(--surface-1);
+    background-color: var(--ink-950);
   }
 }
 

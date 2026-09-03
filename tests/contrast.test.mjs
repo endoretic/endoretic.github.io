@@ -29,9 +29,6 @@ const hex = (value) => [
   parseInt(value.slice(3, 5), 16),
   parseInt(value.slice(5, 7), 16),
 ];
-const composite = (base, layer, alpha) =>
-  base.map((value, index) => value + alpha * (layer[index] - value));
-
 const declaration = (name) => {
   const line = tokens
     .split(/\r?\n/)
@@ -46,48 +43,17 @@ const token = (name) => {
   return hex(value.slice(0, 7));
 };
 
-const alphaOf = (name) => {
-  const value = declaration(name);
-  const slash = value.lastIndexOf("/");
-  assert.ok(slash !== -1, name + " should carry an alpha channel");
-  const alpha = Number.parseFloat(value.slice(slash + 1));
-  assert.ok(
-    Number.isFinite(alpha) && alpha >= 0 && alpha <= 1,
-    name + " has an unreadable alpha",
-  );
-  return alpha;
-};
-
-/*
- * The page ground is a stack of translucent warm and cool light over a dark
- * gradient, and muted body copy sits directly on it. A glow layer added for
- * atmosphere once pushed muted text to 2.2:1, so the alpha of these layers is
- * bounded by contrast rather than by taste.
- *
- * This composites every layer at full strength over each stop of the base
- * gradient, which is stricter than what the page actually renders, since the
- * radial layers peak in different places and never all reach full strength at
- * one point. Passing here means the real page has margin in hand.
- */
-test("muted text keeps WCAG AA over the page atmosphere", () => {
-  const khaki = Number.parseFloat(
-    globalCss.match(/rgb\(103 95 69 \/ ([\d.]+)\)/)?.[1] ?? "1",
-  );
+test("interface text keeps WCAG AA across the pale display surfaces", () => {
   const grounds = [
-    token("--carbon-975"),
-    token("--indigo-700"),
-    hex("#20221d"),
-    token("--carbon-925"),
+    token("--surface-0"),
+    token("--surface-1"),
+    token("--surface-2"),
   ];
-  const texts = ["--ash-500", "--bone-300", "--bone-200", "--bone-100"];
+  const texts = ["--ink-950", "--ink-800", "--ink-650", "--ink-500"];
 
   for (const ground of grounds) {
-    let background = composite(ground, [103, 95, 69], khaki);
-    background = composite(background, [177, 126, 93], alphaOf("--glow-warm"));
-    background = composite(background, [119, 143, 135], alphaOf("--glow-cool"));
-
     for (const name of texts) {
-      const ratio = contrast(token(name), background);
+      const ratio = contrast(token(name), ground);
       assert.ok(
         ratio >= 4.5,
         name +
@@ -96,6 +62,13 @@ test("muted text keeps WCAG AA over the page atmosphere", () => {
           ":1, below AA",
       );
     }
+  }
+});
+
+test("the oxidised signal remains readable on every pale surface", () => {
+  for (const ground of ["--surface-0", "--surface-1", "--surface-2"]) {
+    const ratio = contrast(token("--signal-500"), token(ground));
+    assert.ok(ratio >= 4.5, `--signal-500 on ${ground} is ${ratio.toFixed(2)}:1`);
   }
 });
 
