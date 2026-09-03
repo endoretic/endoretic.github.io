@@ -135,8 +135,10 @@ the site into `public/media/generated/`.
 
 User-supplied photographic inputs are retained separately under
 `assets/source/original/`. The current `spine-city-viaduct-source.jpg` input and
-its `spine-archive-study-01-source.png` stylized master remain non-production
-assets until the photograph's authorship or reuse permission is confirmed.
+its `spine-archive-study-01-v2-source.png` preferred stylized master are cleared
+for this project by the site owner's confirmed authorization and contract. They
+remain source-only until a page placement and responsive exports are selected;
+the warmer first-pass master is retained as iteration history.
 
 ## Optional ambience
 
