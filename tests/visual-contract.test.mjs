@@ -139,9 +139,27 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
   assert.match(html, /data-scene-mode="image"/i);
-  assert.match(html, /\/media\/generated\/scene-hall-01-1280\.avif/i);
   assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
   assert.match(html, /foreground-artifact--megastructure/i);
+  assert.match(html, /class="site-background-art"/i);
+});
+
+test("the monument is a document background and the home hero has no record rail", () => {
+  const layout = readFileSync(
+    join(repositoryRoot, "src/layouts/BaseLayout.astro"),
+    "utf8",
+  );
+  const home = readFileSync(join(sourceRoot, "pages/index.astro"), "utf8");
+  const globalCss = readFileSync(
+    join(repositoryRoot, "src/styles/global.css"),
+    "utf8",
+  );
+
+  assert.match(layout, /class="site-background-art"/);
+  assert.match(layout, /ForegroundArtifact variant="megastructure"/);
+  assert.doesNotMatch(home, /ForegroundArtifact|SceneVignette/);
+  assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*position:\s*absolute/);
+  assert.doesNotMatch(globalCss, /\.hero__grid::before/);
 });
 
 test("the owner-directed pale interface remains the primary visual surface", () => {

@@ -1,6 +1,7 @@
 ---
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
+import ForegroundArtifact from "../components/ForegroundArtifact.astro";
 import { SITE, type SiteLanguage } from "../data/site";
 import "../styles/tokens.css";
 import "../styles/global.css";
@@ -57,6 +58,9 @@ const canonical = new URL(Astro.url.pathname, SITE.url);
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="site-background-art" aria-hidden="true">
+      <ForegroundArtifact variant="megastructure" />
+    </div>
     <SiteHeader />
     <main id="main-content" tabindex="-1">
       <slot />
