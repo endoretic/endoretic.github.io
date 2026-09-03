@@ -1,0 +1,24 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class:list={["record-locator", className]}
+  viewBox="0 0 76 76"
+  aria-hidden="true"
+  focusable="false"
+>
+  <g class="record-locator__corners">
+    <path d="M8 25V9h19" />
+    <path d="M50 9h18v17" />
+    <path d="M68 50v17H49" />
+    <path d="M27 67H8V49" />
+  </g>
+  <path class="record-locator__gate" d="M26 22h24v32H22V29" />
+  <path class="record-locator__signal" d="M22 22h9" />
+  <circle class="record-locator__index" cx="56.5" cy="56.5" r="1.5" />
+</svg>

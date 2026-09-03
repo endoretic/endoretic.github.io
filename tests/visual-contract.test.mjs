@@ -161,10 +161,12 @@ test("project artwork is a masked underlay rather than a banner row", () => {
   );
 
   assert.match(component, /RecordArtwork/);
+  assert.match(component, /RecordLocator/);
   assert.doesNotMatch(component, /SceneVignette/);
   assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
   assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*position:\s*absolute/);
   assert.match(globalCss, /\.record-artwork\s*\{[\s\S]*mask-image:/);
+  assert.match(globalCss, /\.record-locator\s*\{[\s\S]*right:\s*0\.8rem[\s\S]*bottom:\s*0\.75rem/);
 });
 
 test("the monument is a document background and the hero rail stays record-sized", () => {
@@ -182,6 +184,8 @@ test("the monument is a document background and the hero rail stays record-sized
   assert.match(layout, /ForegroundArtifact variant="megastructure"/);
   assert.doesNotMatch(home, /ForegroundArtifact|SceneVignette/);
   assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*position:\s*absolute/);
+  assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*right:\s*0[\s\S]*bottom:\s*0/);
+  assert.doesNotMatch(globalCss, /body > \.site-background-art\s*\{[\s\S]*top:\s*clamp/);
   assert.doesNotMatch(globalCss, /\.hero__grid::before/);
   assert.match(globalCss, /\.hero__copy::before\s*\{[\s\S]*height:\s*5\.75rem/);
 });
