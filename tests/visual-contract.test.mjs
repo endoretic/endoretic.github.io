@@ -144,7 +144,7 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.match(html, /class="site-background-art"/i);
 });
 
-test("the monument is a document background and the home hero has no record rail", () => {
+test("the monument is a document background and the hero rail stays record-sized", () => {
   const layout = readFileSync(
     join(repositoryRoot, "src/layouts/BaseLayout.astro"),
     "utf8",
@@ -160,6 +160,7 @@ test("the monument is a document background and the home hero has no record rail
   assert.doesNotMatch(home, /ForegroundArtifact|SceneVignette/);
   assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*position:\s*absolute/);
   assert.doesNotMatch(globalCss, /\.hero__grid::before/);
+  assert.match(globalCss, /\.hero__copy::before\s*\{[\s\S]*height:\s*5\.75rem/);
 });
 
 test("the owner-directed pale interface remains the primary visual surface", () => {

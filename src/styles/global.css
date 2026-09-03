@@ -306,7 +306,7 @@ main {
 .hero__grid {
   position: relative;
   display: grid;
-  min-height: clamp(29rem, 58vh, 38rem);
+  min-height: clamp(32rem, 64vh, 42rem);
   grid-template-columns: minmax(18rem, 0.75fr) minmax(28rem, 1.25fr);
   align-items: center;
   gap: clamp(2rem, 4vw, 4rem);
@@ -316,6 +316,19 @@ main {
 .hero__copy {
   position: relative;
   z-index: 2;
+  padding-left: var(--space-4);
+}
+
+/* The rail belongs to record 00; it no longer spans the full hero. */
+.hero__copy::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0.28rem;
+  height: 5.75rem;
+  background: linear-gradient(to bottom, var(--ink-950) 0 62%, transparent 62% 74%, var(--signal-500) 74% 100%);
+  content: "";
+  transform: translateY(-50%);
 }
 
 .hero__index-line {
@@ -371,7 +384,7 @@ main {
 .hero-media__plate {
   position: relative;
   overflow: hidden;
-  min-height: clamp(18rem, 32vw, 27rem);
+  min-height: clamp(20rem, 35vw, 30rem);
   border: 1px solid var(--line-strong);
   background: var(--surface-2);
 }
@@ -476,21 +489,27 @@ main {
   display: grid;
   overflow: hidden;
   min-height: 0;
-  grid-template-columns: minmax(13rem, 0.62fr) minmax(18rem, 1.38fr);
+  grid-template-columns: minmax(22rem, 0.78fr) minmax(18rem, 1.22fr);
   align-items: center;
-  gap: clamp(2rem, 5vw, 5rem);
-  padding: clamp(2.75rem, 4vw, 4rem) clamp(1.5rem, 4vw, 4rem);
+  gap: var(--space-6);
+  padding-block: clamp(2.75rem, 4vw, 4rem);
   background: rgb(233 228 207 / 0.58);
 }
 
 .identity-section::before {
-  left: clamp(1.5rem, 4vw, 4rem);
+  left: 0;
 }
 
-.identity-section__heading,
+.identity-section__heading {
+  position: relative;
+  z-index: 1;
+  padding-left: var(--space-4);
+}
+
 .identity-section .pending-copy {
   position: relative;
   z-index: 1;
+  padding-right: var(--space-4);
 }
 
 .foreground-artifact {
@@ -1052,11 +1071,15 @@ main {
   .identity-section {
     align-content: start;
     gap: var(--space-4);
-    padding: var(--space-5);
+    padding-block: var(--space-5);
   }
 
   .identity-section::before {
-    left: var(--space-5);
+    left: 0;
+  }
+
+  .identity-section .pending-copy {
+    padding-inline: var(--space-4);
   }
 
   .note-card {
@@ -1150,12 +1173,11 @@ main {
   }
 
   .identity-section {
-    width: 100%;
-    padding-inline: 1.5rem;
+    width: min(calc(100% - 1.25rem), var(--shell));
   }
 
   .identity-section::before {
-    left: 1.5rem;
+    left: 0;
   }
 
   body > .site-background-art {
