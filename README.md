@@ -127,6 +127,12 @@ Repository-original generated art lives under `public/media/generated/` and may
 be referenced directly; it must still be responsive, local, and documented in
 the visual report. Remote fonts and remote media requests remain prohibited.
 
+High-resolution working masters for repository-original art live under
+`assets/source/generated/`. That directory is source storage, is not copied to
+the static build, and uses the same stable ID as its production derivatives
+with a `-source.png` suffix. Export only the responsive files actually used by
+the site into `public/media/generated/`.
+
 ## Optional ambience
 
 The single ambient track is a secondary preserved-memory or transmission
