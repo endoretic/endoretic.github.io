@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import NotationMotif from "./NotationMotif.astro";
 import RecordArtwork from "./RecordArtwork.astro";
+import RecordLocator from "./RecordLocator.astro";
 import { sceneForRecord } from "../lib/scene";
 
 interface Props {
@@ -67,4 +68,5 @@ const artwork = artworkByScene[scene];
     </div>
   </div>
   <RecordArtwork variant={artwork} class="record-card__artwork" />
+  <RecordLocator class="record-card__locator" />
 </article>
