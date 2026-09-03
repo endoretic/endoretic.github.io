@@ -25,6 +25,9 @@ const projects = defineCollection({
     repo: z.url().optional(),
     demo: z.url().optional(),
     coverAssetId: z.string().min(1).optional(),
+    // Optional override for the painted vignette on the record card.
+    // Omitted, the scene is derived deterministically from the slug.
+    coverScene: z.enum(["relay", "console", "hall", "coast"]).optional(),
   }),
 });
 

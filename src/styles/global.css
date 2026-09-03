@@ -265,7 +265,6 @@ time {
 .hero__facts,
 .record-card__registration,
 .record-card__meta,
-.record-card__diagram span,
 .note-card__meta,
 .record-metadata,
 .record-page__registration,
@@ -454,65 +453,6 @@ main {
   gap: clamp(2rem, 6vw, 6rem);
 }
 
-.identity-section__horizon {
-  position: relative;
-  min-height: clamp(13rem, 25vw, 20rem);
-  overflow: hidden;
-  border: 1px solid var(--rule);
-  background:
-    radial-gradient(circle at 72% 30%, rgb(229 223 210 / 0.74) 0 0.8rem, transparent 0.88rem),
-    radial-gradient(ellipse at 52% 110%, rgb(132 150 150 / 0.36), transparent 52%),
-    linear-gradient(176deg, #252c3d 0 56%, #9a716c 56.4% 58%, #2b3543 59% 74%, #141925 75%);
-  box-shadow: inset 0 -3rem 5rem rgb(7 10 17 / 0.32);
-}
-
-.identity-section__horizon::before,
-.identity-section__horizon::after {
-  position: absolute;
-  content: "";
-}
-
-.identity-section__horizon::before {
-  right: 19%;
-  bottom: 22%;
-  width: 1.4rem;
-  height: 36%;
-  border-radius: 50% 50% 0 0;
-  background: #111723;
-  box-shadow: 0 0 0 1px rgb(229 223 210 / 0.08);
-}
-
-.identity-section__horizon::after {
-  right: 19%;
-  bottom: 8%;
-  width: 1px;
-  height: 13%;
-  background: rgb(184 115 104 / 0.42);
-}
-
-.identity-section__moon,
-.identity-section__shore,
-.identity-section__reflection {
-  position: absolute;
-  display: block;
-}
-
-.identity-section__shore {
-  right: 0;
-  bottom: 19%;
-  width: 52%;
-  border-top: 1px solid rgb(229 223 210 / 0.22);
-  transform: rotate(-2deg);
-}
-
-.identity-section__reflection {
-  right: 9%;
-  bottom: 11%;
-  width: 34%;
-  height: 1.6rem;
-  border-block: 1px solid rgb(132 150 150 / 0.16);
-}
-
 .section-heading {
   margin-bottom: var(--space-5);
   align-items: end;
@@ -627,49 +567,55 @@ main {
   margin-top: auto;
 }
 
-.record-card__diagram {
+/*
+ * Painted scene vignettes. The art fills its frame; the caption stays
+ * available to assistive technology and is not drawn over the picture.
+ */
+.scene-vignette {
   position: relative;
-  overflow: hidden;
-  border-top: 1px solid var(--rule);
-  background: linear-gradient(180deg, #252d40, #38404b 58%, #141a26);
+  display: grid;
+  min-width: 0;
+  margin: 0;
 }
 
-.record-card__diagram svg {
+.scene-vignette svg {
+  display: block;
   width: 100%;
   height: 100%;
-  fill: none;
-  stroke: var(--rule-strong);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
+  min-height: 0;
 }
 
-.record-card__sky {
-  fill: transparent;
-  stroke: none;
-}
-
-.record-card__horizon {
-  fill: rgb(13 16 24 / 0.72);
-  stroke: rgb(132 150 150 / 0.34);
-}
-
-.record-card__ruin {
-  fill: rgb(13 16 24 / 0.88);
-  stroke: rgb(229 223 210 / 0.3);
-}
-
-.record-card__reflection {
-  stroke: rgb(184 115 104 / 0.36);
-}
-
-.record-card__diagram span {
+.scene-vignette figcaption {
   position: absolute;
-  right: var(--space-3);
-  bottom: var(--space-2);
-  color: var(--ash-500);
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.record-card__scene {
+  overflow: hidden;
+  border-top: 1px solid var(--rule);
+}
+
+.identity-section__scene {
+  overflow: hidden;
+  min-height: clamp(13rem, 25vw, 20rem);
+  border: 1px solid var(--rule);
+  box-shadow: 0 1.5rem 4rem rgb(3 6 14 / 0.28);
+}
+
+.not-found__scene {
+  position: absolute;
+  z-index: 0;
+  overflow: hidden;
+  inset: 0;
+  border: 1px solid var(--rule);
+  opacity: 0.5;
 }
 
 .note-list {

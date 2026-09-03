@@ -1,0 +1,416 @@
+---
+/*
+ * Original painted scene vignettes for endoretic.cc.
+ *
+ * These are compositions, not diagrams. They avoid the stroked traces, dials,
+ * coordinates, and calibration marks of an engineering drawing, and they are
+ * built instead from the things a painted background is built from: a graded
+ * sky, soft-edged cloud, atmospheric haze that lifts distant shapes toward the
+ * sky colour, silhouettes, and a single warm light source.
+ *
+ * Softness comes from radial gradients that fade to transparent rather than
+ * from SVG filters. Gradients cost nothing to composite, cannot blow out a
+ * filter region, and keep the whole vignette resolution independent.
+ *
+ * No scene depicts a real place, machine, or product, and none is traced from
+ * or modelled on any existing image or commercial work.
+ *
+ * Every instance is decorative and marked aria-hidden. A readable caption
+ * always accompanies it, and no scene carries information found nowhere else.
+ */
+
+import { nextUid } from "../lib/uid";
+
+export type SceneVariant = "relay" | "console" | "hall" | "coast";
+
+interface Props {
+  variant: SceneVariant;
+  caption?: string;
+  class?: string;
+}
+
+const { variant, caption, class: className } = Astro.props;
+
+// Gradient ids must be unique per instance so that several vignettes can share
+// a page without one instance's <defs> capturing another's fill references.
+const uid = nextUid(`sv-${variant}`);
+const ref = (name: string) => `url(#${uid}-${name})`;
+
+const captions: Record<SceneVariant, string> = {
+  relay: "Painted scene: a derelict antenna ring at dusk.",
+  console: "Painted scene: an unattended control room at blue hour.",
+  hall: "Painted scene: an archival hall receding into fog.",
+  coast: "Painted scene: a quiet coastline at night after rain.",
+};
+const captionText = caption ?? captions[variant];
+---
+
+<figure class:list={["scene-vignette", `scene-vignette--${variant}`, className]}>
+  <svg
+    viewBox="0 0 560 210"
+    preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true"
+    focusable="false"
+    data-scene-vignette={variant}
+  >
+    {
+      variant === "relay" && (
+        <>
+          <defs>
+            <linearGradient id={`${uid}-sky`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0c1024" />
+              <stop offset="28%" stop-color="#20264a" />
+              <stop offset="52%" stop-color="#3d3760" />
+              <stop offset="70%" stop-color="#6d4f68" />
+              <stop offset="82%" stop-color="#a86c62" />
+              <stop offset="90%" stop-color="#cf8d6a" />
+              <stop offset="100%" stop-color="#e6b78e" />
+            </linearGradient>
+            {/* Soft-edged cloud: opaque at the core, gone at the rim. */}
+            <radialGradient id={`${uid}-cloud`}>
+              <stop offset="0%" stop-color="#f4d2b4" stop-opacity="0.5" />
+              <stop offset="55%" stop-color="#e8bda8" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="#d9aa9c" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id={`${uid}-coolcloud`}>
+              <stop offset="0%" stop-color="#c9c2d8" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#b9b2cc" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id={`${uid}-horizonglow`}>
+              <stop offset="0%" stop-color="#ffd0a0" stop-opacity="0.6" />
+              <stop offset="100%" stop-color="#e8a578" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id={`${uid}-lamp`}>
+              <stop offset="0%" stop-color="#ffe3ba" stop-opacity="1" />
+              <stop offset="28%" stop-color="#f0a86a" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="#e29a63" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient id={`${uid}-ground`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2c2438" />
+              <stop offset="100%" stop-color="#0e0f1a" />
+            </linearGradient>
+          </defs>
+
+          <rect width="560" height="210" fill={ref("sky")} />
+
+          {/* Cloud shelves. Cool and thin high up, warm and flat near the light. */}
+          <ellipse cx="150" cy="46" rx="200" ry="20" fill={ref("coolcloud")} />
+          <ellipse cx="410" cy="70" rx="230" ry="16" fill={ref("coolcloud")} />
+          <ellipse cx="250" cy="104" rx="260" ry="14" fill={ref("cloud")} opacity="0.7" />
+          <ellipse cx="430" cy="126" rx="220" ry="11" fill={ref("cloud")} opacity="0.85" />
+          <ellipse cx="120" cy="140" rx="190" ry="9" fill={ref("cloud")} opacity="0.6" />
+
+          {/* The light itself, sitting on the horizon behind everything. */}
+          <ellipse cx="300" cy="176" rx="260" ry="36" fill={ref("horizonglow")} />
+
+          {/* Far ridge, lifted toward the sky colour by distance. */}
+          <path
+            d="M0 166c72-7 120 4 178-1 66-6 104-11 168-7 62 4 118-2 214-8v70H0z"
+            fill="#5b4a63"
+            opacity="0.42"
+          />
+
+          {/* The ring: a broken lattice arc, read as silhouette only. */}
+          <g fill="#15172a" opacity="0.95">
+            <path d="M392 158a64 64 0 0 1 122-27l-11 5a52 52 0 0 0-99 22z" />
+            <path d="M514 131a64 64 0 0 1-20 46l-8-9a52 52 0 0 0 17-37z" />
+            <path d="M440 184a64 64 0 0 0 34 9v10a74 74 0 0 1-41-11z" />
+            <rect x="448" y="129" width="5" height="61" />
+            <rect x="498" y="142" width="4" height="48" />
+            <path d="M432 190h92l7 8h-106z" />
+          </g>
+
+          {/* Thin growth taking the lower supports. */}
+          <path
+            d="M428 190c6-9 10-5 12-13 3 9 8 6 11 13zM506 190c5-8 9-4 11-11 3 8 7 5 10 11z"
+            fill="#1b2626"
+            opacity="0.75"
+          />
+
+          {/* The one warm point in the frame. */}
+          <circle cx="470" cy="137" r="20" fill={ref("lamp")} />
+          <circle cx="470" cy="137" r="1.6" fill="#fff1d8" />
+
+          <path d="M0 188c130-5 250-3 560-1v23H0z" fill={ref("ground")} />
+        </>
+      )
+    }
+
+    {
+      variant === "console" && (
+        <>
+          <defs>
+            <linearGradient id={`${uid}-room`} x1="0.1" y1="0" x2="0.9" y2="1">
+              <stop offset="0%" stop-color="#090c18" />
+              <stop offset="55%" stop-color="#131829" />
+              <stop offset="100%" stop-color="#1b2134" />
+            </linearGradient>
+            <linearGradient id={`${uid}-window`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#54708f" />
+              <stop offset="44%" stop-color="#8ba3b6" />
+              <stop offset="70%" stop-color="#bcc4c3" />
+              <stop offset="100%" stop-color="#63757f" />
+            </linearGradient>
+            <linearGradient id={`${uid}-shaft`} x1="0.85" y1="0" x2="0.1" y2="1">
+              <stop offset="0%" stop-color="#c8d8e4" stop-opacity="0.26" />
+              <stop offset="60%" stop-color="#c8d8e4" stop-opacity="0.06" />
+              <stop offset="100%" stop-color="#c8d8e4" stop-opacity="0" />
+            </linearGradient>
+            <radialGradient id={`${uid}-panelglow`}>
+              <stop offset="0%" stop-color="#f4b06c" stop-opacity="0.45" />
+              <stop offset="60%" stop-color="#e09256" stop-opacity="0.12" />
+              <stop offset="100%" stop-color="#e09256" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id={`${uid}-windowbloom`}>
+              <stop offset="0%" stop-color="#b9cfdc" stop-opacity="0.34" />
+              <stop offset="100%" stop-color="#b9cfdc" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient id={`${uid}-desk`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2a3044" />
+              <stop offset="100%" stop-color="#0b0e17" />
+            </linearGradient>
+          </defs>
+
+          <rect width="560" height="210" fill={ref("room")} />
+
+          {/* Bloom spilling off the window into the dark interior. */}
+          <ellipse cx="452" cy="92" rx="180" ry="120" fill={ref("windowbloom")} />
+
+          {/* A tall window onto a dim flooded plain. */}
+          <rect x="392" y="16" width="142" height="136" fill={ref("window")} opacity="0.85" />
+          <rect x="392" y="106" width="142" height="46" fill="#4a5b68" opacity="0.45" />
+          <path
+            d="M392 100c28-4 46 2 68-1 24-3 44-5 74-3v7H392z"
+            fill="#3a4757"
+            opacity="0.5"
+          />
+          <rect x="392" y="103" width="142" height="3" fill="#d3dcd8" opacity="0.3" />
+          {/* Mullions, few and soft, so the window stays a light source. */}
+          <g fill="#0c101a" opacity="0.42">
+            <rect x="437" y="16" width="3" height="136" />
+            <rect x="486" y="16" width="3" height="136" />
+            <rect x="392" y="70" width="142" height="2" />
+          </g>
+
+          {/* Light falling across the floor in a soft diagonal. */}
+          <path d="M392 152 534 152 320 210 130 210z" fill={ref("shaft")} />
+
+          {/* The console: a long low mass, still faintly lit. */}
+          <ellipse cx="150" cy="160" rx="150" ry="26" fill={ref("panelglow")} />
+          <path d="M0 158h360l28 24H0z" fill={ref("desk")} />
+          <path d="M0 152h346l14 6H0z" fill="#394052" opacity="0.7" />
+
+          {/* Recessed indicators: rounded housings, uneven spacing, no text. */}
+          <g opacity="0.9">
+            <rect x="42" y="153.5" width="24" height="4" rx="2" fill="#e79a58" />
+            <rect x="76" y="153.5" width="11" height="4" rx="2" fill="#e79a58" opacity="0.62" />
+            <rect x="115" y="153.5" width="33" height="4" rx="2" fill="#9fd0d4" opacity="0.68" />
+            <rect x="181" y="153.5" width="9" height="4" rx="2" fill="#e79a58" opacity="0.45" />
+            <rect x="207" y="153.5" width="28" height="4" rx="2" fill="#9fd0d4" opacity="0.4" />
+            <circle cx="268" cy="155.5" r="2.4" fill="#ffd6a2" opacity="0.85" />
+            <circle cx="295" cy="155.5" r="2" fill="#9fd0d4" opacity="0.6" />
+          </g>
+
+          {/* Dust hanging in the light. */}
+          <g fill="#e2e9ed" opacity="0.26">
+            <circle cx="330" cy="120" r="1" />
+            <circle cx="358" cy="94" r="0.8" />
+            <circle cx="302" cy="142" r="0.9" />
+            <circle cx="376" cy="130" r="0.7" />
+            <circle cx="266" cy="112" r="0.7" />
+            <circle cx="344" cy="160" r="0.8" />
+          </g>
+
+          <rect y="190" width="560" height="20" fill="#070911" opacity="0.7" />
+        </>
+      )
+    }
+
+    {
+      variant === "hall" && (
+        <>
+          <defs>
+            <linearGradient id={`${uid}-air`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#080b16" />
+              <stop offset="46%" stop-color="#161d31" />
+              <stop offset="100%" stop-color="#0a0e18" />
+            </linearGradient>
+            <radialGradient id={`${uid}-fog`}>
+              <stop offset="0%" stop-color="#cfd8d4" stop-opacity="0.34" />
+              <stop offset="34%" stop-color="#8b98a8" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#7f8ea0" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id={`${uid}-lantern`}>
+              <stop offset="0%" stop-color="#ffe8c4" stop-opacity="1" />
+              <stop offset="26%" stop-color="#e8ae74" stop-opacity="0.34" />
+              <stop offset="100%" stop-color="#e0a468" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient id={`${uid}-floor`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#222a3c" />
+              <stop offset="100%" stop-color="#080b13" />
+            </linearGradient>
+            {/* Reflections fade downward, as they do on a shallow wet floor. */}
+            <linearGradient id={`${uid}-mirror`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8fa8ac" stop-opacity="0.1" />
+              <stop offset="100%" stop-color="#8fa8ac" stop-opacity="0" />
+            </linearGradient>
+            {/* The lamp's return on the floor: a bloom, not a drawn ellipse. */}
+            <radialGradient id={`${uid}-lampfloor`}>
+              <stop offset="0%" stop-color="#e8b478" stop-opacity="0.3" />
+              <stop offset="55%" stop-color="#d99a62" stop-opacity="0.08" />
+              <stop offset="100%" stop-color="#d99a62" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+
+          <rect width="560" height="210" fill={ref("air")} />
+
+          {/*
+           * Two receding rows. Each column tapers toward the vanishing point,
+           * and both its height and its contrast drop with distance, so depth
+           * is carried by atmosphere rather than by outline.
+           */}
+          <g fill="#0b0e18">
+            <path d="M0 0h46v168l-46 12z" opacity="0.96" />
+            <path d="M64 20h34v148l-34 6z" opacity="0.85" />
+            <path d="M116 40h25v122l-25 3z" opacity="0.68" />
+            <path d="M157 56h19v100l-19 2z" opacity="0.52" />
+            <path d="M191 68h14v82l-14 1z" opacity="0.38" />
+            <path d="M219 78h10v66h-10z" opacity="0.26" />
+            <path d="M241 86h7v52h-7z" opacity="0.17" />
+          </g>
+          <g fill="#0b0e18">
+            <path d="M514 0h46v180l-46-12z" opacity="0.96" />
+            <path d="M462 20h34v154l-34-6z" opacity="0.85" />
+            <path d="M419 40h25v125l-25-3z" opacity="0.68" />
+            <path d="M384 56h19v102l-19-2z" opacity="0.52" />
+            <path d="M355 68h14v83l-14-1z" opacity="0.38" />
+            <path d="M331 78h10v66h-10z" opacity="0.26" />
+            <path d="M312 86h7v52h-7z" opacity="0.17" />
+          </g>
+
+          {/* Fog sits in front of the rows, dissolving the far end. */}
+          <ellipse cx="280" cy="118" rx="190" ry="74" fill={ref("fog")} />
+
+          {/* One suspended lamp, too far away to light the foreground. */}
+          <circle cx="280" cy="116" r="30" fill={ref("lantern")} />
+          <circle cx="280" cy="116" r="1.8" fill="#fff3dc" />
+
+          {/* Polished floor returning a soft doubled reflection. */}
+          <path d="M0 164h560v46H0z" fill={ref("floor")} />
+          <g fill={ref("mirror")}>
+            <rect x="0" y="164" width="46" height="34" />
+            <rect x="64" y="164" width="34" height="26" />
+            <rect x="116" y="164" width="25" height="19" />
+            <rect x="514" y="164" width="46" height="34" />
+            <rect x="462" y="164" width="34" height="26" />
+            <rect x="419" y="164" width="25" height="19" />
+          </g>
+          {/* The lamp's own reflection, soft and centred. */}
+          <ellipse cx="280" cy="170" rx="80" ry="14" fill={ref("lampfloor")} />
+        </>
+      )
+    }
+
+    {
+      variant === "coast" && (
+        <>
+          <defs>
+            <linearGradient id={`${uid}-night`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#070a15" />
+              <stop offset="42%" stop-color="#0e1729" />
+              <stop offset="72%" stop-color="#182739" />
+              <stop offset="100%" stop-color="#25404e" />
+            </linearGradient>
+            <radialGradient id={`${uid}-band`}>
+              <stop offset="0%" stop-color="#a9d6d8" stop-opacity="0.26" />
+              <stop offset="60%" stop-color="#8fbfc6" stop-opacity="0.08" />
+              <stop offset="100%" stop-color="#8fbfc6" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id={`${uid}-cloud`}>
+              <stop offset="0%" stop-color="#aebccb" stop-opacity="0.2" />
+              <stop offset="100%" stop-color="#aebccb" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient id={`${uid}-sea`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1d3341" />
+              <stop offset="100%" stop-color="#0a121a" />
+            </linearGradient>
+            <linearGradient id={`${uid}-sand`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#16202b" />
+              <stop offset="100%" stop-color="#080c12" />
+            </linearGradient>
+            {/* A light on water smears downward and fades, never a hard bar. */}
+            <linearGradient id={`${uid}-trail`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffcf95" stop-opacity="0.42" />
+              <stop offset="100%" stop-color="#ffcf95" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id={`${uid}-sheen`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#b9ccd6" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#b9ccd6" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+
+          <rect width="560" height="210" fill={ref("night")} />
+
+          {/* A faint cool band low on the horizon, no constellations above it. */}
+          <ellipse cx="300" cy="128" rx="300" ry="44" fill={ref("band")} />
+          <ellipse cx="150" cy="44" rx="150" ry="14" fill={ref("cloud")} />
+          <ellipse cx="420" cy="66" rx="170" ry="11" fill={ref("cloud")} />
+          <g fill="#e8eef2" opacity="0.4">
+            <circle cx="72" cy="24" r="0.8" />
+            <circle cx="198" cy="17" r="0.7" />
+            <circle cx="338" cy="32" r="0.7" />
+            <circle cx="472" cy="20" r="0.6" />
+            <circle cx="527" cy="50" r="0.6" />
+          </g>
+
+          {/*
+           * A low, irregular line of distant structures. Kept small, uneven,
+           * and close to the sky value so it reads as far away rather than as
+           * a barrier across the frame.
+           */}
+          <path
+            d="M0 133c48-1 62-5 78-5s22 4 40 3c26-1 34-7 52-7 14 0 20 6 44 6 30 0 44-8 66-8 18 0 26 7 52 7 22 0 32-5 50-5s28 5 56 4c40-1 70-4 122-3v9H0z"
+            fill="#101b28"
+            opacity="0.92"
+          />
+
+          {/* Two slender masts with faint steady beacons. */}
+          <rect x="196" y="104" width="1.4" height="30" fill="#101b28" />
+          <rect x="404" y="110" width="1.4" height="24" fill="#101b28" />
+          <circle cx="196.7" cy="103" r="1.5" fill="#e09a86" opacity="0.85" />
+          <circle cx="404.7" cy="109" r="1.3" fill="#e09a86" opacity="0.7" />
+
+          {/* A scatter of small warm lights along the shore. */}
+          <g fill="#ffcf95">
+            <circle cx="88" cy="130" r="1.1" opacity="0.9" />
+            <circle cx="158" cy="129" r="0.9" opacity="0.75" />
+            <circle cx="246" cy="130" r="1.2" opacity="0.95" />
+            <circle cx="352" cy="129" r="0.9" opacity="0.7" />
+            <circle cx="444" cy="131" r="1.1" opacity="0.85" />
+            <circle cx="300" cy="131" r="0.8" opacity="0.5" />
+          </g>
+
+          <path d="M0 138h560v40H0z" fill={ref("sea")} />
+
+          {/*
+           * Reflections: near-vertical smears that stay close to the width of
+           * their source and fade out. A shape that widens as it descends
+           * reads as a beam shining down rather than as light on water.
+           */}
+          <g fill={ref("trail")}>
+            <path d="M86.6 138h2.8l1 26h-4.8z" />
+            <path d="M244.4 138h3.2l1.2 30h-5.6z" />
+            <path d="M442.6 138h2.8l1 22h-4.8z" />
+            <path d="M156.8 138h2l0.8 18h-3.6z" opacity="0.6" />
+            <path d="M350.8 138h2l0.8 15h-3.6z" opacity="0.5" />
+          </g>
+
+          {/* Wet dark sand holding a mirror-flat sheen. */}
+          <path d="M0 172c150 7 300 3 560 8v30H0z" fill={ref("sand")} />
+          <path d="M0 172c150 7 300 3 560 8v10H0z" fill={ref("sheen")} />
+        </>
+      )
+    }
+  </svg>
+  <figcaption>{captionText}</figcaption>
+</figure>
