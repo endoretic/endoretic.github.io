@@ -178,16 +178,6 @@ time {
 .notation-motif {
   width: 3.25rem;
   height: auto;
-  /*
-   * Stated rather than inherited from the viewBox. The switch in the footer
-   * ships hidden and is revealed by script, and a hidden SVG that the client
-   * router has adopted from the parsed document comes back without its
-   * intrinsic ratio: height: auto then resolves to zero and the trigger
-   * collapses to nothing, leaving no way out of the language layer. Every
-   * motif is drawn on the same 72 x 18 grid, so naming the ratio costs
-   * nothing and removes the dependency on that recovery.
-   */
-  aspect-ratio: 72 / 18;
   flex: 0 0 auto;
   stroke: currentColor;
   stroke-linecap: square;

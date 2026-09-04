@@ -572,7 +572,7 @@ test("the hidden switch stays reachable by keyboard and assistive technology", (
   assert.match(layer, /trigger\.focus\(\)/);
 
   /* Progressive enhancement: no script, no switch, no broken furniture. */
-  assert.match(layer, /data-language-layer[\s\S]*?\n\s*hidden\n/);
+  assert.match(layer, /data-language-switch[\s\S]*?\n\s*hidden\n/);
   assert.match(layer, /root\.hidden = false;/);
 
   const styles = read("src/styles/hymmnos.css");
@@ -583,6 +583,42 @@ test("the hidden switch stays reachable by keyboard and assistive technology", (
    */
   assert.match(styles, /\.hy-meaning \{[\s\S]*?clip-path: inset\(50%\);/);
   assert.doesNotMatch(styles, /\.hy-meaning[^{]*\{[^}]*display:\s*none/);
+});
+
+test("the switch and the document flag cannot be confused for each other", () => {
+  const layer = read("src/components/LanguageLayer.astro");
+
+  /*
+   * Regression: both once used data-language-layer — the div in the footer as
+   * its identity, and the document element as the flag saying the layer is on.
+   * On a first load that was harmless, because the flag is only set after the
+   * lookup has already run. After a client-side navigation the flag is
+   * restored before the page is set up again, so querySelector returned <html>
+   * — which comes first in document order — the real switch was never
+   * revealed, and a reader in Hymmnos had no way back to English.
+   */
+  const rootLookup = layer.match(
+    /const root = document\.querySelector<HTMLElement>\("\[([a-z-]+)\]\"\)/,
+  );
+  assert.ok(rootLookup, "The switch root is no longer found by one attribute.");
+
+  const documentFlags = [
+    ...layer.matchAll(/documentElement\.dataset\.([A-Za-z]+)/g),
+  ].map(([, name]) => "data-" + name.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase()));
+
+  assert.ok(
+    documentFlags.length > 0,
+    "The layer no longer flags the document; this guard needs rewriting.",
+  );
+
+  for (const flag of documentFlags) {
+    assert.notEqual(
+      flag,
+      rootLookup[1],
+      `The switch container and the document flag both use ${flag}. ` +
+        "documentElement matches first, so the switch would stay hidden.",
+    );
+  }
 });
 
 test("motion in the decode is opt-in", () => {

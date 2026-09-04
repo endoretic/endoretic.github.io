@@ -35,9 +35,17 @@ interface Props {
 const { seed = "language-layer" } = Astro.props;
 ---
 
+{/*
+  * The marker is `data-language-switch`, not `data-language-layer`: that second
+  * name belongs to the flag the script sets on the document element while the
+  * layer is on. Sharing one name would put the attribute on both <html> and
+  * this div, and <html> comes first in document order, so the lookup would
+  * return the document, the real switch would never be revealed, and a reader
+  * in Hymmnos would have no way back to English.
+  */}
 <div
   class="language-layer"
-  data-language-layer
+  data-language-switch
   data-default-locale={DEFAULT_LOCALE}
   data-layer-locale={LAYER_LOCALE}
   data-locale-param={LOCALE_PARAM}
@@ -170,7 +178,7 @@ const { seed = "language-layer" } = Astro.props;
     bindings = new AbortController();
     const { signal } = bindings;
 
-    const root = document.querySelector<HTMLElement>("[data-language-layer]");
+    const root = document.querySelector<HTMLElement>("[data-language-switch]");
     const trigger = document.querySelector<HTMLButtonElement>(
       "[data-language-trigger]",
     );
