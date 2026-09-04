@@ -1333,11 +1333,22 @@ main {
   border-right: 0;
 }
 
-.credit-record dt,
-.credit-record__notes h4 {
+.credit-record dt {
   color: var(--ink-500);
   font-family: var(--font-meta);
   font-size: var(--type-meta);
+}
+
+/*
+ * Changes and Rights review head their own bodies of prose, so they are read as
+ * headings rather than scanned as field labels like the dt terms above. At meta
+ * size they were losing that job; a step up restores the rank without turning
+ * them into another tier of heading.
+ */
+.credit-record__notes h4 {
+  color: var(--ink-500);
+  font-family: var(--font-meta);
+  font-size: var(--type-meta-strong);
 }
 
 .credit-record dd {
