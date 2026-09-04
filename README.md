@@ -184,34 +184,52 @@ remain blocked. Reduced-motion mode keeps all audio UI static.
 
 ## Deployment
 
-The tracked root index.html and root CNAME are intentionally preserved as the
-existing deployment fallback. [TODO: verify the exact GitHub Pages source
-setting and the hosting mechanism for the two existing project subpaths.]
+.github/workflows/deploy.yml builds the Astro artifact and publishes dist/ to
+GitHub Pages on every push to main. It re-runs npm run build and npm test
+before uploading, and fails the build if dist/CNAME does not match
+public/CNAME, so a deployment cannot silently drop the custom domain.
 
 public/CNAME is copied into the Astro artifact and contains:
 
     endoretic.cc
 
-.github/workflows/verify.yml is validation-only. It has no Pages write
-permission, uploads no Pages artifact, and cannot replace the current
-deployment. This is intentional until the existing Pages source and subpath
-routing are verified.
+The workflow only publishes once Pages Source is set to GitHub Actions in
+repository settings. That setting is not code and must be changed by hand.
 
-Before enabling an artifact deployment:
+.github/workflows/verify.yml remains validation-only. It has no Pages write
+permission and uploads no artifact.
 
-1. Verify the Astro artifact locally and confirm dist/CNAME.
-2. Confirm that /, /pjsk-tier-maker/, and /score-calculator/ still have a
-   documented rollback path.
-3. If Pages is branch-published, manually change Pages Source to GitHub
-   Actions.
-4. Add or enable the reviewed deploy workflow.
-5. Verify the custom domain and HTTPS after deployment.
+### Verified hosting facts
+
+- This repository had no published Pages site. Both endoretic.github.io and
+  endoretic.cc returned GitHub's "Site not found" page, which is why every
+  path 404ed regardless of what was pushed.
+- The two project subpaths are published by their own repositories, not by
+  this one. endoretic.github.io/pjsk-tier-maker/ serves normally from
+  endoretic/pjsk-tier-maker.
+- Project sites are reachable under endoretic.cc/<repo>/ only while this user
+  site claims endoretic.cc as its custom domain. Those subpaths are currently
+  404 at the apex for that reason, and publishing this site restores them.
+- DNS is already correct: endoretic.cc resolves to GitHub Pages' apex
+  addresses (185.199.108-111.153), unproxied.
+- The Astro site publishes its own project pages under /works/<slug>/, so it
+  does not collide with the root-level /pjsk-tier-maker/ and
+  /score-calculator/ subpaths.
+
+### Enabling the deployment
+
+1. Set Settings > Pages > Source to GitHub Actions.
+2. Push to main, or run the Deploy to GitHub Pages workflow manually.
+3. Set the custom domain to endoretic.cc and enable Enforce HTTPS once the
+   first deployment succeeds.
+4. Confirm /, /works/, /pjsk-tier-maker/, and /score-calculator/.
 
 Cloudflare remains an external DNS concern. Do not change Cloudflare DNS,
 proxy, or SSL/TLS settings as part of a site-code deployment.
 
-Rollback is to restore the verified prior Pages source and the preserved root
-index.html plus root CNAME. DNS should not be changed for this rollback.
+To roll back, disable or revert deploy.yml and return Pages Source to a
+branch. The tracked root index.html and root CNAME are preserved as that
+fallback. DNS should not be changed for this rollback.
 
 ## Remaining content TODOs
 
