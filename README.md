@@ -126,16 +126,6 @@ nothing about the layer is fetched until a reader finds it, and no accessible
 name, alt text, `<title>`, or metadata is ever translated — so navigation,
 assistive technology, and search results are unaffected by it.
 
-The glyph font is self-hosted, deliberately kept out of `src/data/assets.yml`
-because it states no licence terms of its own, and disclosed in the
-always-visible Typeface section of `/credits`. Tracing its origin or replacing
-it with a font whose terms are stated is an open `[TODO]`; the layer degrades to
-readable Latin transcription without it.
-
-Fuller design notes live in `docs/HYMMNOS_LAYER.md`, which — like the rest of
-`docs/` and `AGENTS.md` — is local guidance and is not tracked in this
-repository.
-
 ## Media policy
 
 Every third-party asset must be registered in `src/data/assets.yml` before it
