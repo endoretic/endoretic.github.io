@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import ForegroundArtifact from "../components/ForegroundArtifact.astro";
@@ -56,6 +57,16 @@ const canonical = new URL(Astro.url.pathname, SITE.url);
     {indexable && <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{documentTitle}</title>
+    {/*
+      * Navigation swaps the body instead of reloading the document, which is
+      * what lets the retained recording keep playing from page to page. It is
+      * a progressive enhancement: without script the browser navigates
+      * normally and every page is still a complete document.
+      *
+      * Links that leave this site for a sibling one on the same origin opt out
+      * through outboundLink() in src/lib/nav.ts.
+      */}
+    <ClientRouter />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>

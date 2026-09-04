@@ -113,6 +113,8 @@ const { seed = "language-layer" } = Astro.props;
 </div>
 
 <script>
+  import { projectBodyKey } from "../lib/prose-key.mjs";
+
   /*
    * Applies a language catalog over already-rendered English, and draws the
    * Hymmnos entries in tower glyphs.
@@ -130,13 +132,52 @@ const { seed = "language-layer" } = Astro.props;
     glyphs: boolean;
   }
 
-  const root = document.querySelector<HTMLElement>("[data-language-layer]");
-  const trigger = document.querySelector<HTMLButtonElement>(
-    "[data-language-trigger]",
-  );
-  const panel = document.querySelector<HTMLElement>("[data-language-panel]");
+  /*
+   * Module scope, because the document outlives the page. With the client
+   * router a navigation swaps the body and leaves this module loaded, so the
+   * things that must survive a swap — the fetched catalog, the contract read
+   * off the markup — live out here, while everything bound to nodes that are
+   * about to be replaced is torn down and rebuilt per page.
+   */
+  let catalog: Record<string, string> | null = null;
+  let bindings: AbortController | null = null;
+  let contract: { layerLocale: string; storageKey: string } | null = null;
 
-  if (root && trigger && panel) {
+  /* Storage is a convenience; a browser refusing it must not break the page. */
+  const read = (name: string): string | null => {
+    try {
+      return window.localStorage.getItem(name);
+    } catch {
+      return null;
+    }
+  };
+
+  const write = (name: string, value: string): void => {
+    try {
+      window.localStorage.setItem(name, value);
+    } catch {
+      /* Private mode, or site data blocked. The layer still works this visit. */
+    }
+  };
+
+  const setup = (): void => {
+    /*
+     * One controller per page. Aborting it drops every listener belonging to
+     * the page being left — including the two on `document`, which outlives the
+     * swap and would otherwise collect another pair on every navigation.
+     */
+    bindings?.abort();
+    bindings = new AbortController();
+    const { signal } = bindings;
+
+    const root = document.querySelector<HTMLElement>("[data-language-layer]");
+    const trigger = document.querySelector<HTMLButtonElement>(
+      "[data-language-trigger]",
+    );
+    const panel = document.querySelector<HTMLElement>("[data-language-panel]");
+
+    if (!root || !trigger || !panel) return;
+
     const defaultLocale = root.dataset.defaultLocale ?? "en";
     const layerLocale = root.dataset.layerLocale ?? "x-hymmnos";
     const localeParam = root.dataset.localeParam ?? "layer";
@@ -148,41 +189,72 @@ const { seed = "language-layer" } = Astro.props;
      */
     const translitLabel = root.dataset.translitLabel ?? "Transliteration";
 
+    contract = { layerLocale, storageKey };
+
+    /*
+     * Interface strings carry their catalog key in `data-i18n`. Content
+     * strings — a project summary, whose English is frontmatter rather than
+     * catalog — carry theirs in `data-i18n-content`, because the English of an
+     * interface key is checked against the catalog byte for byte and a summary
+     * has no catalog English to be checked against. Once the layer is on, both
+     * are replaced identically.
+     */
+    /*
+     * Body prose arrives from markdown with nothing to key it by, so each
+     * paragraph is named here from its own text. Doing it before the targets
+     * are collected lets everything downstream treat prose and markup the same.
+     *
+     * A paragraph already carrying a key is left alone: on a second pass its
+     * text content is the glyph tier, and rehashing that would name a
+     * paragraph that does not exist.
+     */
+    for (const prose of document.querySelectorAll<HTMLElement>(
+      "[data-i18n-prose]",
+    )) {
+      const id = prose.dataset.i18nProse;
+      if (!id) continue;
+
+      for (const paragraph of prose.querySelectorAll<HTMLElement>(":scope > p")) {
+        if (paragraph.dataset.i18nContent !== undefined) continue;
+
+        const text = paragraph.textContent ?? "";
+        if (text.trim() === "") continue;
+
+        paragraph.dataset.i18nContent = projectBodyKey(id, text);
+        /* Prose sets its gloss below the line rather than lifting it out. */
+        paragraph.dataset.i18nFlow = "";
+      }
+    }
+
     const targets = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-i18n]"),
+      document.querySelectorAll<HTMLElement>("[data-i18n], [data-i18n-content]"),
     );
+
+    const catalogKey = (node: HTMLElement): string =>
+      node.dataset.i18n ?? node.dataset.i18nContent ?? "";
 
     /*
      * The rendered English is captured before anything is replaced. Restoring
      * from the page is exact and free, which is why only the Hymmnos catalog is
      * ever fetched.
+     *
+     * A persisted element arrives already translated: the recording keeps
+     * playing across a navigation, so its label survives the swap with the
+     * tiers still built. Its English has to be read back off the meaning tier,
+     * because its text content is now glyph transcription and reading that
+     * would make the way back out of the layer restore nonsense.
      */
     const english = new Map<HTMLElement, string>(
-      targets.map((node) => [node, node.textContent ?? ""]),
+      targets.map((node) => {
+        const meaning = node.querySelector<HTMLElement>(".hy-meaning");
+        return [node, (meaning ?? node).textContent ?? ""];
+      }),
     );
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let catalog: Record<string, string> | null = null;
     let locale = defaultLocale;
     let animation = 0;
     let restoreTimer = 0;
-
-    /* Storage is a convenience; a browser refusing it must not break the page. */
-    const read = (name: string): string | null => {
-      try {
-        return window.localStorage.getItem(name);
-      } catch {
-        return null;
-      }
-    };
-
-    const write = (name: string, value: string): void => {
-      try {
-        window.localStorage.setItem(name, value);
-      } catch {
-        /* Private mode, or site data blocked. The layer still works this visit. */
-      }
-    };
 
     /*
      * Structure, not just text. The glyph line is hidden from assistive
@@ -236,6 +308,38 @@ const { seed = "language-layer" } = Astro.props;
         node.replaceChildren(document.createTextNode(english.get(node) ?? ""));
       }
     };
+
+    /*
+     * Components that write their own labels hand the element back here instead
+     * of translating it themselves. The recording's controls are the reason:
+     * their text changes as it plays, and a component that rebuilt the tiers on
+     * its own would be deciding what a screen reader hears, which is the one
+     * thing this script keeps to itself.
+     *
+     * The caller has already written the English, so that is what gets recorded
+     * as the original. A control the page never touched is not in `targets`
+     * yet, and is added, or switching back to English would leave it behind.
+     */
+    const relabel = (node: HTMLElement): void => {
+      if (!targets.includes(node)) targets.push(node);
+      english.set(node, node.textContent ?? "");
+
+      if (locale !== layerLocale) return;
+
+      const text = catalog?.[catalogKey(node)];
+      if (text === undefined) return;
+
+      build(node, text, layerLocale, text);
+    };
+
+    document.addEventListener(
+      "endoretic:relabel",
+      (event) => {
+        const node = (event as CustomEvent<{ node?: unknown }>).detail?.node;
+        if (node instanceof HTMLElement) relabel(node);
+      },
+      { signal },
+    );
 
     /*
      * Sections that only exist inside the layer — the homage on /credits is the
@@ -384,9 +488,9 @@ const { seed = "language-layer" } = Astro.props;
 
       const entries: DecodeEntry[] = [];
       for (const node of targets) {
-        const text = catalog[node.dataset.i18n ?? ""];
+        const text = catalog[catalogKey(node)];
         if (text === undefined) continue;
-        const from = node.textContent ?? "";
+        const from = english.get(node) ?? "";
         /*
           * While animating, the line opens on the departing English and must be
           * marked as English, or the first frame draws Latin words in glyphs.
@@ -461,38 +565,58 @@ const { seed = "language-layer" } = Astro.props;
 
     panel
       .querySelector<HTMLButtonElement>("[data-language-close]")
-      ?.addEventListener("click", () => {
-        openPanel(false);
-        trigger.focus();
-      });
+      ?.addEventListener(
+        "click",
+        () => {
+          openPanel(false);
+          trigger.focus();
+        },
+        { signal },
+      );
 
-    trigger.addEventListener("click", () => {
-      /* `hidden` is `string | boolean` since `until-found`; only openness matters. */
-      openPanel(Boolean(panel.hidden));
-    });
+    trigger.addEventListener(
+      "click",
+      () => {
+        /* `hidden` is `string | boolean` since `until-found`; only openness matters. */
+        openPanel(Boolean(panel.hidden));
+      },
+      { signal },
+    );
 
     for (const option of panel.querySelectorAll<HTMLButtonElement>(
       "[data-language-option]",
     )) {
-      option.addEventListener("click", () => {
-        const next = option.dataset.languageOption ?? defaultLocale;
-        if (next !== locale) void apply(next, true);
-      });
+      option.addEventListener(
+        "click",
+        () => {
+          const next = option.dataset.languageOption ?? defaultLocale;
+          if (next !== locale) void apply(next, true);
+        },
+        { signal },
+      );
     }
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !panel.hidden) {
-        openPanel(false);
-        trigger.focus();
-      }
-    });
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "Escape" && !panel.hidden) {
+          openPanel(false);
+          trigger.focus();
+        }
+      },
+      { signal },
+    );
 
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!panel.hidden && target instanceof Node && !root.contains(target)) {
-        openPanel(false);
-      }
-    });
+    document.addEventListener(
+      "click",
+      (event) => {
+        const target = event.target;
+        if (!panel.hidden && target instanceof Node && !root.contains(target)) {
+          openPanel(false);
+        }
+      },
+      { signal },
+    );
 
     /*
      * The switch only exists for readers whose browser ran this. Without it the
@@ -514,11 +638,52 @@ const { seed = "language-layer" } = Astro.props;
     if (asked === layerLocale || (asked === null && remembered === layerLocale)) {
       /*
        * A remembered layer is the reader's settled state, so it arrives without
-       * theatre; a link that asks for it explicitly gets the decode.
+       * theatre; a link that asks for it explicitly gets the decode. Every page
+       * after the first is a remembered state, never a fresh reveal.
        */
       void apply(layerLocale, asked !== null);
     } else {
       markOptions();
     }
-  }
+  };
+
+  /*
+   * Two triggers, one run per page.
+   *
+   * The router fires astro:page-load on the window `load` event, which is after
+   * every image and stylesheet has settled. Waiting for it would leave a reader
+   * who has the layer remembered watching the page sit in English until the
+   * last asset arrived, so the first page is set up here instead, at the old
+   * timing: module scripts are deferred, so the footer is already parsed.
+   *
+   * astro:page-load then covers every page reached by navigating, since the
+   * router leaves this module loaded and nothing else would rebind the switch
+   * to the new markup. The token keeps the two from both firing on the first
+   * page, where a second run would restart a decode already in progress.
+   */
+  let pending = true;
+
+  const run = (): void => {
+    if (!pending) return;
+    pending = false;
+    setup();
+  };
+
+  run();
+
+  document.addEventListener("astro:page-load", run);
+
+  /*
+   * The router copies the incoming document's root attributes over the live
+   * ones, which drops the flag that selects the glyph face. Putting it back
+   * here, before the frame is painted rather than in `setup` after it, is what
+   * keeps a switched reader from seeing one frame of Latin on every navigation.
+   */
+  document.addEventListener("astro:after-swap", () => {
+    pending = true;
+
+    if (contract && read(contract.storageKey) === contract.layerLocale) {
+      document.documentElement.dataset.languageLayer = contract.layerLocale;
+    }
+  });
 </script>

@@ -2,7 +2,8 @@
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
 import NotationMotif from "../components/NotationMotif.astro";
-import { key, t } from "../lib/i18n";
+import { contentKey, key, projectSummaryKey, t } from "../lib/i18n";
+import { outboundLink } from "../lib/nav";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -10,6 +11,7 @@ interface Props {
 
 const { project } = Astro.props;
 const { data } = project;
+/* Metadata is never translated, in any layer: this stays the English summary. */
 const metadataDescription = data.placeholder
   ? "Project record is being assembled."
   : data.summary;
@@ -45,7 +47,9 @@ const metadataDescription = data.placeholder
           )}
         </p>
         <h1>{data.title}</h1>
-        <p class="lede">{data.summary}</p>
+        <p class="lede" data-i18n-flow {...contentKey(projectSummaryKey(project.id))}>
+          {data.summary}
+        </p>
 
         <dl class="record-metadata">
           {/* Values are identifiers, dates, and numbers: labels translate, data does not. */}
@@ -78,7 +82,12 @@ const metadataDescription = data.placeholder
         </dl>
       </header>
 
-      <div class="prose">
+      {/*
+        * The record id, so the language layer can name each paragraph of body
+        * prose. Nothing about the layer is stamped into the build; the keys are
+        * derived in the browser only once a reader opens the switch.
+        */}
+      <div class="prose" data-i18n-prose={project.id}>
         <slot />
       </div>
 
@@ -86,12 +95,20 @@ const metadataDescription = data.placeholder
         (data.repo || data.demo) && (
           <footer class="record-page__links">
             {data.repo && (
-              <a href={data.repo} {...key("record.repo")}>
+              <a
+                href={data.repo}
+                {...outboundLink(data.repo)}
+                {...key("record.repo")}
+              >
                 {t("record.repo")}
               </a>
             )}
             {data.demo && (
-              <a href={data.demo} {...key("record.demo")}>
+              <a
+                href={data.demo}
+                {...outboundLink(data.demo)}
+                {...key("record.demo")}
+              >
                 {t("record.demo")}
               </a>
             )}

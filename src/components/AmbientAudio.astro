@@ -1,7 +1,7 @@
 ---
 import { getAsset, getAudioSources } from "../lib/assets";
 import { stableIndex } from "../lib/hash";
-import { key, type MessageKey } from "../lib/i18n";
+import { key, t, type MessageKey } from "../lib/i18n";
 
 interface Props {
   assetId: string;
@@ -60,22 +60,65 @@ const waveform = Array.from({ length: WAVE_BARS }, (_, index) => {
   return Math.max(0.06, Math.min(1, envelope * (0.55 + seed * 0.75)));
 });
 const settingsKey = `endoretic:audio:${assetId}:settings`;
+
+/*
+ * Every label the player can show, resolved from the catalog at build time.
+ *
+ * The controls rewrite their own text as the recording plays, so the strings
+ * cannot live only in the markup. Shipping them as one table keeps the English
+ * single-sourced from the catalog — the script never spells a label itself —
+ * and lets the language layer translate a button the moment its state changes.
+ */
+const LABEL_KEYS = [
+  "audio.enable",
+  "audio.enabled",
+  "audio.play",
+  "audio.pause",
+  "audio.mute",
+  "audio.unmute",
+  "audio.volume",
+  "audio.status.off",
+  "audio.status.starting",
+  "audio.status.ready",
+  "audio.status.playing",
+  "audio.status.playingMuted",
+  "audio.status.paused",
+  "audio.status.hidden",
+  "audio.status.finished",
+  "audio.status.unavailable",
+] as const satisfies readonly MessageKey[];
+
+const labels = Object.fromEntries(LABEL_KEYS.map((id) => [id, t(id)]));
 ---
 
+{/*
+  * The one element on the site that must outlive a navigation. The router moves
+  * this node into the next page rather than rebuilding it, so the audio element
+  * is never torn down, playback is never interrupted, and the controls keep the
+  * listeners they were given: the whole section persists, not just the <audio>,
+  * because a persisted player under freshly rendered buttons would be playing
+  * with nothing wired to it.
+  */}
 <section
   class:list={["ambient-audio", className]}
   aria-label={label}
+  transition:persist="retained-recording"
   data-ambient-audio
   data-asset-id={assetId}
   data-sources={JSON.stringify(sources)}
   data-settings-key={settingsKey}
   data-initial-volume={initialVolume}
+  data-labels={JSON.stringify(labels)}
 >
   <div class="ambient-audio__heading">
     <span class="ambient-audio__label" {...(labelKey ? key(labelKey) : {})}>
       {label}
     </span>
-    <span class="ambient-audio__status" data-audio-status role="status">Off</span>
+    <span
+      class="ambient-audio__status"
+      data-audio-status
+      role="status"
+      {...key("audio.status.off")}>{t("audio.status.off")}</span>
   </div>
 
   <p class="ambient-audio__register">
@@ -108,11 +151,11 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
   <audio preload="none" hidden></audio>
 
   <div class="ambient-audio__controls">
-    <button type="button" data-audio-enable>Play recording</button>
-    <button type="button" data-audio-toggle aria-pressed="false" disabled>Play</button>
-    <button type="button" data-audio-mute aria-pressed="false" disabled>Mute</button>
+    <button type="button" data-audio-enable {...key("audio.enable")}>{t("audio.enable")}</button>
+    <button type="button" data-audio-toggle aria-pressed="false" disabled {...key("audio.play")}>{t("audio.play")}</button>
+    <button type="button" data-audio-mute aria-pressed="false" disabled {...key("audio.mute")}>{t("audio.mute")}</button>
     <label class="ambient-audio__volume">
-      <span>Volume</span>
+      <span {...key("audio.volume")}>{t("audio.volume")}</span>
       <input
         type="range"
         min="0"
@@ -149,6 +192,12 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
     volume: number;
   }
 
+  /*
+   * Runs once per document. The section is persisted across navigations, so it
+   * arrives on the next page already initialised and carrying its listeners,
+   * and the flag below is what stops a second pass from binding them twice if
+   * this module is ever evaluated again.
+   */
   document
     .querySelectorAll<HTMLElement>("[data-ambient-audio]")
     .forEach((root) => {
@@ -166,6 +215,31 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
       let enabled = false;
 
       if (!audio || !enable || !toggle || !mute || !volume || !status) return;
+
+      let labels: Record<string, string> = {};
+      try {
+        labels = JSON.parse(root.dataset.labels ?? "{}") as Record<string, string>;
+      } catch {
+        /* Without the table the controls keep the English already in the markup. */
+      }
+
+      /*
+       * Every label change goes through here. The English from the catalog is
+       * written first, so the page is correct even if no layer is active, and
+       * the element is then handed to the language layer, which owns the
+       * decision about what is drawn and what a screen reader is told. Nothing
+       * in this component knows that Hymmnos exists.
+       */
+      const setLabel = (node: HTMLElement, id: string): void => {
+        const text = labels[id];
+        if (text === undefined) return;
+
+        node.dataset.i18n = id;
+        node.textContent = text;
+        document.dispatchEvent(
+          new CustomEvent("endoretic:relabel", { detail: { node } }),
+        );
+      };
 
       const readSettings = (): AudioSettings => {
         try {
@@ -202,13 +276,13 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
         audio.muted = saved.muted;
         audio.volume = saved.volume;
         volume.value = String(saved.volume);
-        mute.textContent = saved.muted ? "Unmute" : "Mute";
+        setLabel(mute, saved.muted ? "audio.unmute" : "audio.mute");
         mute.setAttribute("aria-pressed", String(saved.muted));
       };
 
       const setUnavailable = () => {
         audio.pause();
-        status.textContent = "Audio unavailable";
+        setLabel(status, "audio.status.unavailable");
         enable.disabled = true;
         toggle.disabled = true;
         mute.disabled = true;
@@ -242,15 +316,15 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
         audio.load();
         enabled = true;
         enable.disabled = true;
-        enable.textContent = "Ambience enabled";
+        setLabel(enable, "audio.enabled");
         toggle.disabled = false;
         mute.disabled = false;
         volume.disabled = false;
-        status.textContent = "Starting";
+        setLabel(status, "audio.status.starting");
 
         void audio.play().catch(() => {
-          toggle.textContent = "Play";
-          status.textContent = "Ready — press Play";
+          setLabel(toggle, "audio.play");
+          setLabel(status, "audio.status.ready");
         });
       });
 
@@ -265,10 +339,13 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
 
       mute.addEventListener("click", () => {
         audio.muted = !audio.muted;
-        mute.textContent = audio.muted ? "Unmute" : "Mute";
+        setLabel(mute, audio.muted ? "audio.unmute" : "audio.mute");
         mute.setAttribute("aria-pressed", String(audio.muted));
         if (!audio.paused) {
-          status.textContent = audio.muted ? "Playing muted" : "Playing";
+          setLabel(
+            status,
+            audio.muted ? "audio.status.playingMuted" : "audio.status.playing",
+          );
         }
         saveSettings();
       });
@@ -279,26 +356,29 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
       });
 
       audio.addEventListener("play", () => {
-        toggle.textContent = "Pause";
+        setLabel(toggle, "audio.pause");
         toggle.setAttribute("aria-pressed", "true");
-        status.textContent = audio.muted ? "Playing muted" : "Playing";
+        setLabel(
+          status,
+          audio.muted ? "audio.status.playingMuted" : "audio.status.playing",
+        );
       });
       audio.addEventListener("pause", () => {
-        toggle.textContent = "Play";
+        setLabel(toggle, "audio.play");
         toggle.setAttribute("aria-pressed", "false");
-        if (enabled && !audio.ended) status.textContent = "Paused";
+        if (enabled && !audio.ended) setLabel(status, "audio.status.paused");
       });
       audio.addEventListener("ended", () => {
-        toggle.textContent = "Play";
+        setLabel(toggle, "audio.play");
         toggle.setAttribute("aria-pressed", "false");
-        status.textContent = "Finished";
+        setLabel(status, "audio.status.finished");
       });
       audio.addEventListener("error", setUnavailable, { once: true });
 
       document.addEventListener("visibilitychange", () => {
         if (document.hidden && !audio.paused) {
           audio.pause();
-          status.textContent = "Paused while tab hidden";
+          setLabel(status, "audio.status.hidden");
         }
       });
     });
