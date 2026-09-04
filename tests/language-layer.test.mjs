@@ -83,6 +83,8 @@ const PROTECTED_TERMS = [
    */
   "Project SEKAI",
   "Ethereal Style",
+  "GPL-3.0",
+  "OpenAI",
   "Zontex Bridge",
   "Sekai.best",
   "NextRUSH+",
@@ -363,9 +365,10 @@ test("the content catalog tracks the records it claims to translate", () => {
   }
 
   /*
-   * Licence and rights paragraphs are deliberately left in English, so body
-   * coverage is not required to be total. It is required not to collapse:
-   * every record carries at least its opening description.
+   * Body coverage is not required to be total — a paragraph added tomorrow
+   * should not fail the build before someone has found attested vocabulary for
+   * it. It is required not to collapse: every record carries at least its
+   * opening description.
    */
   for (const { id } of projects) {
     const [first] = renderedProse(id);
