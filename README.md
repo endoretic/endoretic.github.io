@@ -133,6 +133,14 @@ the static build, and uses the same stable ID as its production derivatives
 with a `-source.png` suffix. Export only the responsive files actually used by
 the site into `public/media/generated/`.
 
+The retained generated source set currently covers `hero-afterlight-01`, the
+four `scene-*-01` vignettes, both `foreground-*-01` artifacts, and the three
+unused `record-art-*-01` studies. The foreground generator outputs contain a
+baked checkerboard; they are retained as upstream inputs, while their deployed
+derivatives use the documented background extraction. The record-art sources
+are the later manually extracted RGBA masters, not duplicate generator
+intermediates.
+
 User-supplied photographic inputs are retained separately under
 `assets/source/original/`. The current `spine-city-viaduct-source.jpg` input and
 its canonical `spine-archive-study-01-source.png` stylized master are cleared
