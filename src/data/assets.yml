@@ -125,7 +125,7 @@
   notes: "SHORTLIST ONLY; not downloaded. No visible person, logo, or mark was observed. Use a factual caption, acknowledge NASA/JSC and Scott, and do not imply endorsement."
 
 - id: ambient-cylinder-seven-01
-  status: active
+  status: proposed
   kind: audio
   title: "Cylinder Seven"
   creator: "Chris Zabriskie"
@@ -135,17 +135,34 @@
   license_url: "https://creativecommons.org/licenses/by/4.0/"
   attribution: "Cylinder Seven by Chris Zabriskie, from Cylinders, licensed under CC BY 4.0; transcoded and stripped of separately credited artwork for endoretic.cc."
   rights_verified_on: "2026-09-03"
-  retrieved_on: "2026-09-03"
+  retrieved_on: null
   source_sha256: "b065596eeca06a82aabc6a46cd7446e56d62ff5fa761abf92d8147a3c3adde96"
+  local_files: []
+  modifications: []
+  used_on: []
+  rights_notes: "The creator's page states that Chris Zabriskie wrote, produced, and performed Cylinders under CC BY 4.0. Patrick Scott Bell's separately credited album artwork is outside this clearance and was removed. Credit, license link, source, and modification notice are displayed; no endorsement is implied."
+  notes: "Previously integrated, then removed from production on 2026-09-04 when the site owner requested a shorter lo-fi recording. Rights research is retained as a historical record only."
+
+- id: ambient-into-the-mist-01
+  status: active
+  kind: audio
+  title: "Into The Mist"
+  creator: "HoliznaCC0"
+  source_page: "https://freemusicarchive.org/music/holiznacc0/public-domain-lofi/into-the-mist-lofi-calm-relaxed/"
+  original_file: "https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/cI5iv9Xga0OOvGsS7mGZn9BlTshZdzAqLW7bmArA.mp3"
+  license: "CC0 1.0"
+  license_url: "https://creativecommons.org/publicdomain/zero/1.0/"
+  attribution: "Into The Mist by HoliznaCC0, dedicated to the public domain under CC0 1.0; sourced from Free Music Archive."
+  rights_verified_on: "2026-09-04"
+  retrieved_on: "2026-09-04"
+  source_sha256: "51abc671658f942ef54ad7340390e2a7e7afa7b2b7a9a223aafb955b27cb3074"
   local_files:
-    - "/media/audio/ambient-cylinder-seven-01.mp3"
+    - "/media/audio/ambient-into-the-mist-01.mp3"
   local_sha256:
-    "/media/audio/ambient-cylinder-seven-01.mp3": "cb8c0ae50a6b95cce200cc234c7c680e71a7b6063540372792b4201d73399f12"
+    "/media/audio/ambient-into-the-mist-01.mp3": "51abc671658f942ef54ad7340390e2a7e7afa7b2b7a9a223aafb955b27cb3074"
   modifications:
-    - "Retained the complete 532.219-second recording."
-    - "Transcoded the original 320 kb/s MP3 to 128 kb/s, 44.1 kHz stereo MP3 for optional web playback."
-    - "Removed the separately credited embedded album artwork and irrelevant tags; retained minimal title, artist, album, CC BY 4.0, source, and change metadata."
+    - "None; retained the complete 2-minute 9-second original MP3 supplied by Free Music Archive."
   used_on:
     - "/*"
-  rights_notes: "The creator's page states that Chris Zabriskie wrote, produced, and performed Cylinders under CC BY 4.0. Patrick Scott Bell's separately credited album artwork is outside this clearance and was removed. Credit, license link, source, and modification notice are displayed; no endorsement is implied."
+  rights_notes: "The track-specific Free Music Archive page explicitly identifies HoliznaCC0 as the creator, marks the recording CC0 1.0, and labels it instrumental and not AI-generated. The downloaded MP3 contains no embedded cover artwork. Display-ready credit is retained even though CC0 does not require attribution; no endorsement is implied."
   notes: "Playback is optional, off by default, preload=none, and starts only after a user gesture. Only the listener's mute and volume settings persist; a previous play action never becomes autoplay."

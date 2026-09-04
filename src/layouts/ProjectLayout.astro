@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
 import NotationMotif from "../components/NotationMotif.astro";
+import { key, t } from "../lib/i18n";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -17,7 +18,7 @@ const metadataDescription = data.placeholder
 <BaseLayout title={data.title} description={metadataDescription} lang={data.lang}>
   <div class="shell page-shell">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/works/">Works</a>
+      <a href="/works/" {...key("breadcrumb.works")}>{t("breadcrumb.works")}</a>
       <span aria-hidden="true">/</span>
       <span aria-current="page">{data.title}</span>
     </nav>
@@ -33,36 +34,44 @@ const metadataDescription = data.placeholder
       </div>
       <header class="record-page__header">
         <p class="eyebrow">
-          Project record
-          {data.placeholder && <span> / details pending</span>}
+          <span {...key("record.projectRecord")}>{t("record.projectRecord")}</span>
+          {data.placeholder && (
+            <span>
+              {" / "}
+              <span {...key("record.detailsPending")}>
+                {t("record.detailsPending")}
+              </span>
+            </span>
+          )}
         </p>
         <h1>{data.title}</h1>
         <p class="lede">{data.summary}</p>
 
         <dl class="record-metadata">
-          <dt>Language</dt>
+          {/* Values are identifiers, dates, and numbers: labels translate, data does not. */}
+          <dt {...key("field.language")}>{t("field.language")}</dt>
           <dd>{data.lang}</dd>
           {data.placeholder && (
             <>
-              <dt>Record state</dt>
-              <dd>Incomplete</dd>
+              <dt {...key("field.state")}>{t("field.state")}</dt>
+              <dd {...key("state.incomplete")}>{t("state.incomplete")}</dd>
             </>
           )}
           {data.status && (
             <>
-              <dt>Status</dt>
+              <dt {...key("field.status")}>{t("field.status")}</dt>
               <dd>{data.status}</dd>
             </>
           )}
           {data.year && (
             <>
-              <dt>Year</dt>
+              <dt {...key("field.year")}>{t("field.year")}</dt>
               <dd>{data.year}</dd>
             </>
           )}
           {data.tags.length > 0 && (
             <>
-              <dt>Tags</dt>
+              <dt {...key("field.tags")}>{t("field.tags")}</dt>
               <dd>{data.tags.join(", ")}</dd>
             </>
           )}
@@ -76,8 +85,16 @@ const metadataDescription = data.placeholder
       {
         (data.repo || data.demo) && (
           <footer class="record-page__links">
-            {data.repo && <a href={data.repo}>Repository</a>}
-            {data.demo && <a href={data.demo}>Demo</a>}
+            {data.repo && (
+              <a href={data.repo} {...key("record.repo")}>
+                {t("record.repo")}
+              </a>
+            )}
+            {data.demo && (
+              <a href={data.demo} {...key("record.demo")}>
+                {t("record.demo")}
+              </a>
+            )}
           </footer>
         )
       }

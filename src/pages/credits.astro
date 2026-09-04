@@ -1,12 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
 import { getIntegratedAssets, type AssetKind } from "../lib/assets";
+import { formatIsoWeekDate } from "../lib/date";
+import { key, t, type MessageKey } from "../lib/i18n";
 
 const assets = getIntegratedAssets();
-const groups: { kind: AssetKind; title: string }[] = [
-  { kind: "video", title: "Video" },
-  { kind: "image", title: "Images" },
-  { kind: "audio", title: "Audio" },
+const groups: { kind: AssetKind; titleKey: MessageKey }[] = [
+  { kind: "video", titleKey: "credits.group.video" },
+  { kind: "image", titleKey: "credits.group.image" },
+  { kind: "audio", titleKey: "credits.group.audio" },
 ];
 ---
 
@@ -15,68 +18,104 @@ const groups: { kind: AssetKind; title: string }[] = [
   description="Media and software credits for endoretic.cc."
 >
   <div class="shell page-shell page-shell--narrow">
-    <header class="page-header">
-      <p class="eyebrow">04 / Credits</p>
-      <h1>Credits</h1>
-      <p class="lede">
-        Every published media file is self-hosted and connected to its original
-        source, license, attribution, and recorded modifications.
-      </p>
-    </header>
+    <PageHero
+      index="04"
+      titleKey="credits.title"
+      descriptionKey="credits.description"
+      scene="coast"
+    />
 
     <div class="credit-index" data-asset-manifest>
       {
-        groups.map(({ kind, title }) => {
+        groups.map(({ kind, titleKey }) => {
           const entries = assets.filter((asset) => asset.kind === kind);
           if (entries.length === 0) return null;
 
           return (
             <section class="credit-group" aria-labelledby={`credits-${kind}`}>
               <header class="credit-group__heading">
-                <p class="eyebrow">Manifest / {kind}</p>
-                <h2 id={`credits-${kind}`}>{title}</h2>
+                <p class="eyebrow">
+                  <span {...key("credits.manifest")}>{t("credits.manifest")}</span>
+                  {` / ${kind}`}
+                </p>
+                <h2 id={`credits-${kind}`} {...key(titleKey)}>
+                  {t(titleKey)}
+                </h2>
               </header>
               <div class="credit-records">
                 {entries.map((asset) => (
                   <article class="credit-record">
+                    {/*
+                      * Record identifiers, creator names, licence labels, dates,
+                      * and source URLs are never translated in any layer. Only
+                      * the field labels around them change.
+                      */}
                     <div class="credit-record__registration">
                       <span>{asset.id}</span>
-                      <span>Retrieved {asset.retrieved_on}</span>
+                      <span>
+                        {asset.retrieved_on ? (
+                          <>
+                            <span {...key("credits.retrieved")}>
+                              {t("credits.retrieved")}
+                            </span>
+                            {` ${formatIsoWeekDate(asset.retrieved_on)}`}
+                          </>
+                        ) : (
+                          <span {...key("credits.retrievedUnavailable")}>
+                            {t("credits.retrievedUnavailable")}
+                          </span>
+                        )}
+                      </span>
                     </div>
                     <div class="credit-record__body">
                       <h3>{asset.title}</h3>
                       <p class="credit-record__attribution">{asset.attribution}</p>
                       <dl>
                         <div>
-                          <dt>Creator / institution</dt>
+                          <dt {...key("credits.field.creator")}>
+                            {t("credits.field.creator")}
+                          </dt>
                           <dd>{asset.creator}</dd>
                         </div>
                         <div>
-                          <dt>License</dt>
+                          <dt {...key("credits.field.license")}>
+                            {t("credits.field.license")}
+                          </dt>
                           <dd><a href={asset.license_url}>{asset.license}</a></dd>
                         </div>
                         <div>
-                          <dt>Record</dt>
+                          <dt {...key("credits.field.record")}>
+                            {t("credits.field.record")}
+                          </dt>
                           <dd>
-                            <a href={asset.source_page}>Original source page</a>
+                            <a href={asset.source_page} {...key("credits.link.source")}>
+                              {t("credits.link.source")}
+                            </a>
                             {asset.original_file && (
-                              <> · <a href={asset.original_file}>Original file</a></>
+                              <>
+                                {" · "}
+                                <a href={asset.original_file} {...key("credits.link.file")}>
+                                  {t("credits.link.file")}
+                                </a>
+                              </>
                             )}
                           </dd>
                         </div>
                         <div>
-                          <dt>Used on</dt>
+                          <dt {...key("credits.field.usedOn")}>
+                            {t("credits.field.usedOn")}
+                          </dt>
                           <dd>{asset.used_on.join(", ")}</dd>
                         </div>
                       </dl>
                       <div class="credit-record__notes">
-                        <h4>Changes</h4>
+                        <h4 {...key("credits.changes")}>{t("credits.changes")}</h4>
                         <ul>
                           {asset.modifications.map((modification) => (
                             <li>{modification}</li>
                           ))}
                         </ul>
-                        <h4>Rights review</h4>
+                        <h4 {...key("credits.rights")}>{t("credits.rights")}</h4>
                         <p>{asset.rights_notes}</p>
                       </div>
                     </div>
@@ -89,11 +128,53 @@ const groups: { kind: AssetKind; title: string }[] = [
       }
     </div>
 
+    {/*
+      * The Hymmnos font sits outside the media manifest on purpose. That
+      * manifest encodes the first-release licence allowlist, and this file
+      * carries no licence statement at all, so passing it through would have
+      * meant loosening a rule that exists to keep the allowlist meaningful.
+      * It is disclosed here instead, plainly, rather than quietly.
+      */}
+    <section class="pending-panel software-credit" aria-labelledby="typeface-credit">
+      <h2 id="typeface-credit" {...key("credits.typeface.title")}>
+        {t("credits.typeface.title")}
+      </h2>
+      <p data-i18n-flow {...key("credits.typeface.body")}>
+        {t("credits.typeface.body")}
+      </p>
+    </section>
+
     <section class="pending-panel software-credit" aria-labelledby="software-credits">
-      <h2 id="software-credits">Software</h2>
-      <p>
-        The site is built with Astro and TypeScript. Exact dependency versions
-        are recorded in the package lockfile.
+      <h2 id="software-credits" {...key("credits.software.title")}>
+        {t("credits.software.title")}
+      </h2>
+      <p data-i18n-flow {...key("credits.software.body")}>
+        {t("credits.software.body")}
+      </p>
+    </section>
+
+    {/*
+      * Shown only once a reader has found the Hymmnos layer, because it is a
+      * note to whoever went looking. The site works, and credits everything it
+      * ships, without it.
+      */}
+    <section
+      class="pending-panel software-credit credit-homage"
+      aria-labelledby="hymmnos-homage"
+      data-layer-only
+      hidden
+    >
+      <p class="eyebrow" {...key("credits.homage.eyebrow")}>
+        {t("credits.homage.eyebrow")}
+      </p>
+      <h2 id="hymmnos-homage" {...key("credits.homage.title")}>
+        {t("credits.homage.title")}
+      </h2>
+      <p data-i18n-flow {...key("credits.homage.body")}>
+        {t("credits.homage.body")}
+      </p>
+      <p class="credit-homage__note" data-i18n-flow {...key("credits.homage.note")}>
+        {t("credits.homage.note")}
       </p>
     </section>
   </div>

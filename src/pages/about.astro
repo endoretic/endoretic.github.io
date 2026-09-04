@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
+import { key, t } from "../lib/i18n";
 ---
 
 <BaseLayout
@@ -10,80 +11,122 @@ import PageHero from "../components/PageHero.astro";
   <div class="shell page-shell page-shell--narrow">
     <PageHero
       index="03"
-      title="About"
-      description="Who keeps this archive, and why it looks like this."
+      titleKey="about.title"
+      descriptionKey="about.description"
       scene="console"
     />
 
-    <div class="prose">
-      <p>
-        I hold an MSc in Bioengineering. Most of what I make is small and
-        practical: tools that solve a problem I actually had, then get written
-        down properly so the next person does not have to solve it again.
-      </p>
+    <div class="about-page">
+      <section class="about-introduction" aria-labelledby="about-keeper">
+        <div class="about-introduction__copy">
+          <h2 id="about-keeper" {...key("about.keeper.title")}>
+            {t("about.keeper.title")}
+          </h2>
+          <p class="about-lede" data-i18n-flow {...key("about.keeper.lede")}>
+            {t("about.keeper.lede")}
+          </p>
+        </div>
 
-      <h2>What I like</h2>
-      <p>
-        Japanese animation, novels, electronic music, and rhythm games. Those
-        look like four separate hobbies, but for me they are mostly one taste
-        wearing different clothes.
-      </p>
-      <p>
-        The works I keep returning to hand you a world late. A single concept
-        painting, a few bars of music, one unfamiliar word, one line of setting,
-        and suddenly the place seems to exist. Nobody stops to explain it. The
-        important events have usually already happened, and what is left is
-        machinery still running, records nobody is reading any more, and a
-        signal with no audience left to receive it. I would rather reconstruct
-        something from what outlived it than watch it happen in order.
-      </p>
-      <p>
-        Rhythm games belong to the same taste rather than sitting outside it.
-        The appeal is not reflex. It is that a chart is a piece of notation, a
-        fixed structure someone designed, which you learn by repetition until
-        it stops being a test and becomes a route you know. That is not far
-        from why I like the rest of it.
-      </p>
+        <aside class="about-index" aria-labelledby="about-interests">
+          <h3 id="about-interests" {...key("about.interests.title")}>
+            {t("about.interests.title")}
+          </h3>
+          <ul>
+            <li {...key("about.interests.animation")}>
+              {t("about.interests.animation")}
+            </li>
+            <li {...key("about.interests.novels")}>
+              {t("about.interests.novels")}
+            </li>
+            <li {...key("about.interests.music")}>
+              {t("about.interests.music")}
+            </li>
+            <li {...key("about.interests.games")}>
+              {t("about.interests.games")}
+            </li>
+          </ul>
+        </aside>
+      </section>
 
-      <h2>Why a personal site</h2>
-      <p>
-        Most of what I build lives in repositories. Repositories are good at
-        holding code and bad at holding context: why a thing exists, what it
-        was for, what it turned into, what quietly stopped. Platforms are worse,
-        because they are built around what is recent rather than what remains.
-      </p>
-      <p>
-        So this is somewhere that keeps things. Finished tools, notes, and the
-        unfinished ones too, in a place I control from end to end, that will
-        still read the same in ten years. An archive rather than a feed.
-      </p>
+      <section class="about-origin" aria-labelledby="about-origin">
+        <div class="about-section-heading">
+          <h2 id="about-origin" {...key("about.origin.title")}>
+            {t("about.origin.title")}
+          </h2>
+        </div>
+        <div class="about-section-copy">
+          <p
+            class="about-origin__statement"
+            data-i18n-flow
+            {...key("about.origin.statement")}
+          >
+            {t("about.origin.statement")}
+          </p>
+          <p data-i18n-flow {...key("about.origin.body")}>
+            {t("about.origin.body")}
+          </p>
+          <div class="about-memory-fragments">
+            <p
+              class="about-memory-fragments__label"
+              {...key("about.fragments.label")}
+            >
+              {t("about.fragments.label")}
+            </p>
+            <p data-i18n-flow {...key("about.fragments.body")}>
+              {t("about.fragments.body")}
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <h2>Why it looks like this</h2>
-      <p>
-        The atmosphere is deliberate, and it follows directly from the taste
-        above: a lost or emptied world, machinery that outlived its operators,
-        and a certain nostalgia for a future that has already gone out of date.
-        The imagery is painted rather than photographed, because an era
-        imagining a digital future is more honest as an illustration than as a
-        picture of real hardware. The palette sits at dusk. One recording is
-        kept in the footer, silent until you ask for it. The small marks beside
-        each record are an invented notation, there to suggest that a larger
-        index once surrounded these entries.
-      </p>
-      <p>
-        It is still an ordinary website underneath, and that limit is
-        intentional. Nothing here is written in character, the notation does not
-        translate to anything, and no navigation depends on the mood. If the
-        atmosphere ever gets in the way of reading a page or finding a link,
-        the atmosphere is what is wrong.
-      </p>
+      <div class="about-closing">
+        <section class="about-purpose" aria-labelledby="about-purpose">
+          <h2 id="about-purpose" {...key("about.purpose.title")}>
+            {t("about.purpose.title")}
+          </h2>
+          <p data-i18n-flow {...key("about.purpose.body")}>
+            {t("about.purpose.body")}
+          </p>
+        </section>
 
-      <h2>Elsewhere</h2>
-      <ul>
-        <li><a href="https://github.com/endoretic">GitHub</a></li>
-      </ul>
-
-      <p class="pending-note">[TODO: owner-supplied contact details]</p>
+        <section class="about-elsewhere" aria-labelledby="about-elsewhere">
+          <h2 id="about-elsewhere" {...key("about.elsewhere.title")}>
+            {t("about.elsewhere.title")}
+          </h2>
+          {/*
+            * Service names, handles, and addresses stay exactly as they are in
+            * every layer. They are identifiers, not prose.
+            */}
+          <ul>
+            <li>
+              <span>GitHub</span>
+              <a href="https://github.com/endoretic">endoretic</a>
+            </li>
+            <li>
+              <span>Bilibili</span>
+              <a
+                href="https://b23.tv/dYV8t7Q"
+                {...key("about.elsewhere.profile")}
+              >
+                {t("about.elsewhere.profile")}
+              </a>
+            </li>
+            <li>
+              <span>LinkedIn</span>
+              <a
+                href="https://www.linkedin.com/in/yukun-bian-a15639387/"
+                {...key("about.elsewhere.profile")}
+              >
+                {t("about.elsewhere.profile")}
+              </a>
+            </li>
+            <li>
+              <span>Email</span>
+              <a href="mailto:pawn0319@gmail.com">pawn0319@gmail.com</a>
+            </li>
+          </ul>
+        </section>
+      </div>
     </div>
   </div>
 </BaseLayout>

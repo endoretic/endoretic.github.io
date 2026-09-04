@@ -62,14 +62,25 @@ test("the first published note keeps its source clear and serves responsive loca
 
   assert.match(html, /<html lang="zh-CN">/);
   assert.match(html, /柳州屏山大桥/);
-  assert.match(html, /记录来源/);
-  assert.match(html, /陈先生/);
-  assert.match(html, /虚实结合：本文以真实影像为基础/);
-  assert.match(html, /现场观察 \/ 文学性重构/);
+  assert.match(html, /本文含虚构整理与想象性叙述/);
+  assert.match(html, /<dt data-i18n="field.lastUpdated">Last updated<\/dt>/);
+  assert.match(html, /<time datetime="2026-09-04">2026-W36-5<\/time>/);
   assert.match(html, /spine-archive-study-01-640\.avif 640w/);
   assert.match(html, /spine-archive-study-01-1024\.webp 1024w/);
   assert.match(html, /alt="从高处纵向望向柳州城区[^"<>]+"/);
   assert.doesNotMatch(html, /https?:\/\/[^"']+\.(?:avif|jpe?g|png|webp)/i);
+});
+
+test("visible dates use ISO week-date notation", () => {
+  const notesIndex = readFileSync(join(dist, "notes/index.html"), "utf8");
+  const credits = readFileSync(join(dist, "credits/index.html"), "utf8");
+
+  assert.match(notesIndex, /<dt data-i18n="field.date">Date<\/dt>/);
+  assert.match(notesIndex, /<time datetime="2026-09-04">2026-W36-5<\/time>/);
+  assert.match(
+    credits,
+    /<span data-i18n="credits.retrieved">Retrieved<\/span> 2026-W36-5/,
+  );
 });
 
 test("generated pages keep a semantic progressive-enhancement shell", () => {
@@ -158,7 +169,19 @@ test("production output contains no remote media or font requests", () => {
         const css = readFileSync(join(cssDirectory, file), "utf8");
         assert.doesNotMatch(css, /(?:url|@import)\s*\(\s*["']?https?:/i);
         assert.doesNotMatch(css, /url\(\s*["']?data:(?:image|audio|video|font)\//i);
-        assert.doesNotMatch(css, /@font-face/i);
+
+        // Web fonts are allowed, but only from this origin. The Hymmnos glyph
+        // face is the one @font-face on the site; a remote or inlined source
+        // would be a rights and privacy regression, not a styling detail.
+        for (const [, block] of css.matchAll(/@font-face\s*\{([^}]*)\}/gi)) {
+          for (const [, source] of block.matchAll(/url\(\s*["']?([^"')]+)/gi)) {
+            assert.match(
+              source,
+              /^\/[^/]/,
+              "Font source must be a root-relative local path: " + source,
+            );
+          }
+        }
       }
     }
   }

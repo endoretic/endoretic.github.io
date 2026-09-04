@@ -1,0 +1,335 @@
+/*
+ * The Hymmnos script layer.
+ *
+ * Two axes, kept apart on purpose: the catalog decides which language a string
+ * is in, this file decides which shapes draw it. Everything here keys off
+ * `[lang="x-hymmnos"]`, so the font follows the language marking rather than a
+ * page-wide mode flag, and untranslated text on the same page keeps its own
+ * typeface.
+ *
+ * Three reading tiers, in the order a reader meets them:
+ *
+ *   .hy-line      Hymmnos glyphs                always visible
+ *   .hy-translit  the same string, Latin        on hover or focus
+ *   .hy-meaning   the English original          never drawn; read by
+ *                                               assistive technology and
+ *                                               matched by in-page search
+ *
+ * The glyph line is aria-hidden and the meaning line is the accessible text,
+ * so the accessibility tree stays in English no matter which layer is on. That
+ * is what keeps the egg from becoming a barrier.
+ */
+
+@font-face {
+  font-family: "Hymmnos";
+  /*
+   * Self-hosted, and requested only once a rendered element actually asks for
+   * the family — which cannot happen before a reader opens the layer.
+   *
+   * WOFF2 only: 9.4 KB, against 35 KB for the TrueType original it was
+   * converted from, for a face nobody asked to download. A browser new enough
+   * to run this layer's module script can read WOFF2, so a second source would
+   * be weight with no reader behind it. The conversion is verified lossless in
+   * tests/language-layer.test.mjs, which reads the glyph coverage straight out
+   * of the shipped file.
+   */
+  src: url("/fonts/fonts.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * The glyph face has one weight and no italics, and its letterforms carry more
+ * ink than the interface stack. Slightly looser tracking and a small optical
+ * size bump keep a line of glyphs from reading as a solid bar.
+ */
+[lang="x-hymmnos"] {
+  font-family: "Hymmnos", var(--font-display);
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.08em;
+  letter-spacing: 0.045em;
+  font-synthesis: none;
+}
+
+/* A translated element is a stack of tiers, not a line of text. */
+.hy {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.hy-line {
+  display: inline;
+}
+
+/*
+ * Short chrome — navigation, labels, buttons. The transliteration is lifted out
+ * of flow so that revealing it never moves the page under the pointer.
+ *
+ * Anchored above the line rather than below it. Several containers on this site
+ * clip their overflow (`.record-card`, `.page-header`, `.not-found`), and the
+ * keyed labels nearest a clipped edge — a card's link row, the 404's return
+ * link — are all at the bottom of their box, where a caption hung underneath
+ * would be cut in half.
+ */
+.hy-translit {
+  position: absolute;
+  bottom: calc(100% + 0.15rem);
+  left: 0;
+  z-index: 20;
+  max-width: min(28rem, 80vw);
+  padding: 0.15rem 0.4rem;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: var(--surface-1);
+  text-transform: none;
+  white-space: nowrap;
+  background: var(--ink-950);
+  /*
+   * `visibility`, not just `opacity`: a transparent element is still selectable
+   * and still matched by find-in-page, which would put a second copy of every
+   * label into the reader's search results.
+   */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hy:hover > .hy-translit,
+.hy:focus-visible > .hy-translit,
+:focus-visible > .hy > .hy-translit,
+a:hover .hy > .hy-translit,
+button:hover .hy > .hy-translit {
+  visibility: visible;
+  opacity: 1;
+}
+
+/*
+ * Long prose. Here the second line belongs in the flow, directly under the
+ * glyphs, the way a gloss sits under a transcribed inscription. Layout movement
+ * is the point rather than a defect.
+ */
+.hy--flow {
+  display: block;
+}
+
+.hy--flow > .hy-translit {
+  position: static;
+  bottom: auto;
+  /*
+   * Taken out of the flow entirely rather than merely faded. In flow, an
+   * invisible gloss would still reserve a full paragraph of height under every
+   * block of prose on the page.
+   */
+  display: none;
+  max-width: none;
+  margin-top: 0.55rem;
+  padding: 0.5rem 0 0.5rem 0.75rem;
+  color: var(--ink-500);
+  white-space: normal;
+  background: none;
+  border-left: 1px solid var(--line);
+  visibility: visible;
+  opacity: 1;
+}
+
+/*
+ * Glyphs, then transliteration: a reader meets an inscription, then a way to
+ * sound it out. Naming the second line makes it a reading apparatus rather than
+ * a page that mysteriously doubled itself.
+ */
+.hy--flow > .hy-translit[data-label]::before {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-family: var(--font-meta);
+  font-size: 0.68em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-650);
+  content: attr(data-label);
+}
+
+.hy--flow:hover > .hy-translit,
+.hy--flow:focus-within > .hy-translit {
+  display: block;
+}
+
+/*
+ * The meaning tier. Never drawn: it exists so the English original is read aloud
+ * and found by in-page search while the glyphs hold the screen. It is the
+ * element's accessible text, not decoration, so it must not be display:none.
+ */
+.hy-meaning {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Mid-decode text is deliberately unreadable, so it must never be handed to a
+ * screen reader or left selectable as a false transcript.
+ */
+.hy-line[data-decoding] {
+  color: var(--ink-650);
+  user-select: none;
+}
+
+/* ---- The hidden switch --------------------------------------------------- */
+
+/*
+ * The trigger looks exactly like the decorative interval mark it wraps: no
+ * label, no chrome, no hint that a language lives behind it. It is a real
+ * button with a real accessible name, so it is reachable by keyboard and
+ * announced properly — hidden from the eye, never from assistive technology.
+ */
+.language-layer {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.language-layer__trigger {
+  display: inline-flex;
+  padding: 0;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.language-layer__trigger .notation-motif {
+  width: 3.25rem;
+}
+
+.language-layer__trigger:hover .notation-motif circle,
+.language-layer__trigger[aria-expanded="true"] .notation-motif circle {
+  fill: var(--signal-500);
+  r: 2.4;
+}
+
+/* Anchored upward: the switch lives at the foot of the page. */
+.language-layer__panel {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 60;
+  width: min(20rem, calc(100vw - 3rem));
+  padding: var(--space-3);
+  color: var(--ink-950);
+  background: var(--surface-1);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 0.75rem 2rem var(--shadow);
+}
+
+.language-layer__bar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.language-layer__close {
+  padding: 0;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  color: var(--ink-500);
+  text-decoration: underline;
+  text-decoration-color: var(--signal-500);
+  text-underline-offset: 0.2em;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.language-layer__close:hover {
+  color: var(--ink-950);
+}
+
+.language-layer__heading {
+  margin: 0;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.language-layer__options {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.language-layer__option {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+  font-size: var(--type-body);
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.language-layer__option:hover {
+  background: var(--surface-2);
+}
+
+.language-layer__option[aria-checked="true"] {
+  color: var(--ink-950);
+}
+
+.language-layer__bullet {
+  font-family: var(--font-meta);
+  color: var(--signal-500);
+}
+
+.language-layer__hint {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-meta);
+  font-size: var(--type-meta);
+  line-height: 1.5;
+  color: var(--ink-500);
+}
+
+/*
+ * No script, no switch. The trigger is only inserted into the accessibility
+ * tree and the tab order once the layer can actually do something.
+ */
+.language-layer[hidden] {
+  display: none;
+}
+
+/*
+ * The homage panel on /credits. Same panel furniture as the software and
+ * typeface notes beside it — a layer should not redecorate the page it is
+ * written over, only change the language on it.
+ */
+.credit-homage {
+  border-left: 2px solid var(--signal-500);
+}
+
+.credit-homage__note {
+  font-size: var(--type-meta);
+  line-height: 1.6;
+  color: var(--ink-500);
+}

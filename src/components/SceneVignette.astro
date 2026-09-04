@@ -29,6 +29,8 @@ interface Props {
   class?: string;
   mode?: "image" | "svg";
   sizes?: string;
+  loading?: "eager" | "lazy";
+  fetchpriority?: "high" | "low" | "auto";
 }
 
 const {
@@ -37,6 +39,8 @@ const {
   class: className,
   mode = "image",
   sizes = "(min-width: 52rem) 42vw, 100vw",
+  loading = "lazy",
+  fetchpriority = "auto",
 } = Astro.props;
 const imageBase = `/media/generated/scene-${variant}-01`;
 
@@ -76,7 +80,8 @@ const captionText = caption ?? captions[variant];
           alt=""
           width="1600"
           height="900"
-          loading="lazy"
+          loading={loading}
+          fetchpriority={fetchpriority}
           decoding="async"
           onerror="this.closest('picture').hidden=true"
         />

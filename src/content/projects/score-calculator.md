@@ -1,5 +1,5 @@
 ---
-title: "Score Calculator"
+title: "World Link Calculator for PJSK"
 summary: "A static event-point planning tool for Project SEKAI World Link tiering."
 lang: "en"
 year: 2026

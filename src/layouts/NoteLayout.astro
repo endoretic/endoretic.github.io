@@ -1,6 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { formatHtmlDate, formatIsoWeekDate } from "../lib/date";
 import BaseLayout from "./BaseLayout.astro";
+import { key, t } from "../lib/i18n";
 
 interface Props {
   note: CollectionEntry<"notes">;
@@ -8,21 +10,15 @@ interface Props {
 
 const { note } = Astro.props;
 const { data } = note;
-const formattedDate = data.publishedAt
-  ? new Intl.DateTimeFormat(data.lang, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      timeZone: "UTC",
-    }).format(data.publishedAt)
-  : null;
+const lastUpdated = data.updatedAt;
+const formattedDate = lastUpdated ? formatIsoWeekDate(lastUpdated) : null;
 const recordId = "N / " + note.id.toUpperCase();
 ---
 
 <BaseLayout title={data.title} description={data.description} lang={data.lang}>
   <div class="shell page-shell note-shell">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/notes/">Notes</a>
+      <a href="/notes/" {...key("breadcrumb.notes")}>{t("breadcrumb.notes")}</a>
       <span aria-hidden="true">/</span>
       <span aria-current="page">{data.title}</span>
     </nav>
@@ -34,30 +30,41 @@ const recordId = "N / " + note.id.toUpperCase();
       </div>
       <header class="note-page__header">
         <p class="eyebrow">
-          Note
-          {data.draft && <span> / local draft preview</span>}
+          <span {...key("record.note")}>{t("record.note")}</span>
+          {data.draft && (
+            <span>
+              {" / "}
+              <span {...key("record.draftPreview")}>
+                {t("record.draftPreview")}
+              </span>
+            </span>
+          )}
         </p>
         <h1>{data.title}</h1>
         {data.fictionalized && (
           <p class="note-page__fiction-notice">
-            虚实结合：本文以真实影像为基础，含虚构整理与想象性叙述，不代表实际情况。
+            本文含虚构整理与想象性叙述，不代表实际情况。
           </p>
         )}
         <p class="lede">{data.description}</p>
         <dl class="note-page__metadata">
           <div>
-            <dt>Record state</dt>
-            <dd>{data.draft ? "Draft preview" : "Published"}</dd>
+            <dt {...key("field.state")}>{t("field.state")}</dt>
+            {data.draft ? (
+              <dd {...key("state.draft")}>{t("state.draft")}</dd>
+            ) : (
+              <dd {...key("state.archived")}>{t("state.archived")}</dd>
+            )}
           </div>
           {formattedDate && (
             <div>
-              <dt>Published</dt>
-              <dd><time datetime={data.publishedAt?.toISOString()}>{formattedDate}</time></dd>
+              <dt {...key("field.lastUpdated")}>{t("field.lastUpdated")}</dt>
+              <dd><time datetime={formatHtmlDate(lastUpdated!)}>{formattedDate}</time></dd>
             </div>
           )}
           {data.tags.length > 0 && (
             <div>
-              <dt>Tags</dt>
+              <dt {...key("field.tags")}>{t("field.tags")}</dt>
               <dd>{data.tags.join(", ")}</dd>
             </div>
           )}

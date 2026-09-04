@@ -1,5 +1,5 @@
 ---
-title: "om2pjsk-usc"
+title: "Osu!mania to PJSK"
 summary: "Converts osu!mania beatmaps into Project SEKAI and NextRUSH+ compatible USC and Sonolus SCP packages."
 lang: "en"
 year: 2026
