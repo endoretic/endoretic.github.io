@@ -1,35 +1,81 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
 ---
 
 <BaseLayout
   title="About"
-  description="About the endoretic archive and the work kept in it."
+  description="Who keeps this archive, what it is for, and why it looks the way it does."
 >
   <div class="shell page-shell page-shell--narrow">
-    <header class="page-header">
-      <p class="eyebrow">03 / About</p>
-      <h1>About</h1>
-    </header>
+    <PageHero
+      index="03"
+      title="About"
+      description="Who keeps this archive, and why it looks like this."
+      scene="console"
+    />
 
     <div class="prose">
       <p>
-        endoretic is a personal archive. It keeps the tools I build, the notes I
-        write, and the things that are still unfinished.
+        I hold an MSc in Bioengineering. Most of what I make is small and
+        practical: tools that solve a problem I actually had, then get written
+        down properly so the next person does not have to solve it again.
+      </p>
+
+      <h2>What I like</h2>
+      <p>
+        Japanese animation, novels, electronic music, and rhythm games. Those
+        look like four separate hobbies, but for me they are mostly one taste
+        wearing different clothes.
       </p>
       <p>
-        Most of the work here falls into two groups. One is research tooling
-        around <a href="/works/zotero-wallpaper/">Zotero</a>, including a local
-        wallpaper plugin and <a href="/works/zontex/">Zontex</a>, a library
-        workflow driven through Codex. The other is a set of small tools for
-        Project SEKAI: an event-point planner, a song tier-list maker, a chart
-        converter, and a package repacker. Nearly all of it is open source and
-        runs locally or as a static page.
+        The works I keep returning to hand you a world late. A single concept
+        painting, a few bars of music, one unfamiliar word, one line of setting,
+        and suddenly the place seems to exist. Nobody stops to explain it. The
+        important events have usually already happened, and what is left is
+        machinery still running, records nobody is reading any more, and a
+        signal with no audience left to receive it. I would rather reconstruct
+        something from what outlived it than watch it happen in order.
       </p>
       <p>
-        The full list, with sources and licences, is under
-        <a href="/works/">Works</a>. Third-party media used on this site is
-        credited on the <a href="/credits/">Credits</a> page.
+        Rhythm games belong to the same taste rather than sitting outside it.
+        The appeal is not reflex. It is that a chart is a piece of notation, a
+        fixed structure someone designed, which you learn by repetition until
+        it stops being a test and becomes a route you know. That is not far
+        from why I like the rest of it.
+      </p>
+
+      <h2>Why a personal site</h2>
+      <p>
+        Most of what I build lives in repositories. Repositories are good at
+        holding code and bad at holding context: why a thing exists, what it
+        was for, what it turned into, what quietly stopped. Platforms are worse,
+        because they are built around what is recent rather than what remains.
+      </p>
+      <p>
+        So this is somewhere that keeps things. Finished tools, notes, and the
+        unfinished ones too, in a place I control from end to end, that will
+        still read the same in ten years. An archive rather than a feed.
+      </p>
+
+      <h2>Why it looks like this</h2>
+      <p>
+        The atmosphere is deliberate, and it follows directly from the taste
+        above: a lost or emptied world, machinery that outlived its operators,
+        and a certain nostalgia for a future that has already gone out of date.
+        The imagery is painted rather than photographed, because an era
+        imagining a digital future is more honest as an illustration than as a
+        picture of real hardware. The palette sits at dusk. One recording is
+        kept in the footer, silent until you ask for it. The small marks beside
+        each record are an invented notation, there to suggest that a larger
+        index once surrounded these entries.
+      </p>
+      <p>
+        It is still an ordinary website underneath, and that limit is
+        intentional. Nothing here is written in character, the notation does not
+        translate to anything, and no navigation depends on the mood. If the
+        atmosphere ever gets in the way of reading a page or finding a link,
+        the atmosphere is what is wrong.
       </p>
 
       <h2>Elsewhere</h2>
@@ -37,9 +83,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <li><a href="https://github.com/endoretic">GitHub</a></li>
       </ul>
 
-      <p class="pending-note">
-        [TODO: owner-supplied biography, interests, and contact details]
-      </p>
+      <p class="pending-note">[TODO: owner-supplied contact details]</p>
     </div>
   </div>
 </BaseLayout>
