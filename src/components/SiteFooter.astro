@@ -1,25 +1,36 @@
 ---
 import AmbientAudio from "./AmbientAudio.astro";
-import NotationMotif from "./NotationMotif.astro";
+import LanguageLayer from "./LanguageLayer.astro";
 import { SITE } from "../data/site";
+import { key, t } from "../lib/i18n";
 ---
 
 <footer class="site-footer">
   <div class="shell site-footer__inner">
     <div class="site-footer__identity">
       <p>
-        <span class="eyebrow">Archive node</span>
-        <span class="site-footer__mark"><NotationMotif /> {SITE.name}</span>
+        <span class="eyebrow" {...key("footer.node")}>{t("footer.node")}</span>
+        <span class="site-footer__mark">
+          {/*
+           * The interval mark beside the footer wordmark is also the way into
+           * the language layer. It stays a decorative glyph to the eye; the
+           * component wraps it in a labelled button so keyboard and assistive
+           * technology are never shut out of the discovery.
+           */}
+          <LanguageLayer seed={SITE.name} />
+          {SITE.name}
+        </span>
       </p>
-      <p class="site-footer__note">
-        One recording is kept here. It stays silent until you play it.
+      <p class="site-footer__note" {...key("footer.recording")}>
+        {t("footer.recording")}
       </p>
     </div>
     <AmbientAudio
-      assetId="ambient-cylinder-seven-01"
-      label="Retained recording"
-      recordId="A / 01"
-      duration="8:52"
+      assetId="ambient-into-the-mist-01"
+      label={t("footer.audio")}
+      labelKey="footer.audio"
+      recordId="A / 02"
+      duration="2:09"
       initialVolume={0.15}
       class="site-footer__audio"
       showAttribution={true}

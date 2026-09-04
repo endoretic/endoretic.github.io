@@ -3,9 +3,9 @@ import HeroMedia from "../components/HeroMedia.astro";
 import NoteCard from "../components/NoteCard.astro";
 import NotationMotif from "../components/NotationMotif.astro";
 import ProjectCard from "../components/ProjectCard.astro";
-import { SITE } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getVisibleNotes, getVisibleProjects } from "../lib/content";
+import { key, t } from "../lib/i18n";
 
 const projects = await getVisibleProjects();
 const notes = await getVisibleNotes();
@@ -16,13 +16,22 @@ const notes = await getVisibleNotes();
     <div class="shell hero__grid">
       <div class="hero__copy">
         <div class="hero__index-line">
-          <p class="eyebrow">00 / Home · Personal archive</p>
+          <p class="eyebrow">
+            00 / <span {...key("home.eyebrow")}>{t("home.eyebrow")}</span>
+          </p>
           <NotationMotif />
         </div>
+        {/*
+          * The wordmark is a name, so it is never translated — the same rule
+          * that keeps project names, dates, and identifiers intact.
+          */}
         <h1>ENDORETIC</h1>
-        <p class="hero__lede">{SITE.description}</p>
+        <p class="hero__lede" data-i18n-flow {...key("site.tagline")}>
+          {t("site.tagline")}
+        </p>
         <a class="text-link" href="/works/">
-          Browse works <span aria-hidden="true">→</span>
+          <span {...key("home.browse")}>{t("home.browse")}</span>{" "}
+          <span aria-hidden="true">→</span>
         </a>
       </div>
       <HeroMedia />
@@ -31,16 +40,18 @@ const notes = await getVisibleNotes();
 
   <section class="section shell identity-section" aria-labelledby="identity-title">
     <div class="identity-section__heading">
-      <p class="eyebrow">H.01 / Introduction</p>
-      <h2 id="identity-title">About this archive</h2>
+      <p class="eyebrow">
+        H.01 / <span {...key("home.intro.eyebrow")}>{t("home.intro.eyebrow")}</span>
+      </p>
+      <h2 id="identity-title" {...key("home.intro.title")}>
+        {t("home.intro.title")}
+      </h2>
     </div>
     <div class="pending-copy">
-      <p>
-        A personal archive of research tooling, small utilities, notes, and
-        unfinished systems. Most of it is open source.
-      </p>
+      <p data-i18n-flow {...key("home.intro.body")}>{t("home.intro.body")}</p>
       <a class="text-link" href="/about/">
-        About <span aria-hidden="true">→</span>
+        <span {...key("nav.about")}>{t("nav.about")}</span>{" "}
+        <span aria-hidden="true">→</span>
       </a>
     </div>
   </section>
@@ -48,10 +59,14 @@ const notes = await getVisibleNotes();
   <section class="section shell" aria-labelledby="works-title">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">H.02 / Works · initial records</p>
-        <h2 id="works-title">Works</h2>
+        <p class="eyebrow">
+          H.02 / <span {...key("home.works.eyebrow")}>{t("home.works.eyebrow")}</span>
+        </p>
+        <h2 id="works-title" {...key("home.works.title")}>{t("home.works.title")}</h2>
       </div>
-      <a class="text-link" href="/works/">View all works</a>
+      <a class="text-link" href="/works/" {...key("home.works.viewAll")}>
+        {t("home.works.viewAll")}
+      </a>
     </div>
     <div class="card-grid">
       {
@@ -65,10 +80,14 @@ const notes = await getVisibleNotes();
   <section class="section shell" aria-labelledby="notes-title">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">H.03 / Notes · recent records</p>
-        <h2 id="notes-title">Notes</h2>
+        <p class="eyebrow">
+          H.03 / <span {...key("home.notes.eyebrow")}>{t("home.notes.eyebrow")}</span>
+        </p>
+        <h2 id="notes-title" {...key("home.notes.title")}>{t("home.notes.title")}</h2>
       </div>
-      <a class="text-link" href="/notes/">View notes</a>
+      <a class="text-link" href="/notes/" {...key("home.notes.viewAll")}>
+        {t("home.notes.viewAll")}
+      </a>
     </div>
     {
       notes.length > 0 ? (
@@ -78,7 +97,9 @@ const notes = await getVisibleNotes();
           ))}
         </div>
       ) : (
-        <p class="empty-state">Nothing published here yet.</p>
+        <p class="empty-state" {...key("common.empty")}>
+          {t("common.empty")}
+        </p>
       )
     }
   </section>

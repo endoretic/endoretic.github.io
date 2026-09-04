@@ -33,9 +33,9 @@ Astro prints the local URL. Draft content is visible during local development
 and is labelled as a draft where it appears.
 
 The site uses no client-side JavaScript for its core navigation or content.
-Small, progressively enhanced scripts are limited to optional hero motion and
-ambient-audio controls; the complete site remains useful when JavaScript is
-unavailable.
+Small, progressively enhanced scripts are limited to optional hero motion,
+ambient-audio controls, and the hidden language layer; the complete site remains
+useful when JavaScript is unavailable.
 
 ## Build and validation
 
@@ -100,9 +100,41 @@ Required draft frontmatter:
     draft: true
     ---
 
-A published note must set draft: false and provide publishedAt. Optional fields
-include updatedAt, tags, readingMode, and coverAssetId. Production builds
-exclude all draft notes from indexes and generated detail routes.
+A published note must set `draft: false` and provide both `publishedAt` (the
+first publication date) and `updatedAt` (the latest content revision). Public
+note cards and ordering use `publishedAt`; the note detail page labels and shows
+`updatedAt` as `Last updated`. Optional fields include tags, readingMode, and
+coverAssetId. Production builds exclude all draft notes from indexes and
+generated detail routes.
+
+## Interface language
+
+Interface copy lives in `src/locales/en.json` and `hymmnos.json`, and is placed
+in markup with `key()` and `t()` from `src/lib/i18n.ts` rather than written
+inline. Both catalogs carry the same keys; `npm test` fails if they drift.
+
+English is the interface language. The second catalog is Hymmnos, reached
+through a switch hidden in the footer, which also swaps the script to a Hymmnos
+glyph font and offers the Latin transliteration on hover or focus.
+
+Interface language and content language are separate axes. Notes and projects
+keep their own `lang` frontmatter, so a Chinese note still renders as
+`<html lang="zh-CN">` inside the English interface.
+
+The layer is applied in the browser. Pages are built and served in English,
+nothing about the layer is fetched until a reader finds it, and no accessible
+name, alt text, `<title>`, or metadata is ever translated — so navigation,
+assistive technology, and search results are unaffected by it.
+
+The glyph font is self-hosted, deliberately kept out of `src/data/assets.yml`
+because it states no licence terms of its own, and disclosed in the
+always-visible Typeface section of `/credits`. Tracing its origin or replacing
+it with a font whose terms are stated is an open `[TODO]`; the layer degrades to
+readable Latin transcription without it.
+
+Fuller design notes live in `docs/HYMMNOS_LAYER.md`, which — like the rest of
+`docs/` and `AGENTS.md` — is local guidance and is not tracked in this
+repository.
 
 ## Media policy
 

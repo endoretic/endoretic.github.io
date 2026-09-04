@@ -54,6 +54,14 @@ const notes = defineCollection({
           message: "Published notes require publishedAt.",
         });
       }
+
+      if (!entry.draft && !entry.updatedAt) {
+        context.addIssue({
+          code: "custom",
+          path: ["updatedAt"],
+          message: "Published notes require updatedAt.",
+        });
+      }
     }),
 });
 

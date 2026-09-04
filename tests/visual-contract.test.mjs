@@ -63,6 +63,12 @@ test("the public asset inventory contains only generated or manifest-approved fi
   const expected = [
     "CNAME",
     "favicon.svg",
+    // The Hymmnos glyph face. It sits outside public/media/ and outside the
+    // asset manifest on purpose: that manifest encodes the first-release
+    // licence allowlist, and this font carries no licence statement, so
+    // admitting it there would have meant weakening the allowlist itself. It is
+    // disclosed on /credits instead. See docs/HYMMNOS_LAYER.md.
+    "fonts/fonts.woff2",
     ...generatedArt,
     ...approvedMedia,
   ].sort();
@@ -146,7 +152,7 @@ test("the home page uses responsive original art and defers optional audio", () 
   assert.ok(audio, "Missing optional ambient audio element");
   assert.match(audio, /\bpreload="none"/i);
   assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
-  assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-cylinder-seven-01\.mp3/i);
+  assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-into-the-mist-01\.mp3/i);
   assert.match(html, /data-notation-motif/);
   assert.match(html, /class="work-signal record-card__signal"/i);
   assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
@@ -251,6 +257,45 @@ test("raster scenes retain their inline SVG loading fallback", () => {
   assert.match(component, /class="scene-vignette__image"/);
   assert.match(component, /class="scene-vignette__fallback"/);
   assert.match(component, /onerror="this\.closest\('picture'\)\.hidden=true"/);
+});
+
+test("archive index heroes reuse the painted scenes as right-side underlays", () => {
+  const routes = new Map([
+    ["works/index.html", "relay"],
+    ["notes/index.html", "hall"],
+    ["about/index.html", "console"],
+    ["credits/index.html", "coast"],
+  ]);
+
+  for (const [route, scene] of routes) {
+    const html = readFileSync(join(distRoot, route), "utf8");
+
+    assert.match(html, /class="page-header page-header--scene/);
+    assert.match(html, /class="page-header__scene" aria-hidden="true"/);
+    assert.match(
+      html,
+      new RegExp(`/media/generated/scene-${scene}-01-1280\\.avif`),
+    );
+    assert.match(html, /fetchpriority="high"/);
+  }
+
+  const styles = readFileSync(join(sourceRoot, "styles/global.css"), "utf8");
+  assert.match(styles, /\.page-header__copy[\s\S]*width:\s*min\(60%,\s*46rem\)/);
+  assert.match(styles, /\.page-header__scene[\s\S]*right:\s*-2%/);
+  assert.match(styles, /\.page-header__scene[\s\S]*mask-image:\s*radial-gradient/);
+});
+
+test("the about page separates personal context, memory, and contact details", () => {
+  const html = readFileSync(join(distRoot, "about/index.html"), "utf8");
+  const source = readFileSync(join(sourceRoot, "pages/about.astro"), "utf8");
+
+  assert.match(html, /Who keeps this site/);
+  assert.match(html, /Why I began recording/);
+  assert.match(html, /rhythm games shaped by an earlier internet/);
+  assert.match(html, /linkedin\.com\/in\/yukun-bian-a15639387\//);
+  assert.match(source, /class="about-memory-fragments"/);
+  assert.doesNotMatch(source, /\(eg\.\s*\)/i);
+  assert.doesNotMatch(source, /\[TODO:/);
 });
 
 test("optional media controllers preserve poster and user-gesture fallbacks", () => {

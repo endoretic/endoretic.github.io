@@ -1,5 +1,6 @@
 ---
 import ProjectCard from "../../components/ProjectCard.astro";
+import PageHero from "../../components/PageHero.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getVisibleProjects } from "../../lib/content";
 
@@ -11,13 +12,12 @@ const projects = await getVisibleProjects();
   description="Project records in the endoretic archive."
 >
   <div class="shell page-shell">
-    <header class="page-header">
-      <p class="eyebrow">01 / Works</p>
-      <h1>Works</h1>
-      <p class="lede">
-        Tools, plugins, and experiments. Each record links to its source.
-      </p>
-    </header>
+    <PageHero
+      index="01"
+      titleKey="works.title"
+      descriptionKey="works.description"
+      scene="relay"
+    />
 
     <div class="card-grid">
       {projects.map((project) => <ProjectCard project={project} />)}

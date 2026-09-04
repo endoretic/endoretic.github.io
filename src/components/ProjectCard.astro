@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import NotationMotif from "./NotationMotif.astro";
 import RecordLocator from "./RecordLocator.astro";
 import WorkSignal from "./WorkSignal.astro";
+import { key, t } from "../lib/i18n";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -18,44 +19,56 @@ const recordId = "W / " + project.id.toUpperCase();
 <article class="record-card" lang={project.data.lang}>
   <header class="record-card__registration">
     <p><NotationMotif seed={project.id} class="notation-motif--inline" />{recordId}</p>
-    {project.data.placeholder && <p>Record incomplete</p>}
+    {project.data.placeholder && (
+      <p {...key("record.incomplete")}>{t("record.incomplete")}</p>
+    )}
   </header>
   <div class="record-card__body">
-    <p class="eyebrow">Project</p>
+    <p class="eyebrow" {...key("record.project")}>{t("record.project")}</p>
     <Heading>
       <a href={projectHref}>{project.data.title}</a>
     </Heading>
     <p>{project.data.summary}</p>
     <dl class="record-card__meta">
       <div>
-        <dt>Language</dt>
+        <dt {...key("field.language")}>{t("field.language")}</dt>
+        {/* The tag itself is an identifier and stays as written. */}
         <dd>{project.data.lang}</dd>
       </div>
       {project.data.status && (
         <div>
-          <dt>Status</dt>
+          <dt {...key("field.status")}>{t("field.status")}</dt>
           <dd>{project.data.status}</dd>
         </div>
       )}
       {project.data.year && (
         <div>
-          <dt>Year</dt>
+          <dt {...key("field.year")}>{t("field.year")}</dt>
           <dd>{project.data.year}</dd>
         </div>
       )}
       {project.data.tags.length > 0 && (
         <div>
-          <dt>Tags</dt>
+          <dt {...key("field.tags")}>{t("field.tags")}</dt>
           <dd>{project.data.tags.join(", ")}</dd>
         </div>
       )}
     </dl>
     <div class="record-card__links">
       <a class="text-link" href={projectHref}>
-        Open record <span aria-hidden="true">→</span>
+        <span {...key("record.open")}>{t("record.open")}</span>{" "}
+        <span aria-hidden="true">→</span>
       </a>
-      {project.data.repo && <a href={project.data.repo}>Repository</a>}
-      {project.data.demo && <a href={project.data.demo}>Demo</a>}
+      {project.data.repo && (
+        <a href={project.data.repo} {...key("record.repo")}>
+          {t("record.repo")}
+        </a>
+      )}
+      {project.data.demo && (
+        <a href={project.data.demo} {...key("record.demo")}>
+          {t("record.demo")}
+        </a>
+      )}
     </div>
   </div>
   <WorkSignal seed={project.id} class="record-card__signal" />

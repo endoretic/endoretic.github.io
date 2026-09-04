@@ -1,0 +1,524 @@
+---
+/*
+ * The hidden language switch.
+ *
+ * This is an easter egg, so it is not a language menu in a corner. The trigger
+ * is the decorative interval mark that already sits in the footer: identical to
+ * the eye, unlabelled on the page, and a real button underneath with a real
+ * accessible name. Hidden from the eye is the intent; hidden from assistive
+ * technology or the keyboard would just be broken.
+ *
+ * Everything the layer needs — catalog, font, transformed markup — arrives only
+ * after that button is used, or after `?layer=hymmnos` is requested directly.
+ * A visitor who never finds it downloads none of it.
+ *
+ * The panel itself stays in the interface language on purpose. Its heading and
+ * hint follow the layer, because they are atmosphere; the two option labels
+ * never do, because they are the way back out.
+ */
+
+import NotationMotif from "./NotationMotif.astro";
+import {
+  DEFAULT_LOCALE,
+  LAYER_LOCALE,
+  LOCALE_PARAM,
+  STORAGE_KEY,
+  key,
+  t,
+} from "../lib/i18n";
+
+interface Props {
+  /* Any stable string, so the trigger keeps one glyph across builds. */
+  seed?: string;
+}
+
+const { seed = "language-layer" } = Astro.props;
+---
+
+<div
+  class="language-layer"
+  data-language-layer
+  data-default-locale={DEFAULT_LOCALE}
+  data-layer-locale={LAYER_LOCALE}
+  data-locale-param={LOCALE_PARAM}
+  data-storage-key={STORAGE_KEY}
+  data-catalog-url="/locales/hymmnos.json"
+  data-translit-label={t("layer.translit")}
+  hidden
+>
+  <button
+    type="button"
+    class="language-layer__trigger"
+    aria-label={t("layer.title")}
+    aria-expanded="false"
+    aria-controls="language-layer-panel"
+    data-language-trigger
+  >
+    <NotationMotif seed={seed} />
+  </button>
+
+  <div
+    class="language-layer__panel"
+    id="language-layer-panel"
+    role="group"
+    aria-label={t("layer.title")}
+    hidden
+    data-language-panel
+  >
+    <div class="language-layer__bar">
+      <p class="language-layer__heading" {...key("layer.title")}>
+        {t("layer.title")}
+      </p>
+      {/*
+        * Escape and an outside click both close the panel, but neither is
+        * discoverable on a touch screen, so the panel carries its own way out.
+        */}
+      <button
+        type="button"
+        class="language-layer__close"
+        lang="en"
+        data-language-close
+      >
+        {t("layer.close")}
+      </button>
+    </div>
+
+    <ul class="language-layer__options">
+      <li>
+        <button
+          type="button"
+          class="language-layer__option"
+          aria-pressed="true"
+          data-language-option={DEFAULT_LOCALE}
+        >
+          <span class="language-layer__bullet" aria-hidden="true">●</span>
+          <span lang="en">{t("layer.english")}</span>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="language-layer__option"
+          aria-pressed="false"
+          data-language-option={LAYER_LOCALE}
+        >
+          <span class="language-layer__bullet" aria-hidden="true">○</span>
+          <span lang="en">{t("layer.hymmnos")}</span>
+        </button>
+      </li>
+    </ul>
+
+    <p class="language-layer__hint" {...key("layer.hint")}>{t("layer.hint")}</p>
+  </div>
+</div>
+
+<script>
+  /*
+   * Applies a language catalog over already-rendered English, and draws the
+   * Hymmnos entries in tower glyphs.
+   *
+   * The catalog stores Latin transcription, not invented private-use
+   * codepoints: Hymmnos is twenty-six letters written left to right, and the
+   * font maps those letters to glyphs. So the text stays real text — selectable,
+   * searchable, copyable — and only the typeface changes. Language layer and
+   * script layer are two axes, never one. See docs/HYMMNOS_LAYER.md.
+   */
+  interface DecodeEntry {
+    line: HTMLElement;
+    from: string;
+    to: string;
+    glyphs: boolean;
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-language-layer]");
+  const trigger = document.querySelector<HTMLButtonElement>(
+    "[data-language-trigger]",
+  );
+  const panel = document.querySelector<HTMLElement>("[data-language-panel]");
+
+  if (root && trigger && panel) {
+    const defaultLocale = root.dataset.defaultLocale ?? "en";
+    const layerLocale = root.dataset.layerLocale ?? "x-hymmnos";
+    const localeParam = root.dataset.localeParam ?? "layer";
+    const storageKey = root.dataset.storageKey ?? "endoretic:language-layer";
+    const catalogUrl = root.dataset.catalogUrl ?? "/locales/hymmnos.json";
+    /*
+     * The gloss label stays in the interface language even inside the layer. A
+     * gloss whose own label needs glossing helps nobody.
+     */
+    const translitLabel = root.dataset.translitLabel ?? "Transliteration";
+
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-i18n]"),
+    );
+
+    /*
+     * The rendered English is captured before anything is replaced. Restoring
+     * from the page is exact and free, which is why only the Hymmnos catalog is
+     * ever fetched.
+     */
+    const english = new Map<HTMLElement, string>(
+      targets.map((node) => [node, node.textContent ?? ""]),
+    );
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let catalog: Record<string, string> | null = null;
+    let locale = defaultLocale;
+    let animation = 0;
+    let restoreTimer = 0;
+
+    /* Storage is a convenience; a browser refusing it must not break the page. */
+    const read = (name: string): string | null => {
+      try {
+        return window.localStorage.getItem(name);
+      } catch {
+        return null;
+      }
+    };
+
+    const write = (name: string, value: string): void => {
+      try {
+        window.localStorage.setItem(name, value);
+      } catch {
+        /* Private mode, or site data blocked. The layer still works this visit. */
+      }
+    };
+
+    /*
+     * Structure, not just text. The glyph line is hidden from assistive
+     * technology and the English original is kept as the element's accessible
+     * text, so switching the layer never changes what a screen reader reads or
+     * what in-page search can find.
+     */
+    const build = (
+      node: HTMLElement,
+      /* What the glyph line shows right now — the departing text mid-decode. */
+      lineText: string,
+      lineLocale: string,
+      /* What the gloss tier always shows: the settled Hymmnos transcription. */
+      hymmnos: string,
+    ): HTMLElement => {
+      const wrap = document.createElement("span");
+      wrap.className = node.hasAttribute("data-i18n-flow")
+        ? "hy hy--flow"
+        : "hy";
+
+      const line = document.createElement("span");
+      line.className = "hy-line";
+      line.lang = lineLocale;
+      line.setAttribute("aria-hidden", "true");
+      line.textContent = lineText;
+
+      const translit = document.createElement("span");
+      translit.className = "hy-translit";
+      translit.setAttribute("aria-hidden", "true");
+      translit.dataset.label = translitLabel;
+      translit.textContent = hymmnos;
+
+      /*
+       * Never drawn. This is the element's accessible text and what in-page
+       * search matches, which is what keeps the layer from hiding the site
+       * from assistive technology.
+       */
+      const meaning = document.createElement("span");
+      meaning.className = "hy-meaning";
+      meaning.lang = "en";
+      meaning.textContent = english.get(node) ?? "";
+
+      wrap.append(line, translit, meaning);
+      node.replaceChildren(wrap);
+
+      return line;
+    };
+
+    const restore = (): void => {
+      for (const node of targets) {
+        node.replaceChildren(document.createTextNode(english.get(node) ?? ""));
+      }
+    };
+
+    /*
+     * Sections that only exist inside the layer — the homage on /credits is the
+     * one so far. They ship in the markup and stay hidden, so they are part of
+     * the page rather than something injected by script.
+     */
+    const layerOnly = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-layer-only]"),
+    );
+
+    const revealLayerOnly = (on: boolean): void => {
+      for (const section of layerOnly) section.hidden = !on;
+    };
+
+    /*
+     * The decode. Text corrupts in the interface face, flips to glyphs at the
+     * halfway mark, then settles into Hymmnos: a signal resolving rather than a
+     * string being swapped. Reduced motion skips straight to the settled state.
+     */
+    const BLOCKS = "█▓▒░";
+    const LETTERS = "abcdefghijklmnopqrstuvwxyz";
+    const DURATION = 620;
+    const STAGGER = 14;
+    const MAX_STAGGER_STEPS = 40;
+    const FLIP = 0.42;
+
+    const pick = (source: string): string =>
+      source[Math.floor(Math.random() * source.length)] ?? "";
+
+    const scramble = (text: string, settled: number, source: string): string => {
+      let output = "";
+      for (let index = 0; index < text.length; index += 1) {
+        const character = text[index] ?? "";
+        output +=
+          index < settled || character === " " ? character : pick(source);
+      }
+      return output;
+    };
+
+    const settle = (entries: DecodeEntry[]): void => {
+      for (const entry of entries) {
+        entry.line.textContent = entry.to;
+        entry.line.lang = entry.glyphs ? layerLocale : "en";
+        entry.line.removeAttribute("data-decoding");
+      }
+    };
+
+    const decode = (entries: DecodeEntry[]): void => {
+      window.cancelAnimationFrame(animation);
+      if (entries.length === 0) return;
+
+      if (reduceMotion.matches) {
+        settle(entries);
+        return;
+      }
+
+      for (const entry of entries) entry.line.setAttribute("data-decoding", "");
+
+      const started = performance.now();
+      const last = STAGGER * Math.min(entries.length, MAX_STAGGER_STEPS);
+
+      const step = (now: number): void => {
+        const elapsed = now - started;
+
+        entries.forEach((entry, index) => {
+          const progress = Math.min(
+            1,
+            Math.max(
+              0,
+              (elapsed - STAGGER * Math.min(index, MAX_STAGGER_STEPS)) /
+                DURATION,
+            ),
+          );
+
+          if (progress <= 0) return;
+
+          if (progress >= 1) {
+            entry.line.textContent = entry.to;
+            entry.line.lang = entry.glyphs ? layerLocale : "en";
+            entry.line.removeAttribute("data-decoding");
+            return;
+          }
+
+          if (progress < FLIP) {
+            /* Phase one: the departing language breaks up, in its own face. */
+            entry.line.lang = entry.glyphs ? "en" : layerLocale;
+            entry.line.textContent = scramble(
+              entry.from,
+              Math.round(entry.from.length * (1 - progress / FLIP)),
+              BLOCKS,
+            );
+          } else {
+            /*
+             * Phase two: the arriving language resolves. Unsettled characters
+             * are random letters, which the glyph font draws as glyphs, so the
+             * noise is already in the destination script.
+             */
+            entry.line.lang = entry.glyphs ? layerLocale : "en";
+            entry.line.textContent = scramble(
+              entry.to,
+              Math.round(entry.to.length * ((progress - FLIP) / (1 - FLIP))),
+              LETTERS,
+            );
+          }
+        });
+
+        if (elapsed < last + DURATION) {
+          animation = window.requestAnimationFrame(step);
+        } else {
+          settle(entries);
+        }
+      };
+
+      animation = window.requestAnimationFrame(step);
+    };
+
+    const markOptions = (): void => {
+      for (const option of panel.querySelectorAll<HTMLButtonElement>(
+        "[data-language-option]",
+      )) {
+        const selected = option.dataset.languageOption === locale;
+        option.setAttribute("aria-pressed", String(selected));
+        const bullet = option.querySelector(".language-layer__bullet");
+        if (bullet) bullet.textContent = selected ? "●" : "○";
+      }
+    };
+
+    const toLayer = async (animate: boolean): Promise<void> => {
+      if (!catalog) {
+        try {
+          const response = await fetch(catalogUrl);
+          if (!response.ok) throw new Error(String(response.status));
+          catalog = (await response.json()) as Record<string, string>;
+        } catch {
+          /* No catalog, no layer. The page is already correct in English. */
+          markOptions();
+          return;
+        }
+      }
+
+      /*
+        * A pending restore from a half-finished switch back would otherwise
+        * fire mid-decode and tear the tiers down again.
+        */
+      window.clearTimeout(restoreTimer);
+
+      const entries: DecodeEntry[] = [];
+      for (const node of targets) {
+        const text = catalog[node.dataset.i18n ?? ""];
+        if (text === undefined) continue;
+        const from = node.textContent ?? "";
+        /*
+          * While animating, the line opens on the departing English and must be
+          * marked as English, or the first frame draws Latin words in glyphs.
+          */
+        const line = animate
+          ? build(node, from, defaultLocale, text)
+          : build(node, text, layerLocale, text);
+        if (animate) entries.push({ line, from, to: text, glyphs: true });
+      }
+
+      locale = layerLocale;
+      document.documentElement.dataset.languageLayer = layerLocale;
+      revealLayerOnly(true);
+      decode(entries);
+    };
+
+    const toDefault = (animate: boolean): void => {
+      const entries: DecodeEntry[] = [];
+
+      if (animate && !reduceMotion.matches) {
+        for (const node of targets) {
+          const line = node.querySelector<HTMLElement>(".hy-line");
+          const to = english.get(node) ?? "";
+          if (!line) continue;
+          entries.push({
+            line,
+            from: line.textContent ?? "",
+            to,
+            glyphs: false,
+          });
+        }
+      }
+
+      locale = defaultLocale;
+      delete document.documentElement.dataset.languageLayer;
+      revealLayerOnly(false);
+
+      window.clearTimeout(restoreTimer);
+
+      if (entries.length > 0) {
+        decode(entries);
+        /* The tiers come down only once the English has finished resolving. */
+        restoreTimer = window.setTimeout(
+          restore,
+          DURATION + STAGGER * MAX_STAGGER_STEPS + 120,
+        );
+      } else {
+        restore();
+      }
+    };
+
+    const apply = async (next: string, animate: boolean): Promise<void> => {
+      if (next === layerLocale) {
+        await toLayer(animate);
+      } else {
+        toDefault(animate);
+      }
+
+      write(storageKey, locale);
+      markOptions();
+    };
+
+    const openPanel = (open: boolean): void => {
+      panel.hidden = !open;
+      trigger.setAttribute("aria-expanded", String(open));
+      if (open) {
+        panel
+          .querySelector<HTMLButtonElement>('[aria-pressed="true"]')
+          ?.focus();
+      }
+    };
+
+    panel
+      .querySelector<HTMLButtonElement>("[data-language-close]")
+      ?.addEventListener("click", () => {
+        openPanel(false);
+        trigger.focus();
+      });
+
+    trigger.addEventListener("click", () => {
+      /* `hidden` is `string | boolean` since `until-found`; only openness matters. */
+      openPanel(Boolean(panel.hidden));
+    });
+
+    for (const option of panel.querySelectorAll<HTMLButtonElement>(
+      "[data-language-option]",
+    )) {
+      option.addEventListener("click", () => {
+        const next = option.dataset.languageOption ?? defaultLocale;
+        if (next !== locale) void apply(next, true);
+      });
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !panel.hidden) {
+        openPanel(false);
+        trigger.focus();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!panel.hidden && target instanceof Node && !root.contains(target)) {
+        openPanel(false);
+      }
+    });
+
+    /*
+     * The switch only exists for readers whose browser ran this. Without it the
+     * footer keeps an ordinary decorative mark and the site is unchanged.
+     */
+    root.hidden = false;
+
+    const requested = new URLSearchParams(window.location.search).get(
+      localeParam,
+    );
+    const asked =
+      requested === "hymmnos" || requested === layerLocale
+        ? layerLocale
+        : requested !== null
+          ? defaultLocale
+          : null;
+    const remembered = read(storageKey);
+
+    if (asked === layerLocale || (asked === null && remembered === layerLocale)) {
+      /*
+       * A remembered layer is the reader's settled state, so it arrives without
+       * theatre; a link that asks for it explicitly gets the decode.
+       */
+      void apply(layerLocale, asked !== null);
+    } else {
+      markOptions();
+    }
+  }
+</script>

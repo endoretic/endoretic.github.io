@@ -1,10 +1,17 @@
 ---
 import { getAsset, getAudioSources } from "../lib/assets";
 import { stableIndex } from "../lib/hash";
+import { key, type MessageKey } from "../lib/i18n";
 
 interface Props {
   assetId: string;
   label?: string;
+  /*
+   * Optional catalog entry for the visible label. The `aria-label` keeps the
+   * English text either way: the language layer changes what is drawn, never
+   * the accessible name of a media control.
+   */
+  labelKey?: MessageKey;
   initialVolume?: number;
   class?: string;
   showAttribution?: boolean;
@@ -17,6 +24,7 @@ interface Props {
 const {
   assetId,
   label = "Ambient audio",
+  labelKey,
   initialVolume = 0.15,
   class: className,
   showAttribution = true,
@@ -64,7 +72,9 @@ const settingsKey = `endoretic:audio:${assetId}:settings`;
   data-initial-volume={initialVolume}
 >
   <div class="ambient-audio__heading">
-    <span class="ambient-audio__label">{label}</span>
+    <span class="ambient-audio__label" {...(labelKey ? key(labelKey) : {})}>
+      {label}
+    </span>
     <span class="ambient-audio__status" data-audio-status role="status">Off</span>
   </div>
 

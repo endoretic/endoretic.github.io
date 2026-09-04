@@ -1,6 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { formatHtmlDate, formatIsoWeekDate } from "../lib/date";
 import NotationMotif from "./NotationMotif.astro";
+import { key, t } from "../lib/i18n";
 
 interface Props {
   note: CollectionEntry<"notes">;
@@ -10,13 +12,9 @@ interface Props {
 const { note, headingLevel = "h2" } = Astro.props;
 const Heading = headingLevel;
 const noteHref = "/notes/" + note.id + "/";
-const formattedDate = note.data.publishedAt
-  ? new Intl.DateTimeFormat(note.data.lang, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      timeZone: "UTC",
-    }).format(note.data.publishedAt)
+const publicationDate = note.data.publishedAt;
+const formattedDate = publicationDate
+  ? formatIsoWeekDate(publicationDate)
   : null;
 const recordId = "N / " + note.id.toUpperCase();
 ---
@@ -28,24 +26,25 @@ const recordId = "N / " + note.id.toUpperCase();
     </p>
     <dl>
       <div>
-        <dt>Language</dt>
+        <dt {...key("field.language")}>{t("field.language")}</dt>
+        {/* The tag itself is an identifier and stays as written. */}
         <dd>{note.data.lang}</dd>
       </div>
       {note.data.draft && (
         <div>
-          <dt>State</dt>
-          <dd>Draft preview</dd>
+          <dt {...key("field.state")}>{t("field.state")}</dt>
+          <dd {...key("state.draft")}>{t("state.draft")}</dd>
         </div>
       )}
       {formattedDate && (
         <div>
-          <dt>Date</dt>
-          <dd><time datetime={note.data.publishedAt?.toISOString()}>{formattedDate}</time></dd>
+          <dt {...key("field.date")}>{t("field.date")}</dt>
+          <dd><time datetime={formatHtmlDate(publicationDate!)}>{formattedDate}</time></dd>
         </div>
       )}
       {note.data.tags.length > 0 && (
         <div>
-          <dt>Tags</dt>
+          <dt {...key("field.tags")}>{t("field.tags")}</dt>
           <dd>{note.data.tags.join(", ")}</dd>
         </div>
       )}
@@ -58,6 +57,7 @@ const recordId = "N / " + note.id.toUpperCase();
     <p>{note.data.description}</p>
   </div>
   <a class="text-link" href={noteHref}>
-    Read note <span aria-hidden="true">→</span>
+    <span {...key("record.read")}>{t("record.read")}</span>{" "}
+    <span aria-hidden="true">→</span>
   </a>
 </article>
