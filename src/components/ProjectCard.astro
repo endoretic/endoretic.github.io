@@ -3,7 +3,8 @@ import type { CollectionEntry } from "astro:content";
 import NotationMotif from "./NotationMotif.astro";
 import RecordLocator from "./RecordLocator.astro";
 import WorkSignal from "./WorkSignal.astro";
-import { key, t } from "../lib/i18n";
+import { contentKey, key, projectSummaryKey, t } from "../lib/i18n";
+import { outboundLink } from "../lib/nav";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -28,7 +29,9 @@ const recordId = "W / " + project.id.toUpperCase();
     <Heading>
       <a href={projectHref}>{project.data.title}</a>
     </Heading>
-    <p>{project.data.summary}</p>
+    <p data-i18n-flow {...contentKey(projectSummaryKey(project.id))}>
+      {project.data.summary}
+    </p>
     <dl class="record-card__meta">
       <div>
         <dt {...key("field.language")}>{t("field.language")}</dt>
@@ -60,12 +63,20 @@ const recordId = "W / " + project.id.toUpperCase();
         <span aria-hidden="true">→</span>
       </a>
       {project.data.repo && (
-        <a href={project.data.repo} {...key("record.repo")}>
+        <a
+          href={project.data.repo}
+          {...outboundLink(project.data.repo)}
+          {...key("record.repo")}
+        >
           {t("record.repo")}
         </a>
       )}
       {project.data.demo && (
-        <a href={project.data.demo} {...key("record.demo")}>
+        <a
+          href={project.data.demo}
+          {...outboundLink(project.data.demo)}
+          {...key("record.demo")}
+        >
           {t("record.demo")}
         </a>
       )}

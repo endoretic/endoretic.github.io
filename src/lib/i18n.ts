@@ -35,6 +35,7 @@
 
 import en from "../locales/en.json";
 import hymmnos from "../locales/hymmnos.json";
+import hymmnosContent from "../locales/hymmnos-content.json";
 
 /* `en` is an ordinary language tag; `x-hymmnos` is private-use. */
 export type LocaleId = "en" | "x-hymmnos";
@@ -53,6 +54,48 @@ export const CATALOGS: Readonly<Record<LocaleId, Record<string, string>>> =
     en,
     "x-hymmnos": hymmnos,
   });
+
+/*
+ * Content strings, as opposed to interface strings.
+ *
+ * A project summary's English lives in its frontmatter, which is the single
+ * place it should ever be written. So this catalog stores only the Hymmnos and
+ * is matched to the entry by id; nothing here duplicates the English, and the
+ * two can never drift into disagreeing about it.
+ *
+ * A missing entry is not an error. Untranslated content simply stays in
+ * English inside the layer, which is the honest result for a record nobody has
+ * carried across yet, and it keeps adding a project from being gated on
+ * finding attested vocabulary for it.
+ */
+const { "//": CONTENT_NOTICE, ...CONTENT } = hymmnosContent;
+
+export const CONTENT_CATALOG: Readonly<Record<string, string>> =
+  Object.freeze(CONTENT);
+
+/* Kept so the provenance note travels with the data rather than being dropped. */
+export const CONTENT_CATALOG_NOTICE: readonly string[] = CONTENT_NOTICE;
+
+/* Content keys live in the same fetched payload, so they must not collide. */
+export const CONTENT_ATTRIBUTE = "data-i18n-content";
+
+/** The catalog key for one project's summary. */
+export function projectSummaryKey(id: string): string {
+  return `project.${id}.summary`;
+}
+
+/**
+ * Marks a content element as translatable, the way `key` does for interface
+ * strings. Returns nothing at all when the string has no Hymmnos entry, so an
+ * untranslated record is left in English instead of being marked and skipped.
+ */
+export function contentKey(
+  contentId: string,
+): Record<string, string> {
+  return contentId in CONTENT_CATALOG
+    ? { [CONTENT_ATTRIBUTE]: contentId }
+    : {};
+}
 
 /* Storage and markup contract, shared with the client script. */
 export const STORAGE_KEY = "endoretic:language-layer";

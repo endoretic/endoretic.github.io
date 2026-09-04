@@ -112,7 +112,8 @@ const sources = getVideoSources(assetId);
     navigator as Navigator & { connection?: ConnectionWithSaveData }
   ).connection;
 
-  document
+  const start = (): void => {
+    document
     .querySelectorAll<HTMLElement>("[data-licensed-video]")
     .forEach((root) => {
       if (root.dataset.videoInitialized === "true") return;
@@ -191,6 +192,20 @@ const sources = getVideoSources(assetId);
       video.load();
       void video.play().catch(usePoster);
     });
+  };
+
+  /*
+   * Run now for the page this module arrived on, rather than waiting for
+   * astro:page-load — the router fires that on window `load`, which for a page
+   * carrying video is exactly the moment that comes last.
+   *
+   * astro:page-load then covers pages reached by navigating, where the module
+   * is already loaded and nothing else would start their video. Roots that were
+   * already initialised are skipped by the flag above, so the two never collide.
+   */
+  start();
+
+  document.addEventListener("astro:page-load", start);
 </script>
 
 <style>

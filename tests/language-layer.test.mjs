@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+
+import { normaliseProse, projectBodyKey } from "../src/lib/prose-key.mjs";
 import { brotliDecompressSync } from "node:zlib";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -15,8 +17,43 @@ const read = (...parts) =>
   readFileSync(join(repositoryRoot, ...parts), "utf8").replace(/\r\n/g, "\n");
 const readJson = (...parts) => JSON.parse(read(...parts));
 
+/*
+ * The body paragraphs of one record, as the browser will see them.
+ *
+ * Read from the build rather than from the markdown, because the processor
+ * rewrites straight apostrophes and dashes into typographic ones. A key
+ * hashed from the source would never match the key the client derives, and
+ * every body translation would silently fail to apply.
+ */
+function renderedProse(id) {
+  const file = join(distRoot, `works/${id}/index.html`);
+  if (!existsSync(file)) return [];
+
+  const html = readFileSync(file, "utf8");
+  const open = html.indexOf('<div class=\"prose\"');
+  if (open === -1) return [];
+
+  const start = html.indexOf(">", open) + 1;
+  const inner = html.slice(start, html.indexOf("</div>", start));
+
+  return [...inner.matchAll(/<p(?:\s[^>]*)?>([\s\S]*?)<\/p>/g)]
+    .map(([, body]) =>
+      normaliseProse(
+        body
+          .replace(/<[^>]+>/g, "")
+          .replace(/&#38;|&amp;/g, "&")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&quot;/g, String.fromCharCode(34))
+          .replace(/&#39;|&apos;/g, String.fromCharCode(39)),
+      ),
+    )
+    .filter(Boolean);
+}
+
 const en = readJson("src/locales/en.json");
 const hymmnos = readJson("src/locales/hymmnos.json");
+const hymmnosContent = readJson("src/locales/hymmnos-content.json");
 const lexicon = readJson("src/data/hymmnos-words.json");
 
 /*
@@ -36,6 +73,48 @@ const PROTECTED_TERMS = [
   "Hymmnos",
   "English",
   "Astro",
+  /*
+   * Content vocabulary. Project summaries name games, engines, file formats and
+   * plugin hosts, and those names are the only part of a summary a reader can
+   * still act on — search for, install, or recognise. Translating "USC" or
+   * "osu!mania" would describe nothing and destroy that, so they are masked the
+   * same way a company name is. Everything outside this list still has to be
+   * attested Hymmnos.
+   */
+  "Project SEKAI",
+  "Ethereal Style",
+  "Zontex Bridge",
+  "Sekai.best",
+  "NextRUSH+",
+  "World Link",
+  "Moesekai",
+  "Prosekai",
+  "Japanese",
+  "Wallpaper",
+  "Chinese",
+  "Zontex",
+  "Bridge",
+  ".scp",
+  "PMID",
+  "ISBN",
+  "PDF",
+  "DOI",
+  "XPI",
+  "osu!mania",
+  "World Link",
+  "event point",
+  "JavaScript",
+  "Prosekai",
+  "tier list",
+  "Sonolus",
+  "plugin",
+  "Zotero",
+  "Python",
+  "Codex",
+  "USC",
+  "SCP",
+  "API",
+  "MIT",
 ].sort((left, right) => right.length - left.length);
 
 function collectFiles(directory) {
@@ -207,6 +286,165 @@ test("both catalogs describe exactly the same interface", () => {
   }
 });
 
+test("the content catalog tracks the records it claims to translate", () => {
+  const entries = Object.entries(hymmnosContent).filter(([key]) => key !== "//");
+  const keys = entries.map(([key]) => key);
+
+  /*
+   * Both catalogs are merged into one payload at /locales/hymmnos.json, so a
+   * shared key would mean one silently overwriting the other.
+   */
+  for (const key of keys) {
+    assert.ok(
+      !(key in en),
+      `Content key "${key}" collides with an interface key.`,
+    );
+  }
+
+  for (const [key, value] of entries) {
+    assert.equal(typeof value, "string", `${key} is not a string.`);
+    assert.notEqual(value.trim(), "", `${key} is empty.`);
+    assert.doesNotMatch(value, /\[TODO/i, `${key} still carries a placeholder.`);
+  }
+
+  const projects = collectFiles(join(sourceRoot, "content", "projects"))
+    .filter((file) => /\.(md|mdx)$/.test(file))
+    .map((file) => {
+      const source = readFileSync(file, "utf8").replace(/\r\n/g, "\n");
+      const parts = source.split(/^---$/m);
+      return {
+        id: basename(file).replace(/\.(md|mdx)$/, ""),
+        frontmatter: parts[1] ?? "",
+        body: parts.slice(2).join("---").trim(),
+      };
+    })
+    .filter(({ frontmatter }) => !/^draft:\s*true\s*$/m.test(frontmatter));
+
+  /*
+   * Every key must still name something real. A summary key names a record; a
+   * body key names one paragraph of it by the hash of its text, so a key that
+   * resolves to nothing is a translation of wording that has since been
+   * edited — the layer falls back to English there, silently, which is exactly
+   * why it is caught here instead.
+   */
+  const bodyKeys = new Set(
+    projects.flatMap(({ id }) =>
+      renderedProse(id).map((paragraph) => projectBodyKey(id, paragraph)),
+    ),
+  );
+
+  for (const key of keys) {
+    if (key.endsWith(".summary")) {
+      const id = key.replace(/^project\./, "").replace(/\.summary$/, "");
+      assert.ok(
+        projects.some((project) => project.id === id),
+        `Content key "${key}" names no published project.`,
+      );
+      continue;
+    }
+
+    assert.ok(
+      bodyKeys.has(key),
+      `Content key "${key}" matches no paragraph in any record. ` +
+        "The wording it translated was probably edited.",
+    );
+  }
+
+  /*
+   * The layer leaves an untranslated summary in English by design, so a missing
+   * entry cannot break a build. That makes it exactly the kind of gap that goes
+   * unnoticed, which is why it is asserted here instead.
+   */
+  for (const { id } of projects) {
+    assert.ok(
+      keys.includes(`project.${id}.summary`),
+      `Published project "${id}" has no Hymmnos summary.`,
+    );
+  }
+
+  /*
+   * Licence and rights paragraphs are deliberately left in English, so body
+   * coverage is not required to be total. It is required not to collapse:
+   * every record carries at least its opening description.
+   */
+  for (const { id } of projects) {
+    const [first] = renderedProse(id);
+    assert.ok(
+      first && keys.includes(projectBodyKey(id, first)),
+      `Published project "${id}" has no Hymmnos for its opening paragraph.`,
+    );
+  }
+});
+
+test("project summaries are marked for the layer but never as metadata", () => {
+  const card = read("src/components/ProjectCard.astro");
+  const layout = read("src/layouts/ProjectLayout.astro");
+
+  for (const source of [card, layout]) {
+    assert.match(source, /contentKey\(projectSummaryKey\(/);
+  }
+
+  /*
+   * The same summary is the page description. Metadata is never translated, in
+   * any layer, so the meta tag must keep reading the frontmatter directly.
+   */
+  assert.match(layout, /const metadataDescription = data\.placeholder/);
+  assert.match(layout, /description=\{metadataDescription\}/);
+
+  for (const file of collectHtml(distRoot)) {
+    const html = readFileSync(file, "utf8");
+    assert.doesNotMatch(
+      html,
+      /<meta[^>]+data-i18n-content/i,
+      "A content translation was attached to metadata in " + file,
+    );
+  }
+});
+
+test("a navigation keeps the recording and lets sibling sites go", () => {
+  /*
+   * The recording plays across pages only because the router swaps the body
+   * instead of reloading, and only because this one node is carried over.
+   */
+  assert.match(read("src/layouts/BaseLayout.astro"), /<ClientRouter \/>/);
+  assert.match(
+    read("src/components/AmbientAudio.astro"),
+    /transition:persist="retained-recording"/,
+  );
+
+  /*
+   * endoretic.cc also serves two project sites this build knows nothing about.
+   * They are same-origin, so the router would swap their HTML into this shell
+   * unless the link opts out.
+   */
+  for (const file of collectHtml(distRoot)) {
+    const html = readFileSync(file, "utf8");
+
+    for (const [, href] of html.matchAll(
+      /<a[^>]*?href="(https:\/\/endoretic\.cc\/[^"]*)"[^>]*>/g,
+    )) {
+      const anchor = html
+        .slice(html.indexOf(`href="${href}"`) - 200, html.indexOf(`href="${href}"`) + 200)
+        .match(/<a[^>]*?>/g)
+        ?.find((tag) => tag.includes(href));
+
+      assert.ok(
+        anchor?.includes("data-astro-reload"),
+        `${href} in ${file} would be intercepted by the router.`,
+      );
+    }
+  }
+
+  /* Scripts that bind per page must re-bind after a swap, or they run once. */
+  for (const component of ["LanguageLayer", "LicensedVideo"]) {
+    assert.match(
+      read(`src/components/${component}.astro`),
+      /addEventListener\("astro:page-load"/,
+      `${component} would only initialise on the first page.`,
+    );
+  }
+});
+
 test("every key is used, and every used key exists", () => {
   const sources = collectFiles(sourceRoot)
     .filter((file) => /\.(astro|ts|mjs)$/.test(file))
@@ -364,7 +602,12 @@ test("the Hymmnos catalog uses only attested vocabulary", () => {
 
   const unattested = new Map();
 
-  for (const [key, value] of Object.entries(hymmnos)) {
+  const translated = [
+    ...Object.entries(hymmnos),
+    ...Object.entries(hymmnosContent).filter(([key]) => key !== "//"),
+  ];
+
+  for (const [key, value] of translated) {
     /* Mask protected names first, longest match first, exactly as the harness does. */
     let masked = value;
     for (const term of PROTECTED_TERMS) masked = masked.split(term).join(" ");
@@ -409,7 +652,14 @@ test("every Hymmnos character can actually be drawn by the glyph font", () => {
   const covered = fontCoverage(path);
   const missing = new Set();
 
-  for (const value of Object.values(hymmnos)) {
+  const drawn = [
+    ...Object.values(hymmnos),
+    ...Object.entries(hymmnosContent)
+      .filter(([key]) => key !== "//")
+      .map(([, value]) => value),
+  ];
+
+  for (const value of drawn) {
     for (const character of value) {
       if (!covered.has(character.codePointAt(0))) missing.add(character);
     }
@@ -459,9 +709,20 @@ test("the glyph font is self-hosted, pinned, and cheap enough to be optional", (
 
 test("the catalog is published as its own file rather than inlined everywhere", () => {
   const published = JSON.parse(read("dist/locales/hymmnos.json"));
+  const content = Object.fromEntries(
+    Object.entries(hymmnosContent).filter(([key]) => key !== "//"),
+  );
 
-  assert.deepEqual(Object.keys(published), Object.keys(hymmnos));
-  assert.deepEqual(published, hymmnos);
+  /*
+   * One request carries both catalogs. They are separate files in the
+   * repository because their English comes from two different places, but a
+   * reader opening the switch needs all of it at once.
+   */
+  assert.deepEqual(Object.keys(published), [
+    ...Object.keys(hymmnos),
+    ...Object.keys(content),
+  ]);
+  assert.deepEqual(published, { ...hymmnos, ...content });
 
   /* Nothing about the layer may be paid for by a reader who never finds it. */
   for (const file of collectHtml(distRoot)) {

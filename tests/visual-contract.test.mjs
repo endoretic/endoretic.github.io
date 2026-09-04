@@ -321,9 +321,14 @@ test("optional media controllers preserve poster and user-gesture fallbacks", ()
   assert.match(audioComponent, /localStorage\.setItem/);
   assert.match(audioComponent, /visibilitychange/);
   assert.match(audioComponent, /document\.hidden\s*&&\s*!audio\.paused/);
+  /*
+   * Ships disabled, so a reader without script gets an inert control rather
+   * than a dead one. Asserted by presence, not by position: the labels are
+   * catalog-keyed now, and the key spread follows the disabled attribute.
+   */
   assert.match(
     audioComponent,
-    /<button\b[^>]*data-audio-toggle[^>]*disabled>/,
+    /<button[^>]*data-audio-toggle[^>]*disabled[^>]*>/,
   );
   assert.match(audioComponent, /type="range"/);
 });
