@@ -126,7 +126,7 @@
   "layer.title": "Language layer",
   "layer.english": "English",
   "layer.hymmnos": "Hymmnos",
-  "layer.hint": "Hover or focus a line to read its transliteration.",
+  "layer.hint": "Pause over a passage to reveal its transliteration.",
   "layer.translit": "Transliteration",
   "layer.close": "Close"
 }

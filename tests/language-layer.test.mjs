@@ -498,7 +498,7 @@ test("every Hymmnos character can actually be drawn by the glyph font", () => {
   ];
 
   for (const value of drawn) {
-    const glyphText = hymmnosParts(value).filter((part) => part.kind === "text")
+    const glyphText = hymmnosParts(value).filter((part) => part.kind !== "lost")
       .map((part) => part.text).join("");
     for (const character of glyphText) {
       if (!covered.has(character.codePointAt(0))) missing.add(character);
