@@ -123,12 +123,21 @@
   white-space: nowrap;
   background: var(--ink-950);
   /*
-   * `visibility`, not just `opacity`: a transparent element is still selectable
-   * and still matched by find-in-page, which would put a second copy of every
-   * label into the reader's search results.
+   * Removed from layout, not merely faded. A transparent element is still
+   * selectable and still matched by find-in-page, which would put a second copy
+   * of every label into the reader's search results — but hiding it was not
+   * enough on its own. An absolutely positioned box still contributes to the
+   * document's scrollable overflow, and this one is a no-wrap caption up to
+   * 28rem wide anchored to the left edge of whatever label it belongs to. On a
+   * phone, the captions belonging to labels part-way across the page reached
+   * about forty pixels beyond the viewport, and the whole site scrolled
+   * sideways in the layer while looking perfectly correct.
+   *
+   * This is the reasoning the flow variant below already gives for taking its
+   * gloss out of the flow rather than fading it. Nothing here animates, so
+   * there is no transition to preserve.
    */
-  visibility: hidden;
-  opacity: 0;
+  display: none;
   pointer-events: none;
 }
 
@@ -137,8 +146,7 @@
 :focus-visible > .hy > .hy-translit,
 a:hover .hy > .hy-translit,
 button:hover .hy > .hy-translit {
-  visibility: visible;
-  opacity: 1;
+  display: block;
 }
 
 /*
@@ -167,8 +175,6 @@ button:hover .hy > .hy-translit {
   white-space: normal;
   background: none;
   border-left: 1px solid var(--line);
-  visibility: visible;
-  opacity: 1;
 }
 
 /*
