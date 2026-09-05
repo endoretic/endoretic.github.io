@@ -40,6 +40,8 @@ const generatedArt = [
   ...[640, 1024].flatMap((width) => [
     `media/generated/spine-archive-study-01-${width}.avif`,
     `media/generated/spine-archive-study-01-${width}.webp`,
+    `media/generated/endoplasmic-reticulum-study-01-${width}.avif`,
+    `media/generated/endoplasmic-reticulum-study-01-${width}.webp`,
   ]),
 ];
 
