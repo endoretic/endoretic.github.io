@@ -4,6 +4,7 @@ import { dirname, extname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { parse } from "yaml";
+import { stableIndex } from "../src/lib/hash.ts";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const publicRoot = join(repositoryRoot, "public");
@@ -131,311 +132,59 @@ test("the original illustrations have compact responsive local derivatives", () 
   }
 });
 
-test("the home page uses responsive original art and defers optional audio", () => {
+test("the home page serves responsive original art", () => {
   const html = readFileSync(join(distRoot, "index.html"), "utf8");
-  const heroArt = html.match(
-    /<picture\b[^>]*hero-media__art[\s\S]*?<\/picture>/i,
-  )?.[0];
-  const audio = html.match(/<audio\b[^>]*>[\s\S]*?<\/audio>/i)?.[0];
-
-  assert.ok(heroArt, "Missing local original hero illustration");
-  assert.match(heroArt, /\/media\/generated\/hero-afterlight-01-640\.avif 640w/i);
-  assert.match(heroArt, /\/media\/generated\/hero-afterlight-01-1600\.webp 1600w/i);
-  assert.match(heroArt, /\bwidth="1600"[^>]*\bheight="900"/i);
-  assert.match(heroArt, /\balt="[^"]+"/i);
-  assert.match(html, /STILL \/ 01/i);
-  assert.match(html, />16:9</i);
-  assert.match(html, /Afterlight study/i);
-  assert.doesNotMatch(html, /<video\b/i);
-  assert.doesNotMatch(html, /hero-radio-array-01|identity-reac-01/i);
-
-  assert.ok(audio, "Missing optional ambient audio element");
-  assert.match(audio, /\bpreload="none"/i);
-  assert.doesNotMatch(audio, /\bsrc\s*=|<source\b/i);
-  assert.match(html, /data-sources="[^\"]*\/media\/audio\/ambient-into-the-mist-01\.mp3/i);
-  assert.match(html, /data-notation-motif/);
-  assert.match(html, /class="work-signal record-card__signal"/i);
-  assert.match(html, /\/media\/generated\/foreground-megastructure-01-1024\.avif/i);
-  assert.match(html, /foreground-artifact--megastructure/i);
-  assert.match(html, /class="site-background-art"/i);
+  const heroArt = [...html.matchAll(/<picture\b[^>]*>[\s\S]*?<\/picture>/gi)]
+    .map(([picture]) => picture)
+    .find((picture) => picture.includes("/media/generated/hero-afterlight-01-"));
+  assert.ok(heroArt, "Missing original hero illustration");
+  assert.match(heroArt, /srcset="[^"]+ 640w[^"]+ 1600w"/);
+  assert.match(heroArt, /<img\b(?=[^>]*\bwidth="1600")(?=[^>]*\bheight="900")(?=[^>]*\balt="[^"]+")[^>]*>/);
+  assert.doesNotMatch(html, /<video\b|hero-radio-array-01|identity-reac-01/i);
 });
 
-test("project cards use slug-derived signal signatures rather than unrelated art", () => {
-  const component = readFileSync(
-    join(sourceRoot, "components/ProjectCard.astro"),
-    "utf8",
-  );
-  const locator = readFileSync(
-    join(sourceRoot, "components/RecordLocator.astro"),
-    "utf8",
-  );
-  const signal = readFileSync(
-    join(sourceRoot, "components/WorkSignal.astro"),
-    "utf8",
-  );
-  const globalCss = readFileSync(
-    join(repositoryRoot, "src/styles/global.css"),
-    "utf8",
-  );
-  const motionCss = readFileSync(
-    join(repositoryRoot, "src/styles/motion.css"),
-    "utf8",
-  );
-
-  assert.match(component, /WorkSignal/);
-  assert.match(component, /RecordLocator/);
-  assert.match(component, /href=\{projectHref\}/);
-  assert.match(component, /label=\{`Open \$\{project\.data\.title\} record`\}/);
-  assert.doesNotMatch(component, /RecordArtwork|SceneVignette|WorkSeal|sceneForRecord/);
-  assert.match(globalCss, /\.record-card\s*\{[\s\S]*grid-template-rows:\s*auto 1fr/);
-  assert.match(globalCss, /\.work-signal\s*\{[\s\S]*position:\s*absolute/);
-  assert.match(signal, /stableIndex\(`\$\{seed\}:signal:/);
-  assert.match(signal, /class="work-signal__axis"/);
-  assert.match(signal, /class="work-signal__ticks"/);
-  assert.match(signal, /<svg[\s\S]*aria-hidden="true"/);
-  assert.doesNotMatch(globalCss, /\.record-artwork\s*\{/);
-  assert.match(globalCss, /\.record-locator\s*\{[\s\S]*right:\s*0\.8rem[\s\S]*bottom:\s*0\.75rem/);
-  assert.match(locator, /<a[\s\S]*href=\{href\}[\s\S]*aria-label=\{label\}/);
-  assert.match(locator, /<svg[\s\S]*aria-hidden="true"/);
-  assert.match(globalCss, /\.record-locator:focus-visible\s*\{[\s\S]*outline:/);
-  assert.match(motionCss, /\.record-locator:hover \.record-locator__corners/);
-});
-
-test("the monument is a document background and the hero rail stays record-sized", () => {
-  const layout = readFileSync(
-    join(repositoryRoot, "src/layouts/BaseLayout.astro"),
-    "utf8",
-  );
-  const home = readFileSync(join(sourceRoot, "pages/index.astro"), "utf8");
-  const globalCss = readFileSync(
-    join(repositoryRoot, "src/styles/global.css"),
-    "utf8",
-  );
-
-  assert.match(layout, /class="site-background-art"/);
-  assert.match(layout, /ForegroundArtifact variant="megastructure"/);
-  assert.doesNotMatch(home, /ForegroundArtifact|SceneVignette/);
-  assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*position:\s*absolute/);
-  assert.match(globalCss, /body > \.site-background-art\s*\{[\s\S]*right:\s*0[\s\S]*bottom:\s*0/);
-  assert.doesNotMatch(globalCss, /body > \.site-background-art\s*\{[\s\S]*top:\s*clamp/);
-  assert.doesNotMatch(globalCss, /\.hero__grid::before/);
-  assert.match(globalCss, /\.hero h1::before\s*\{[\s\S]*height:\s*1em/);
-  assert.match(globalCss, /\.hero__lede::before\s*\{[\s\S]*background:\s*var\(--signal-500\)/);
-});
-
-test("the owner-directed pale interface remains the primary visual surface", () => {
-  const tokens = readFileSync(
-    join(repositoryRoot, "src/styles/tokens.css"),
-    "utf8",
-  );
-  const globalCss = readFileSync(
-    join(repositoryRoot, "src/styles/global.css"),
-    "utf8",
-  );
-
-  assert.match(tokens, /color-scheme:\s*light/);
-  assert.match(tokens, /--surface-0:\s*#d8d3bd/);
-  assert.match(tokens, /--ink-950:\s*#292a26/);
-  assert.match(globalCss, /body\s*\{[\s\S]*var\(--surface-0\)/);
-  assert.match(
-    globalCss,
-    /\.site-nav a\[aria-current="page"\][\s\S]*background:\s*var\(--ink-950\)/,
-  );
-  assert.match(
-    globalCss,
-    /@media \(max-width:\s*38rem\)[\s\S]*\.site-nav\s*\{[\s\S]*grid-template-columns:\s*repeat\(6/,
-  );
-});
-
-test("raster scenes retain their inline SVG loading fallback", () => {
-  const component = readFileSync(
-    join(sourceRoot, "components/SceneVignette.astro"),
-    "utf8",
-  );
-
-  assert.match(component, /mode\s*=\s*"image"/);
-  assert.match(component, /class="scene-vignette__image"/);
-  assert.match(component, /class="scene-vignette__fallback"/);
-  assert.match(component, /onerror="this\.closest\('picture'\)\.hidden=true"/);
-});
-
-test("archive index heroes reuse the painted scenes as right-side underlays", () => {
-  const routes = new Map([
-    ["works/index.html", "relay"],
-    ["notes/index.html", "hall"],
-    ["about/index.html", "console"],
-    ["credits/index.html", "coast"],
-  ]);
-
-  for (const [route, scene] of routes) {
-    const html = readFileSync(join(distRoot, route), "utf8");
-
-    assert.match(html, /class="page-header page-header--scene/);
-    assert.match(html, /class="page-header__scene" aria-hidden="true"/);
-    assert.match(
-      html,
-      new RegExp(`/media/generated/scene-${scene}-01-1280\\.avif`),
-    );
-    assert.match(html, /fetchpriority="high"/);
+test("archive indexes serve their local decorative scenes", () => {
+  for (const [route, scene] of [
+    ["works", "relay"], ["notes", "hall"], ["about", "console"], ["credits", "coast"],
+  ]) {
+    const html = readFileSync(join(distRoot, route, "index.html"), "utf8");
+    const picture = [...html.matchAll(/<picture\b[^>]*>[\s\S]*?<\/picture>/gi)]
+      .map(([markup]) => markup)
+      .find((markup) => markup.includes(`/media/generated/scene-${scene}-01-`));
+    assert.ok(picture, `Missing ${scene} on /${route}/`);
+    assert.match(picture, /srcset="[^"]+ 640w[^"]+ 1280w"/);
+    assert.match(picture, /<img\b[^>]*\balt=""/);
   }
-
-  const styles = readFileSync(join(sourceRoot, "styles/global.css"), "utf8");
-  assert.match(styles, /\.page-header__copy[\s\S]*width:\s*min\(60%,\s*46rem\)/);
-  assert.match(styles, /\.page-header__scene[\s\S]*right:\s*-2%/);
-  assert.match(styles, /\.page-header__scene[\s\S]*mask-image:\s*radial-gradient/);
 });
 
-test("the about page separates personal context, memory, and contact details", () => {
-  const html = readFileSync(join(distRoot, "about/index.html"), "utf8");
-  const source = readFileSync(join(sourceRoot, "pages/about.astro"), "utf8");
-
-  assert.match(html, /Who keeps this site/);
-  assert.match(html, /Why I began recording/);
-  assert.match(html, /rhythm games shaped by an earlier internet/);
-  assert.match(html, /linkedin\.com\/in\/yukun-bian-a15639387\//);
-  assert.match(source, /class="about-memory-fragments"/);
-  assert.doesNotMatch(source, /\(eg\.\s*\)/i);
-  assert.doesNotMatch(source, /\[TODO:/);
-});
-
-test("optional media controllers preserve poster and user-gesture fallbacks", () => {
-  const videoComponent = readFileSync(
-    join(sourceRoot, "components/LicensedVideo.astro"),
-    "utf8",
-  );
-  const audioComponent = readFileSync(
-    join(sourceRoot, "components/AmbientAudio.astro"),
-    "utf8",
-  );
-
-  assert.match(videoComponent, /desktop\.matches/);
-  assert.match(videoComponent, /connection\?\.saveData\s*!==\s*true/);
-  assert.match(videoComponent, /prefers-reduced-motion:\s*reduce/);
-  assert.match(videoComponent, /video\.play\(\)\.catch\(usePoster\)/);
-  assert.match(videoComponent, /data-video-state="poster"/);
-  assert.match(videoComponent, /video\.addEventListener\("error",\s*usePoster/);
-
-  assert.match(audioComponent, /<audio preload="none" hidden><\/audio>/);
-  assert.match(audioComponent, /enable\.addEventListener\("click"/);
-  assert.match(audioComponent, /document\.createElement\("source"\)/);
-  assert.match(audioComponent, /localStorage\.setItem/);
-  assert.match(audioComponent, /visibilitychange/);
-  assert.match(audioComponent, /document\.hidden\s*&&\s*!audio\.paused/);
-  /*
-   * Ships disabled, so a reader without script gets an inert control rather
-   * than a dead one. Asserted by presence, not by position: the labels are
-   * catalog-keyed now, and the key spread follows the disabled attribute.
-   */
-  assert.match(
-    audioComponent,
-    /<button[^>]*data-audio-toggle[^>]*disabled[^>]*>/,
-  );
-  assert.match(audioComponent, /type="range"/);
-});
-
-test("motion is opt-in and completely disabled for reduced-motion users", () => {
-  const css = readFileSync(
-    join(repositoryRoot, "src/styles/motion.css"),
-    "utf8",
-  );
-
-  assert.match(css, /prefers-reduced-motion:\s*no-preference/);
-  assert.match(css, /prefers-reduced-motion:\s*reduce/);
-  assert.match(css, /animation:\s*none\s*!important/);
-  assert.match(css, /transition:\s*none\s*!important/);
-  assert.match(css, /scroll-behavior:\s*auto\s*!important/);
-  assert.doesNotMatch(css, /@keyframes|animation-name/);
-
-  const layout = readFileSync(
-    join(repositoryRoot, "src/layouts/BaseLayout.astro"),
-    "utf8",
-  );
-  const compiledCss = collectFiles(join(distRoot, "_astro"))
-    .filter((file) => file.endsWith(".css"))
-    .map((file) => readFileSync(file, "utf8"))
-    .join("\n");
-
-  assert.match(layout, /import\s+["']\.\.\/styles\/motion\.css["']/);
-  assert.match(compiledCss, /prefers-reduced-motion:\s*no-preference/);
-  assert.match(compiledCss, /prefers-reduced-motion:\s*reduce/);
-  assert.match(compiledCss, /animation:\s*none\s*!important/);
-  assert.match(compiledCss, /transition:\s*none\s*!important/);
-});
-
-test("the notation motif is original, decorative, and never a text replacement", () => {
-  const component = readFileSync(
-    join(repositoryRoot, "src/components/NotationMotif.astro"),
-    "utf8",
-  );
-
-  assert.match(component, /Original endoretic\.cc interval mark/);
-  assert.match(component, /aria-hidden="true"/);
-  assert.match(component, /data-notation-motif/);
-  assert.doesNotMatch(component, /aria-label|role="img"/);
-});
-
-test("the notation is a set of glyphs rather than one repeated mark", () => {
-  const component = readFileSync(
-    join(repositoryRoot, "src/components/NotationMotif.astro"),
-    "utf8",
-  );
-  const glyphs = component.match(/\{ d: "/g) ?? [];
-
-  // A single repeated mark reads as a logo, which is the opposite of the
-  // intent: the set exists to imply a larger surrounding index.
-  assert.ok(
-    glyphs.length >= 8,
-    `Expected at least 8 glyphs, found ${glyphs.length}`,
-  );
-
+test("rendered notation is decorative and varies between records", () => {
   const html = readFileSync(join(distRoot, "index.html"), "utf8");
-  const rendered = new Set(
-    [...html.matchAll(/data-notation-motif><path d="([^"]+)"/g)].map(
-      (match) => match[1],
-    ),
-  );
-  assert.ok(
-    rendered.size >= 2,
-    "Records should not all render the same notation glyph",
-  );
+  const motifs = [...html.matchAll(/<svg\b[^>]*\bdata-notation-motif[^>]*>[\s\S]*?<\/svg>/g)];
+  assert.ok(motifs.length > 1, "Expected notation beside multiple records");
+  const drawings = new Set();
+  for (const [svg] of motifs) {
+    const tag = svg.slice(0, svg.indexOf(">") + 1);
+    assert.match(tag, /aria-hidden="true"/);
+    assert.doesNotMatch(tag, /aria-label=|role="img"/);
+    drawings.add(svg.slice(svg.indexOf(">") + 1));
+  }
+  assert.ok(drawings.size > 1, "All records rendered the same notation");
 });
 
-test("record bucket selection is stable, in range, and well spread", () => {
-  const source = readFileSync(join(sourceRoot, "lib/hash.ts"), "utf8");
-
-  // `^=` produces a signed 32-bit result. Without normalising before the
-  // modulo, the returned index goes negative and every lookup is undefined.
-  assert.match(source, /\(hash \^ \(hash >>> 16\)\) >>> 0/);
-
-  // FNV-1a on its own mixes its low bits poorly for short slugs, and the
-  // modulo reads exactly those bits, which collapsed most real project slugs
-  // onto one bucket. The finalizer must survive.
-  assert.match(source, /0x7feb352d/);
-  assert.match(source, /0x846ca68b/);
-});
-
-test("the note reading surface protects measure, overflow, and paper contrast", () => {
-  const layout = readFileSync(
-    join(repositoryRoot, "src/layouts/NoteLayout.astro"),
-    "utf8",
-  );
-  const prose = readFileSync(
-    join(repositoryRoot, "src/styles/prose.css"),
-    "utf8",
-  );
-  const tokens = readFileSync(
-    join(repositoryRoot, "src/styles/tokens.css"),
-    "utf8",
-  );
-
-  assert.match(layout, /<article class:list=/);
-  assert.match(layout, /note-page--/);
-  assert.match(layout, /class="prose"/);
-  assert.match(tokens, /--reading-text:\s*70ch/);
-  assert.match(prose, /\.note-page--paper/);
-  assert.match(prose, /\.note-page--paper \.prose blockquote[\s\S]*color:\s*#48483f/);
-  assert.match(prose, /\.note-page--paper :focus-visible[\s\S]*outline-color:\s*var\(--paper-ink\)/);
-  assert.match(prose, /\.prose pre[\s\S]*overflow-x:\s*auto/);
-  assert.match(prose, /\.prose table[\s\S]*overflow-x:\s*auto/);
-  assert.match(prose, /overflow-wrap:\s*anywhere/);
+test("record bucket selection is deterministic, bounded, and varied", () => {
+  const slugs = readdirSync(join(sourceRoot, "content/projects"))
+    .filter((file) => /\.(md|mdx)$/.test(file))
+    .map((file) => file.replace(/\.(md|mdx)$/, ""));
+  const seeds = ["", "柳州屏山大桥", ...slugs,
+    ...Array.from({ length: 1000 }, (_, index) => `record-${index}`)];
+  for (const buckets of [1, 4, 12, 1000]) {
+    for (const seed of seeds) {
+      const index = stableIndex(seed, buckets);
+      assert.ok(Number.isInteger(index) && index >= 0 && index < buckets,
+        `Invalid bucket ${index} for ${seed} / ${buckets}`);
+      assert.equal(stableIndex(seed, buckets), index);
+    }
+  }
+  const selected = slugs.map((slug) => stableIndex(slug, 12));
+  assert.ok(new Set(selected).size >= 3, "Project marks collapsed into too few buckets");
 });

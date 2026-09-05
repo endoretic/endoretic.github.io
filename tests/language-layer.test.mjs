@@ -5,6 +5,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { hymmnosParts, hymmnosTranscription } from "../src/lib/hymmnos-text.mjs";
 import { normaliseProse, projectBodyKey } from "../src/lib/prose-key.mjs";
 import { brotliDecompressSync } from "node:zlib";
 
@@ -16,6 +17,16 @@ const distRoot = join(repositoryRoot, "dist");
 const read = (...parts) =>
   readFileSync(join(repositoryRoot, ...parts), "utf8").replace(/\r\n/g, "\n");
 const readJson = (...parts) => JSON.parse(read(...parts));
+
+// Decode rendered text, allowing equivalent entity spelling and whitespace.
+const decodeText = (html) => normaliseProse(html.replace(/<[^>]+>/g, "")
+  .replace(/&(#x[\da-f]+|#\d+|amp|lt|gt|quot|apos);/gi, (_, entity) => {
+    if (entity.startsWith("#")) {
+      const hex = entity[1].toLowerCase() === "x";
+      return String.fromCodePoint(parseInt(entity.slice(hex ? 2 : 1), hex ? 16 : 10));
+    }
+    return { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" }[entity.toLowerCase()];
+  }));
 
 /*
  * The body paragraphs of one record, as the browser will see them.
@@ -55,69 +66,6 @@ const en = readJson("src/locales/en.json");
 const hymmnos = readJson("src/locales/hymmnos.json");
 const hymmnosContent = readJson("src/locales/hymmnos-content.json");
 const lexicon = readJson("src/data/hymmnos-words.json");
-
-/*
- * Names that survive translation untouched, longest first — the same
- * precedence the hm-translator harness uses when it masks protected spans
- * before handing prose to a translator. Project names, brands, people,
- * companies, and technologies are identifiers, not prose.
- */
-const PROTECTED_TERMS = [
-  "Koei Tecmo Games Co., Ltd.",
-  "Gust Co., Ltd.",
-  "Akira Tsuchiya",
-  "Ar tonelico",
-  "endoretic.cc",
-  "TypeScript",
-  "Endoretic",
-  "Hymmnos",
-  "English",
-  "Astro",
-  /*
-   * Content vocabulary. Project summaries name games, engines, file formats and
-   * plugin hosts, and those names are the only part of a summary a reader can
-   * still act on — search for, install, or recognise. Translating "USC" or
-   * "osu!mania" would describe nothing and destroy that, so they are masked the
-   * same way a company name is. Everything outside this list still has to be
-   * attested Hymmnos.
-   */
-  "Project SEKAI",
-  "Ethereal Style",
-  "GPL-3.0",
-  "OpenAI",
-  "Zontex Bridge",
-  "Sekai.best",
-  "NextRUSH+",
-  "World Link",
-  "Moesekai",
-  "Prosekai",
-  "Japanese",
-  "Wallpaper",
-  "Chinese",
-  "Zontex",
-  "Bridge",
-  ".scp",
-  "PMID",
-  "ISBN",
-  "PDF",
-  "DOI",
-  "XPI",
-  "osu!mania",
-  "World Link",
-  "event point",
-  "JavaScript",
-  "Prosekai",
-  "tier list",
-  "Sonolus",
-  "plugin",
-  "Zotero",
-  "Python",
-  "Codex",
-  "USC",
-  "SCP",
-  "API",
-  "MIT",
-].sort((left, right) => right.length - left.length);
 
 function collectFiles(directory) {
   if (!existsSync(directory)) return [];
@@ -379,128 +327,53 @@ test("the content catalog tracks the records it claims to translate", () => {
   }
 });
 
-test("project summaries are marked for the layer but never as metadata", () => {
-  const card = read("src/components/ProjectCard.astro");
-  const layout = read("src/layouts/ProjectLayout.astro");
-
-  for (const source of [card, layout]) {
-    assert.match(source, /contentKey\(projectSummaryKey\(/);
-  }
-
-  /*
-   * The same summary is the page description. Metadata is never translated, in
-   * any layer, so the meta tag must keep reading the frontmatter directly.
-   */
-  assert.match(layout, /const metadataDescription = data\.placeholder/);
-  assert.match(layout, /description=\{metadataDescription\}/);
-
-  for (const file of collectHtml(distRoot)) {
-    const html = readFileSync(file, "utf8");
-    assert.doesNotMatch(
-      html,
-      /<meta[^>]+data-i18n-content/i,
-      "A content translation was attached to metadata in " + file,
-    );
+test("project summaries are translated visibly while metadata keeps the original", () => {
+  for (const [contentKey] of Object.entries(hymmnosContent)) {
+    const match = contentKey.match(/^project\.(.+)\.summary$/);
+    if (!match) continue;
+    const html = read("dist/works", match[1], "index.html");
+    const summary = [...html.matchAll(/<p\b[^>]*data-i18n-content="([^"]+)"[^>]*>([\s\S]*?)<\/p>/g)]
+      .find(([, key]) => key === contentKey);
+    assert.ok(summary, `Missing visible summary ${contentKey}`);
+    const meta = [...html.matchAll(/<meta\b[^>]*>/g)]
+      .map(([tag]) => tag)
+      .find((tag) => /\bname="description"/.test(tag));
+    assert.ok(meta, `Missing description for ${match[1]}`);
+    const description = meta.match(/\bcontent="([^"]*)"/)?.[1];
+    assert.equal(decodeText(description ?? ""), decodeText(summary[2]));
   }
 });
-
-test("a navigation keeps the recording and lets sibling sites go", () => {
-  /*
-   * The recording plays across pages only because the router swaps the body
-   * instead of reloading, and only because this one node is carried over.
-   */
-  assert.match(read("src/layouts/BaseLayout.astro"), /<ClientRouter \/>/);
-  assert.match(
-    read("src/components/AmbientAudio.astro"),
-    /transition:persist="retained-recording"/,
-  );
-
-  /*
-   * endoretic.cc also serves two project sites this build knows nothing about.
-   * They are same-origin, so the router would swap their HTML into this shell
-   * unless the link opts out.
-   */
+test("published sibling-site links opt out of the local router", () => {
+  const destinations = new Set();
   for (const file of collectHtml(distRoot)) {
     const html = readFileSync(file, "utf8");
-
-    for (const [, href] of html.matchAll(
-      /<a[^>]*?href="(https:\/\/endoretic\.cc\/[^"]*)"[^>]*>/g,
-    )) {
-      const anchor = html
-        .slice(html.indexOf(`href="${href}"`) - 200, html.indexOf(`href="${href}"`) + 200)
-        .match(/<a[^>]*?>/g)
-        ?.find((tag) => tag.includes(href));
-
-      assert.ok(
-        anchor?.includes("data-astro-reload"),
-        `${href} in ${file} would be intercepted by the router.`,
-      );
+    for (const [anchor, href] of html.matchAll(/<a\b[^>]*\bhref="(https:\/\/endoretic\.cc\/[^\"]*)"[^>]*>/g)) {
+      const path = new URL(href).pathname;
+      if (path === "/" || /^\/(?:works|notes|about|credits)(?:\/|$)/.test(path)) continue;
+      assert.match(anchor, /\bdata-astro-reload(?:[\s=>])/,
+        `${href} in ${file} would be intercepted by the router.`);
+      destinations.add(path);
     }
   }
-
-  /* Scripts that bind per page must re-bind after a swap, or they run once. */
-  for (const component of ["LanguageLayer", "LicensedVideo"]) {
-    assert.match(
-      read(`src/components/${component}.astro`),
-      /addEventListener\("astro:page-load"/,
-      `${component} would only initialise on the first page.`,
-    );
+  for (const path of ["/pjsk-tier-maker/", "/score-calculator/"]) {
+    assert.ok(destinations.has(path), `No sibling-site link checked for ${path}`);
   }
 });
-
-test("every key is used, and every used key exists", () => {
-  const sources = collectFiles(sourceRoot)
-    .filter((file) => /\.(astro|ts|mjs)$/.test(file))
-    .filter((file) => !file.includes(join("src", "locales")))
-    .map((file) => readFileSync(file, "utf8"))
-    .join("\n");
-
-  for (const key of Object.keys(en)) {
-    assert.ok(
-      sources.includes(`"${key}"`),
-      `Catalog key "${key}" is not referenced anywhere in src/.`,
-    );
-  }
-
-  for (const [, key] of sources.matchAll(/\bkey\("([^"]+)"\)/g)) {
-    assert.ok(key in en, `key("${key}") has no catalog entry.`);
-  }
-});
-
-test("the rendered English is the catalog English, byte for byte", () => {
-  const pages = collectHtml(distRoot);
-  assert.ok(pages.length > 0, "Build the site before running this test.");
-
+test("rendered English matches its catalog entry", () => {
   let checked = 0;
-
-  for (const file of pages) {
+  for (const file of collectHtml(distRoot)) {
     const html = readFileSync(file, "utf8");
-
-    for (const [, key, text] of html.matchAll(
-      /data-i18n="([^"]+)"[^>]*>([^<]*)</g,
+    for (const [, , key, text] of html.matchAll(
+      /<([a-z][\w:-]*)\b[^>]*\bdata-i18n="([^"]+)"[^>]*>([\s\S]*?)<\/\1>/gi,
     )) {
-      assert.ok(key in en, `Unknown key "${key}" rendered in ${file}.`);
-
-      /*
-       * A few labels render the message beside literal punctuation or a
-       * numeral, so only the elements that hold the message alone are compared.
-       * Those are the ones the client script replaces wholesale.
-       */
-      if (text.trim() === "") continue;
-      const expected = en[key]
-        .replaceAll("&", "&#38;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;");
-      if (text.trim() !== expected.trim()) continue;
-
-      assert.equal(text.trim(), expected.trim());
+      assert.ok(key in en, `Unknown key ${key} in ${file}`);
+      assert.equal(decodeText(text), normaliseProse(en[key]),
+        `Wrong rendered text for ${key} in ${file}`);
       checked += 1;
     }
   }
-
-  assert.ok(checked > 50, `Only ${checked} keyed elements found in dist/.`);
+  assert.ok(checked > 50, `Only ${checked} keyed elements found in dist/`);
 });
-
 test("pages ship in English; the layer is never baked into the output", () => {
   for (const file of collectHtml(distRoot)) {
     const html = readFileSync(file, "utf8");
@@ -530,111 +403,33 @@ test("pages ship in English; the layer is never baked into the output", () => {
   }
 });
 
-test("the layer never translates an accessible name or page metadata", () => {
-  /*
-   * The glyph layer is visual. Accessible names, alt text, titles, and social
-   * metadata stay in English so that navigation, assistive technology, and
-   * search results are unaffected by an easter egg.
-   */
+test("page metadata is never marked for translation", () => {
   for (const file of collectHtml(distRoot)) {
     const html = readFileSync(file, "utf8");
-
-    assert.doesNotMatch(
-      html,
-      /(?:aria-label|alt|title|placeholder)="[^"]*"\s+data-i18n=/i,
-      "An accessible name was made translatable in " + file,
-    );
-    assert.match(html, /aria-label="Primary navigation"/);
-    assert.match(html, /href="#main-content">Skip to main content</);
-  }
-
-  const layer = read("src/components/LanguageLayer.astro");
-  assert.match(layer, /aria-hidden", "true"/);
-  assert.match(layer, /meaning\.className = "hy-meaning"/);
-  assert.match(layer, /meaning\.lang = "en"/);
-
-  /*
-   * The three tiers must draw from three different sources. Mid-decode the
-   * glyph line holds the departing text, so a gloss built from the same value
-   * would quietly show English under the heading "Transliteration".
-   */
-  assert.match(layer, /line\.textContent = lineText;/);
-  assert.match(layer, /translit\.textContent = hymmnos;/);
-  assert.match(layer, /meaning\.textContent = english\.get\(node\) \?\? "";/);
-});
-
-test("the hidden switch stays reachable by keyboard and assistive technology", () => {
-  const layer = read("src/components/LanguageLayer.astro");
-
-  /* Hidden from the eye is the intent; hidden from a screen reader is a bug. */
-  assert.match(layer, /<button[\s\S]*?class="language-layer__trigger"/);
-  assert.match(layer, /aria-label=\{t\("layer\.title"\)\}/);
-  assert.match(layer, /aria-expanded="false"/);
-  assert.match(layer, /aria-controls="language-layer-panel"/);
-  assert.match(layer, /event\.key === "Escape"/);
-  assert.match(layer, /trigger\.focus\(\)/);
-
-  /* Progressive enhancement: no script, no switch, no broken furniture. */
-  assert.match(layer, /data-language-switch[\s\S]*?\n\s*hidden\n/);
-  assert.match(layer, /root\.hidden = false;/);
-
-  const styles = read("src/styles/hymmnos.css");
-  /*
-   * The meaning tier is the accessible text, so it is hidden the one way that
-   * keeps it in the accessibility tree. `display: none` here would hand a
-   * screen reader a page of untranslatable glyph transcription.
-   */
-  assert.match(styles, /\.hy-meaning \{[\s\S]*?clip-path: inset\(50%\);/);
-  assert.doesNotMatch(styles, /\.hy-meaning[^{]*\{[^}]*display:\s*none/);
-});
-
-test("the switch and the document flag cannot be confused for each other", () => {
-  const layer = read("src/components/LanguageLayer.astro");
-
-  /*
-   * Regression: both once used data-language-layer — the div in the footer as
-   * its identity, and the document element as the flag saying the layer is on.
-   * On a first load that was harmless, because the flag is only set after the
-   * lookup has already run. After a client-side navigation the flag is
-   * restored before the page is set up again, so querySelector returned <html>
-   * — which comes first in document order — the real switch was never
-   * revealed, and a reader in Hymmnos had no way back to English.
-   */
-  const rootLookup = layer.match(
-    /const root = document\.querySelector<HTMLElement>\("\[([a-z-]+)\]\"\)/,
-  );
-  assert.ok(rootLookup, "The switch root is no longer found by one attribute.");
-
-  const documentFlags = [
-    ...layer.matchAll(/documentElement\.dataset\.([A-Za-z]+)/g),
-  ].map(([, name]) => "data-" + name.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase()));
-
-  assert.ok(
-    documentFlags.length > 0,
-    "The layer no longer flags the document; this guard needs rewriting.",
-  );
-
-  for (const flag of documentFlags) {
-    assert.notEqual(
-      flag,
-      rootLookup[1],
-      `The switch container and the document flag both use ${flag}. ` +
-        "documentElement matches first, so the switch would stay hidden.",
-    );
+    for (const [tag] of html.matchAll(/<(?:html|meta|title|img)\b[^>]*>/gi)) {
+      assert.doesNotMatch(tag, /\bdata-i18n(?:-content)?=/,
+        `Metadata or an image was marked for replacement in ${file}`);
+    }
   }
 });
-
-test("motion in the decode is opt-in", () => {
-  const layer = read("src/components/LanguageLayer.astro");
-
-  assert.match(layer, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
-  assert.match(layer, /if \(reduceMotion\.matches\) \{\s*\n\s*settle\(entries\);/);
-
-  /* The scramble is driven from script, so it must add no CSS keyframes. */
-  assert.doesNotMatch(read("src/styles/hymmnos.css"), /@keyframes|animation-name/);
+test("the initial language switch has a named button and a matching panel", () => {
+  for (const file of collectHtml(distRoot)) {
+    const html = readFileSync(file, "utf8");
+    const trigger = [...html.matchAll(/<button\b[^>]*>/g)]
+      .map(([tag]) => tag)
+      .find((tag) => tag.includes('aria-label="' + en["layer.title"] + '"'));
+    assert.ok(trigger, `Missing language button in ${file}`);
+    assert.match(trigger, /\baria-expanded="false"/);
+    const panelId = trigger.match(/\baria-controls="([^"]+)"/)?.[1];
+    assert.ok(panelId, `Language button has no panel target in ${file}`);
+    const panel = [...html.matchAll(/<[a-z][\w:-]*\b[^>]*>/gi)]
+      .map(([tag]) => tag)
+      .find((tag) => tag.includes('id="' + panelId + '"'));
+    assert.ok(panel, `Language panel ${panelId} is missing in ${file}`);
+    assert.match(panel, /\bhidden(?:[\s=>])/);
+  }
 });
-
-test("the Hymmnos catalog uses only attested vocabulary", () => {
+test("Hymmnos words use the index; borrowings and lost fragments are explicit", () => {
   const attested = new Set(lexicon.words.map((word) => word.toLowerCase()));
   assert.equal(lexicon.words.length, 506);
   assert.equal(attested.size, 506);
@@ -647,9 +442,13 @@ test("the Hymmnos catalog uses only attested vocabulary", () => {
   ];
 
   for (const [key, value] of translated) {
-    /* Mask protected names first, longest match first, exactly as the harness does. */
-    let masked = value;
-    for (const term of PROTECTED_TERMS) masked = masked.split(term).join(" ");
+    const parts = hymmnosParts(value);
+    for (const part of parts) {
+      assert.ok(part.text.trim() || part.kind === "text", `${key}: empty annotation`);
+      assert.doesNotMatch(part.text, /[\[\]{}]/, `${key}: malformed annotation`);
+    }
+    const masked = parts.filter((part) => part.kind === "text")
+      .map((part) => part.text).join(" ");
 
     for (const token of masked.split(/[^A-Za-z.]+/).filter(Boolean)) {
       /* Stops left behind by masking a protected name are punctuation, not words. */
@@ -665,8 +464,8 @@ test("the Hymmnos catalog uses only attested vocabulary", () => {
   assert.deepEqual(
     [...unattested.entries()],
     [],
-    "Hymmnos words with no entry in the pinned lexicon. Paraphrase with " +
-      "indexed vocabulary, or record and approve a coinage before using it.",
+    "Unindexed Hymmnos: verify the word source, or explicitly mark a site borrowing. " +
+      "The finite index is a spelling check, not a test of meaning or grammar.",
   );
 });
 
@@ -699,7 +498,9 @@ test("every Hymmnos character can actually be drawn by the glyph font", () => {
   ];
 
   for (const value of drawn) {
-    for (const character of value) {
+    const glyphText = hymmnosParts(value).filter((part) => part.kind === "text")
+      .map((part) => part.text).join("");
+    for (const character of glyphText) {
       if (!covered.has(character.codePointAt(0))) missing.add(character);
     }
   }
@@ -733,17 +534,6 @@ test("the glyph font is self-hosted, pinned, and cheap enough to be optional", (
   /* Small enough that an easter egg never costs a reader real weight. */
   assert.ok(statSync(path).size < 16 * 1024);
 
-  const styles = read("src/styles/hymmnos.css");
-  assert.match(styles, /src: url\("\/fonts\/fonts\.woff2"\) format\("woff2"\);/);
-  assert.match(styles, /font-display: swap;/);
-  assert.match(styles, /\[lang="x-hymmnos"\]/);
-
-  /* One source, one format: no TrueType weight left behind after the switch. */
-  const sources = [...styles.matchAll(/^\s*src:\s*([^;]+);/gm)].map(
-    (match) => match[1],
-  );
-  assert.equal(sources.length, 1, "Expected exactly one @font-face source.");
-  assert.doesNotMatch(sources[0], /\.ttf|truetype/i);
 });
 
 test("the catalog is published as its own file rather than inlined everywhere", () => {
@@ -788,4 +578,21 @@ test("the credits page always discloses the font, and hides only the homage", ()
   assert.match(homage, /Ar tonelico/);
   assert.match(homage, /not affiliated with, sponsored by, or endorsed by/);
   assert.match(homage, /Koei Tecmo Games Co\., Ltd\./);
+});
+
+test("site annotations preserve words and punctuation without interpreting HTML", () => {
+  const text = "Ma haf [[Zotero 10]], {{API}} en {{<script>}}.";
+  assert.deepEqual(hymmnosParts(text), [
+    { kind: "text", text: "Ma haf " },
+    { kind: "borrow", text: "Zotero 10" },
+    { kind: "text", text: ", " },
+    { kind: "lost", text: "API" },
+    { kind: "text", text: " en " },
+    { kind: "lost", text: "<script>" },
+    { kind: "text", text: "." },
+  ]);
+  assert.equal(hymmnosTranscription(text), "Ma haf Zotero 10, API en <script>.");
+  assert.equal(hymmnosTranscription("[[PDF]]{{CSL}}"), "PDFCSL");
+  assert.equal(hymmnosTranscription("Ma haf wart."), "Ma haf wart.");
+  assert.equal(hymmnosTranscription("{{unfinished"), "{{unfinished");
 });

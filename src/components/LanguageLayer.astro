@@ -122,6 +122,7 @@ const { seed = "language-layer" } = Astro.props;
 
 <script>
   import { projectBodyKey } from "../lib/prose-key.mjs";
+  import { hymmnosTranscription, renderHymmnos } from "../lib/hymmnos-text.mjs";
 
   /*
    * Applies a language catalog over already-rendered English, and draws the
@@ -137,6 +138,7 @@ const { seed = "language-layer" } = Astro.props;
     line: HTMLElement;
     from: string;
     to: string;
+    text: string;
     glyphs: boolean;
   }
 
@@ -261,8 +263,14 @@ const { seed = "language-layer" } = Astro.props;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let locale = defaultLocale;
+    let requestedLocale = defaultLocale;
+    let request = 0;
     let animation = 0;
     let restoreTimer = 0;
+    signal.addEventListener("abort", () => {
+      window.cancelAnimationFrame(animation);
+      window.clearTimeout(restoreTimer);
+    }, { once: true });
 
     /*
      * Structure, not just text. The glyph line is hidden from assistive
@@ -282,18 +290,22 @@ const { seed = "language-layer" } = Astro.props;
       wrap.className = node.hasAttribute("data-i18n-flow")
         ? "hy hy--flow"
         : "hy";
+      if (node.hasAttribute("data-i18n-flow") && !node.closest("a, button")) {
+        wrap.tabIndex = 0;
+      }
 
       const line = document.createElement("span");
       line.className = "hy-line";
       line.lang = lineLocale;
       line.setAttribute("aria-hidden", "true");
-      line.textContent = lineText;
+      if (lineLocale === layerLocale) renderHymmnos(line, lineText);
+      else line.textContent = lineText;
 
       const translit = document.createElement("span");
       translit.className = "hy-translit";
       translit.setAttribute("aria-hidden", "true");
       translit.dataset.label = translitLabel;
-      translit.textContent = hymmnos;
+      translit.textContent = hymmnosTranscription(hymmnos);
 
       /*
        * Never drawn. This is the element's accessible text and what in-page
@@ -389,7 +401,8 @@ const { seed = "language-layer" } = Astro.props;
 
     const settle = (entries: DecodeEntry[]): void => {
       for (const entry of entries) {
-        entry.line.textContent = entry.to;
+        if (entry.glyphs) renderHymmnos(entry.line, entry.to);
+        else entry.line.textContent = entry.to;
         entry.line.lang = entry.glyphs ? layerLocale : "en";
         entry.line.removeAttribute("data-decoding");
       }
@@ -425,9 +438,7 @@ const { seed = "language-layer" } = Astro.props;
           if (progress <= 0) return;
 
           if (progress >= 1) {
-            entry.line.textContent = entry.to;
-            entry.line.lang = entry.glyphs ? layerLocale : "en";
-            entry.line.removeAttribute("data-decoding");
+            if (entry.line.hasAttribute("data-decoding")) settle([entry]);
             return;
           }
 
@@ -447,8 +458,8 @@ const { seed = "language-layer" } = Astro.props;
              */
             entry.line.lang = entry.glyphs ? layerLocale : "en";
             entry.line.textContent = scramble(
-              entry.to,
-              Math.round(entry.to.length * ((progress - FLIP) / (1 - FLIP))),
+              entry.text,
+              Math.round(entry.text.length * ((progress - FLIP) / (1 - FLIP))),
               LETTERS,
             );
           }
@@ -475,7 +486,7 @@ const { seed = "language-layer" } = Astro.props;
       }
     };
 
-    const toLayer = async (animate: boolean): Promise<void> => {
+    const toLayer = async (animate: boolean, current: number): Promise<void> => {
       if (!catalog) {
         try {
           const response = await fetch(catalogUrl);
@@ -483,10 +494,14 @@ const { seed = "language-layer" } = Astro.props;
           catalog = (await response.json()) as Record<string, string>;
         } catch {
           /* No catalog, no layer. The page is already correct in English. */
+          if (signal.aborted || current !== request) return;
+          requestedLocale = locale;
           markOptions();
           return;
         }
       }
+
+      if (signal.aborted || current !== request) return;
 
       /*
         * A pending restore from a half-finished switch back would otherwise
@@ -506,7 +521,7 @@ const { seed = "language-layer" } = Astro.props;
         const line = animate
           ? build(node, from, defaultLocale, text)
           : build(node, text, layerLocale, text);
-        if (animate) entries.push({ line, from, to: text, glyphs: true });
+        if (animate) entries.push({ line, from, to: text, text: hymmnosTranscription(text), glyphs: true });
       }
 
       locale = layerLocale;
@@ -527,6 +542,7 @@ const { seed = "language-layer" } = Astro.props;
             line,
             from: line.textContent ?? "",
             to,
+            text: to,
             glyphs: false,
           });
         }
@@ -546,17 +562,21 @@ const { seed = "language-layer" } = Astro.props;
           DURATION + STAGGER * MAX_STAGGER_STEPS + 120,
         );
       } else {
+        window.cancelAnimationFrame(animation);
         restore();
       }
     };
 
     const apply = async (next: string, animate: boolean): Promise<void> => {
+      requestedLocale = next;
+      const current = ++request;
       if (next === layerLocale) {
-        await toLayer(animate);
+        await toLayer(animate, current);
       } else {
         toDefault(animate);
       }
 
+      if (signal.aborted || current !== request) return;
       write(storageKey, locale);
       markOptions();
     };
@@ -598,7 +618,7 @@ const { seed = "language-layer" } = Astro.props;
         "click",
         () => {
           const next = option.dataset.languageOption ?? defaultLocale;
-          if (next !== locale) void apply(next, true);
+          if (next !== requestedLocale) void apply(next, true);
         },
         { signal },
       );

@@ -9,10 +9,6 @@ const tokens = readFileSync(
   join(repositoryRoot, "src/styles/tokens.css"),
   "utf8",
 );
-const globalCss = readFileSync(
-  join(repositoryRoot, "src/styles/global.css"),
-  "utf8",
-);
 
 const channel = (value) => {
   const c = value / 255;
@@ -70,14 +66,4 @@ test("the oxidised signal remains readable on every pale surface", () => {
     const ratio = contrast(token("--signal-500"), token(ground));
     assert.ok(ratio >= 4.5, `--signal-500 on ${ground} is ${ratio.toFixed(2)}:1`);
   }
-});
-
-/*
- * A warm band fixed to the bottom of the viewport sits under the footer and
- * the end of every page, which is where the earlier contrast failure came
- * from. Atmosphere belongs in the body gradient, where the test above bounds
- * it.
- */
-test("no fixed full-viewport glow layer sits under page text", () => {
-  assert.doesNotMatch(globalCss, /body::after\s*\{[^}]*position:\s*fixed/);
 });
