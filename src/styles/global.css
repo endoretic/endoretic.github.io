@@ -1438,12 +1438,21 @@ main {
   gap: var(--space-1);
 }
 
+/*
+ * Aligned on the baseline, not on the centre of the line box. "endoretic" has
+ * no descenders, so its ink stops at the baseline while the line box keeps
+ * space below it for the ones it does not use; centring a small mark in that
+ * box hung it four pixels under the word and left the two barely overlapping.
+ * Sitting the glyph on the same baseline the letters stand on is what makes
+ * them read as one line rather than two things placed near each other.
+ */
 .site-footer__mark {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-3);
   color: var(--ink-950);
   font-weight: 650;
+  font-size: var(--type-lede);
 }
 
 .site-footer__mark .notation-motif {
@@ -1484,7 +1493,8 @@ main {
  * running text and wants its lighter default.
  */
 .site-footer__mark .language-layer__trigger .notation-motif {
-  width: 2.8rem;
+  /* In em, so the glyph keeps its proportion to the word at every breakpoint. */
+  width: 2.3em;
   stroke-width: 2.4;
   color: var(--ink-500);
 }
