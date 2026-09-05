@@ -134,6 +134,12 @@
   border-color: var(--rule-paper);
 }
 
+@media (width > 48rem) {
+  .note-page--paper .note-page__header {
+    padding-bottom: clamp(1.75rem, 4.5vw, 3.25rem);
+  }
+}
+
 .note-page--paper .note-page__header h1,
 .note-page--paper .note-page__header .lede {
   color: var(--paper-ink);
@@ -170,8 +176,8 @@
   line-height: 1.82;
 }
 
-/* The record column hangs from the same left margin as the header, so the
-   sheet reads as one filed document instead of a centred article. */
+/* Keep the reading column aligned with the header; illustrated desktop
+   notes use the wider wrapping layout below. */
 .note-page--paper .prose > * {
   max-width: var(--reading-text);
   margin-right: auto;
@@ -429,5 +435,33 @@ html[lang^="zh"] .note-page--paper .prose > p {
   .note-page--paper .prose > figure > picture {
     grid-row: auto;
     max-width: 20rem;
+  }
+}
+
+/* Keep each paragraph intact beside the plate; later paragraphs use the
+   full sheet width once they start below it. */
+@media (width > 64rem) {
+  .note-page--paper .prose:has(> figure) {
+    display: flow-root;
+  }
+
+  .note-page--paper .prose:has(> figure) > :not(figure) {
+    max-width: none;
+  }
+
+  .note-page--paper .prose:has(> figure) > p {
+    display: flow-root;
+    margin-top: 1em;
+  }
+
+  .note-page--paper .prose > figure {
+    float: right;
+    clear: right;
+    width: min(58%, 40rem);
+    margin: 0 0 1.35em clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .note-page--paper .prose:has(> figure) > figure:first-child + * {
+    margin-top: 0;
   }
 }

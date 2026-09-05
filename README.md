@@ -50,6 +50,8 @@ updatedAt: 2026-09-05
 
 公开笔记必须有首次发表与最后修改日期；列表按 `publishedAt` 倒序，详情显示 `updatedAt`。可见日期使用 ISO 周日期，HTML datetime 保持日历日期。可选 `readingMode`（paper / dark）、`coverAssetId`、`fictionalized`；后者为重构性文字显示提示。不要把示例稿或 AI 占位文字当作者定稿发布。
 
+带图笔记默认使用 paper，并将图片及图注放在正文顶层 `<figure>` 中。宽屏将图版及图注放在右侧，正文整段排列于左侧，起点低于图版的后续段落接续全宽；移动端保持上下排列。不需要逐篇增加布局字段。
+
 ## 文案与素材
 
 - 界面英文：`src/locales/en.json`，Astro 通过 `t()` / `key()` 标记；内容语言仍由各条目的 `lang` 决定。
