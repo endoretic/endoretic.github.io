@@ -1,9 +1,6 @@
-name: Verify Astro foundation
+name: Verify site
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
   workflow_dispatch:
 

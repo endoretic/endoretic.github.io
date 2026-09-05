@@ -27,7 +27,8 @@
  *
  * Delivery is deliberately client-side. Hymmnos is a discovery, not a
  * publication target: the pages ship in English, and nothing about the layer —
- * catalog, font, or script — is fetched until a reader finds the switch.
+ * catalog and font — is fetched until a reader finds the switch; the controller
+ * script loads with the page.
  * Accessible names, alt text, `<title>`, and metadata are therefore never
  * translated. That is a rule, not an omission: the layer is a visual register,
  * and navigation must stay operable for assistive technology and for search.

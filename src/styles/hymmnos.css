@@ -84,6 +84,27 @@
   display: inline;
 }
 
+/* Borrowed names survive as Latin; selected fragments look like lost ink.
+ * The complete transcription and accessible original remain in their tiers. */
+.hy-borrow {
+  font-family: var(--font-meta);
+  font-size: 0.85em;
+  letter-spacing: 0;
+}
+
+.hy-lost {
+  display: inline-block;
+  height: 0.7em;
+  max-width: 100%;
+  overflow: hidden;
+  vertical-align: -0.02em;
+  color: transparent;
+  background: var(--ink-950);
+  opacity: 0.82;
+  white-space: nowrap;
+  user-select: none;
+}
+
 /*
  * The blocks the tiers sit in, not only the tiers themselves. A heading is an
  * inline-block inside its own h2, and balancing the inner box cannot always

@@ -38,6 +38,11 @@ test("all required static routes and the CNAME are generated", () => {
   }
 
   assert.equal(readFileSync(join(dist, "CNAME"), "utf8").trim(), "endoretic.cc");
+  assert.equal(
+    readFileSync(join(dist, "CNAME"), "utf8").trim(),
+    readFileSync(join(repositoryRoot, "public/CNAME"), "utf8").trim(),
+    "The published CNAME must match public/CNAME.",
+  );
 });
 
 test("draft notes are excluded from production", () => {

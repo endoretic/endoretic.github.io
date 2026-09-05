@@ -40,11 +40,6 @@ jobs:
       - name: Verify generated output
         run: npm test
 
-      - name: Confirm the custom domain survives the build
-        run: |
-          test -f dist/CNAME || { echo "dist/CNAME is missing; public/CNAME was not copied."; exit 1; }
-          diff <(tr -d '\r' < public/CNAME) <(tr -d '\r' < dist/CNAME)
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
