@@ -219,6 +219,24 @@ button:hover .hy > .hy-translit {
   r: 2.4;
 }
 
+/*
+ * The panel opens from the left edge of the footer wordmark, not from the
+ * trigger. With the mark reading [endoretic | glyphs] the trigger sits well
+ * into the line, and a panel anchored to it ran off the right of a phone and
+ * gave the whole page a horizontal scrollbar. Anchoring to the block restores
+ * the geometry the panel had when the trigger led the line, at every width.
+ *
+ * The component keeps its own positioning for anywhere else it is used; this
+ * only re-parents the anchor in the one place it currently lives.
+ */
+.site-footer__mark {
+  position: relative;
+}
+
+.site-footer__mark .language-layer {
+  position: static;
+}
+
 /* Anchored upward: the switch lives at the foot of the page. */
 .language-layer__panel {
   position: absolute;

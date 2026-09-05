@@ -8,19 +8,28 @@ import { key, t } from "../lib/i18n";
 <footer class="site-footer">
   <div class="shell site-footer__inner">
     <div class="site-footer__identity">
-      <p>
+      {/*
+        * Containers, not a paragraph. The language layer is a button and a
+        * popover panel, so it carries real block content — a list of options
+        * and two lines of text. Inside a <p> the parser closed the paragraph
+        * at the first of them and left the wordmark stranded outside its own
+        * flex container, which is why the mark and the name stacked instead of
+        * sitting on one line. This block is a label and a wordmark, never
+        * prose, so nothing is lost by saying so.
+        */}
+      <div>
         <span class="eyebrow" {...key("footer.node")}>{t("footer.node")}</span>
-        <span class="site-footer__mark">
+        <div class="site-footer__mark">
+          {SITE.name}
           {/*
-           * The interval mark beside the footer wordmark is also the way into
+           * The interval mark after the footer wordmark is also the way into
            * the language layer. It stays a decorative glyph to the eye; the
            * component wraps it in a labelled button so keyboard and assistive
            * technology are never shut out of the discovery.
            */}
           <LanguageLayer seed={SITE.name} />
-          {SITE.name}
-        </span>
-      </p>
+        </div>
+      </div>
       <p class="site-footer__note" {...key("footer.recording")}>
         {t("footer.recording")}
       </p>
