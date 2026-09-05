@@ -10,7 +10,7 @@
  * Three reading tiers, in the order a reader meets them:
  *
  *   .hy-line      Hymmnos glyphs                always visible
- *   .hy-translit  the same string, Latin        on hover or focus
+ *   .hy-translit  the same string, Latin        prose: delayed hover/focus/tap
  *   .hy-meaning   the English original          never drawn; read by
  *                                               assistive technology and
  *                                               matched by in-page search
@@ -84,14 +84,8 @@
   display: inline;
 }
 
-/* Borrowed names survive as Latin; selected fragments look like lost ink.
- * The complete transcription and accessible original remain in their tiers. */
-.hy-borrow {
-  font-family: var(--font-meta);
-  font-size: 0.85em;
-  letter-spacing: 0;
-}
-
+/* Borrowings inherit the glyph face; only the transcription uses Latin shapes.
+ * Selected fragments look like lost ink, with their original text preserved. */
 .hy-lost {
   display: inline-block;
   height: 0.7em;
@@ -162,22 +156,37 @@
   pointer-events: none;
 }
 
-.hy:hover > .hy-translit,
-.hy:focus-visible > .hy-translit,
-:focus-visible > .hy > .hy-translit,
-a:hover .hy > .hy-translit,
-button:hover .hy > .hy-translit {
+.hy:not(.hy--flow):hover > .hy-translit,
+.hy:not(.hy--flow):focus-visible > .hy-translit,
+:focus-visible > .hy:not(.hy--flow) > .hy-translit,
+a:focus-visible .hy:not(.hy--flow) > .hy-translit,
+button:focus-visible .hy:not(.hy--flow) > .hy-translit,
+a:hover .hy:not(.hy--flow) > .hy-translit,
+button:hover .hy:not(.hy--flow) > .hy-translit {
   display: block;
 }
 
 /*
  * Long prose. Here the second line belongs in the flow, directly under the
- * glyphs, the way a gloss sits under a transcribed inscription. Layout movement
- * is the point rather than a defect.
+ * glyphs. A 600 ms hover delay filters passing pointer movement while scrolling.
+ * Native buttons also provide keyboard focus and touch activation.
  */
 .hy--flow {
   display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
   text-wrap: pretty;
+  cursor: pointer;
+}
+
+.hy--flow:hover > .hy-line {
+  color: var(--ink-650);
 }
 
 .hy--flow > .hy-translit {
@@ -214,8 +223,7 @@ button:hover .hy > .hy-translit {
   content: attr(data-label);
 }
 
-.hy--flow:hover > .hy-translit,
-.hy--flow:focus-within > .hy-translit {
+.hy--flow[aria-expanded="true"] > .hy-translit {
   display: block;
 }
 

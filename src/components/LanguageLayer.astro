@@ -286,12 +286,34 @@ const { seed = "language-layer" } = Astro.props;
       /* What the gloss tier always shows: the settled Hymmnos transcription. */
       hymmnos: string,
     ): HTMLElement => {
-      const wrap = document.createElement("span");
-      wrap.className = node.hasAttribute("data-i18n-flow")
-        ? "hy hy--flow"
-        : "hy";
-      if (node.hasAttribute("data-i18n-flow") && !node.closest("a, button")) {
-        wrap.tabIndex = 0;
+      const flow = node.hasAttribute("data-i18n-flow") && !node.closest("a, button");
+      const wrap = document.createElement(flow ? "button" : "span");
+      wrap.className = flow ? "hy hy--flow" : "hy";
+      if (wrap instanceof HTMLButtonElement) {
+        wrap.type = "button";
+        wrap.setAttribute("aria-expanded", "false");
+        let hoverTimer = 0;
+        wrap.addEventListener("pointerenter", (event) => {
+          if (event.pointerType === "touch") return;
+          hoverTimer = window.setTimeout(() => {
+            wrap.setAttribute("aria-expanded", "true");
+          }, 600);
+        });
+        wrap.addEventListener("pointerleave", () => {
+          window.clearTimeout(hoverTimer);
+          if (!wrap.matches(":focus-visible")) wrap.setAttribute("aria-expanded", "false");
+        });
+        wrap.addEventListener("focus", () => {
+          if (wrap.matches(":focus-visible")) wrap.setAttribute("aria-expanded", "true");
+        });
+        wrap.addEventListener("blur", () => {
+          window.clearTimeout(hoverTimer);
+          wrap.setAttribute("aria-expanded", "false");
+        });
+        wrap.addEventListener("click", () => {
+          window.clearTimeout(hoverTimer);
+          wrap.setAttribute("aria-expanded", String(wrap.getAttribute("aria-expanded") !== "true"));
+        });
       }
 
       const line = document.createElement("span");
