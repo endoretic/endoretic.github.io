@@ -17,10 +17,18 @@ import { key, t } from "../lib/i18n";
         * sitting on one line. This block is a label and a wordmark, never
         * prose, so nothing is lost by saying so.
         */}
-      <div>
+      <div class="site-footer__identity-line">
         <span class="eyebrow" {...key("footer.node")}>{t("footer.node")}</span>
         <div class="site-footer__mark">
           {SITE.name}
+          {/*
+           * Punctuation, not content: it separates the wordmark from the glyph
+           * so the two read as one lockup rather than as a name with something
+           * stuck to it. Hidden from assistive technology, which would
+           * otherwise announce a vertical bar between the site name and a
+           * button that already has its own label.
+           */}
+          <span class="site-footer__rule" aria-hidden="true">|</span>
           {/*
            * The interval mark after the footer wordmark is also the way into
            * the language layer. It stays a decorative glyph to the eye; the

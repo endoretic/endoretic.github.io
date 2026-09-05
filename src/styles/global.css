@@ -1450,6 +1450,45 @@ main {
   width: 2.4rem;
 }
 
+/*
+ * The eyebrow and the wordmark are two ranks of the same block, so they need
+ * air between them rather than the single line box they inherited.
+ */
+.site-footer__identity-line {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/*
+ * The lockup is a wordmark, a rule, and a glyph, and all three have to read as
+ * one object. The rule is set at the weight of ordinary text against a
+ * wordmark at 650, so it separates without competing.
+ */
+.site-footer__rule {
+  color: var(--ink-500);
+  font-weight: 400;
+}
+
+/*
+ * Three ranks, not two competing marks. The name is the object; the rule and
+ * the glyph are what sit beside it, so both take the secondary ink and the
+ * lockup resolves into name, separator, mark.
+ *
+ * The glyph needed the stroke as much as the colour. Drawn at the trigger's
+ * hairline default it read as a faded copy of the wordmark rather than a
+ * different kind of thing — same ink, a fraction of the weight. Heavier
+ * strokes at the word's own measure give it a density of its own, which is
+ * what lets it drop to the quieter ink without disappearing.
+ *
+ * Scoped to the footer: the same motif elsewhere on the site sits alone in
+ * running text and wants its lighter default.
+ */
+.site-footer__mark .language-layer__trigger .notation-motif {
+  width: 2.8rem;
+  stroke-width: 2.4;
+  color: var(--ink-500);
+}
+
 .site-footer__identity {
   display: grid;
   gap: var(--space-4);
