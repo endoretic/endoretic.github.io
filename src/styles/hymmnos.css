@@ -41,27 +41,58 @@
 
 /*
  * The glyph face has one weight and no italics, and its letterforms carry more
- * ink than the interface stack. Slightly looser tracking and a small optical
- * size bump keep a line of glyphs from reading as a solid bar.
+ * ink than the interface stack, so looser tracking keeps a line of glyphs from
+ * reading as a solid bar.
+ *
+ * It is set at the surrounding size rather than the optical bump it once
+ * carried. Hymmnos says the same thing in more characters than English does —
+ * "Tags" becomes "Wart oz sor" — so every label and heading on the page is
+ * already closer to wrapping than the English it replaced, and an extra eight
+ * per cent was enough to push several of them over. Tracking still does the
+ * work the bump was there for.
  */
 [lang="x-hymmnos"] {
   font-family: "Hymmnos", var(--font-display);
   font-weight: normal;
   font-style: normal;
-  font-size: 1.08em;
+  font-size: 1em;
   letter-spacing: 0.045em;
   font-synthesis: none;
 }
 
-/* A translated element is a stack of tiers, not a line of text. */
+/*
+ * A translated element is a stack of tiers, not a line of text.
+ *
+ * Both tiers are inline-block, so each is a block container for its own text
+ * and can be told how to break it. That distinction is already drawn here:
+ * short chrome balances, because a heading whose last line holds one word
+ * reads as a mistake, and balancing is free when there are only two or three
+ * lines to even out. Prose only avoids the orphan on its final line, since
+ * balancing a paragraph would rewrap all of it to fix the end.
+ *
+ * Both are allowed to break earlier than they strictly must. Wrapping a word
+ * sooner costs nothing; stranding one costs the line.
+ */
 .hy {
   position: relative;
   display: inline-block;
   max-width: 100%;
+  text-wrap: balance;
 }
 
 .hy-line {
   display: inline;
+}
+
+/*
+ * The blocks the tiers sit in, not only the tiers themselves. A heading is an
+ * inline-block inside its own h2, and balancing the inner box cannot always
+ * find a break the outer one would allow, so the outer block is told the same
+ * thing. Scoped to the layer by the flag on the document element: English is
+ * shorter, does not wrap in these places, and keeps the wrapping it had.
+ */
+:root[data-language-layer] :is(h1, h2, h3, h4, dt, dd, .eyebrow, figcaption) {
+  text-wrap: balance;
 }
 
 /*
@@ -117,6 +148,7 @@ button:hover .hy > .hy-translit {
  */
 .hy--flow {
   display: block;
+  text-wrap: pretty;
 }
 
 .hy--flow > .hy-translit {
