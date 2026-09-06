@@ -18,6 +18,8 @@ const requiredFiles = [
   "credits/index.html",
   "404.html",
   "CNAME",
+  "robots.txt",
+  "sitemap.xml",
 ];
 
 function collectHtml(directory) {
@@ -57,6 +59,19 @@ test("draft notes are excluded from production", () => {
 
   assert.doesNotMatch(output, /TODO：随笔标题/);
   assert.doesNotMatch(output, /未发布模板/);
+});
+
+test("the root crawl files advertise only public routes", () => {
+  const robots = readFileSync(join(dist, "robots.txt"), "utf8");
+  const sitemap = readFileSync(join(dist, "sitemap.xml"), "utf8");
+
+  assert.match(robots, /User-agent: \*\s+Allow: \//);
+  assert.match(robots, /Sitemap: https:\/\/endoretic\.cc\/sitemap\.xml/);
+  assert.match(sitemap, /https:\/\/endoretic\.cc\/pjsk-tier-maker\//);
+  assert.match(sitemap, /https:\/\/endoretic\.cc\/score-calculator\//);
+  assert.match(sitemap, /https:\/\/endoretic\.cc\/notes\/why-endoretic\//);
+  assert.doesNotMatch(sitemap, /ursekai-xray/);
+  assert.doesNotMatch(sitemap, /draft-template/);
 });
 
 test("the first published note keeps its source clear and serves responsive local art", () => {

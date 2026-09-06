@@ -66,6 +66,7 @@ test("the public asset inventory contains only generated or manifest-approved fi
   const expected = [
     "CNAME",
     "favicon.svg",
+    "robots.txt",
     // The Hymmnos glyph face. It sits outside public/media/ and outside the
     // asset manifest on purpose: that manifest encodes the first-release
     // licence allowlist, and this font carries no licence statement, so
