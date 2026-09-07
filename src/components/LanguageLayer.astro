@@ -22,7 +22,6 @@ import {
   DEFAULT_LOCALE,
   LAYER_LOCALE,
   LOCALE_PARAM,
-  STORAGE_KEY,
   key,
   t,
 } from "../lib/i18n";
@@ -49,7 +48,6 @@ const { seed = "language-layer" } = Astro.props;
   data-default-locale={DEFAULT_LOCALE}
   data-layer-locale={LAYER_LOCALE}
   data-locale-param={LOCALE_PARAM}
-  data-storage-key={STORAGE_KEY}
   data-catalog-url="/locales/hymmnos.json"
   data-translit-label={t("layer.translit")}
   hidden
@@ -145,30 +143,20 @@ const { seed = "language-layer" } = Astro.props;
   /*
    * Module scope, because the document outlives the page. With the client
    * router a navigation swaps the body and leaves this module loaded, so the
-   * things that must survive a swap — the fetched catalog, the contract read
-   * off the markup — live out here, while everything bound to nodes that are
+   * things that must survive a swap — the fetched catalog and this visit's
+   * selected layer — live out here, while everything bound to nodes that are
    * about to be replaced is torn down and rebuilt per page.
    */
   let catalog: Record<string, string> | null = null;
   let bindings: AbortController | null = null;
-  let contract: { layerLocale: string; storageKey: string } | null = null;
+  let activeLayer: string | null = null;
 
-  /* Storage is a convenience; a browser refusing it must not break the page. */
-  const read = (name: string): string | null => {
-    try {
-      return window.localStorage.getItem(name);
-    } catch {
-      return null;
-    }
-  };
-
-  const write = (name: string, value: string): void => {
-    try {
-      window.localStorage.setItem(name, value);
-    } catch {
-      /* Private mode, or site data blocked. The layer still works this visit. */
-    }
-  };
+  /* Discard the old saved preference; a fresh document starts in English. */
+  try {
+    window.localStorage.removeItem("endoretic:language-layer");
+  } catch {
+    /* Blocked storage does not affect this in-memory easter egg. */
+  }
 
   const setup = (): void => {
     /*
@@ -191,15 +179,12 @@ const { seed = "language-layer" } = Astro.props;
     const defaultLocale = root.dataset.defaultLocale ?? "en";
     const layerLocale = root.dataset.layerLocale ?? "x-hymmnos";
     const localeParam = root.dataset.localeParam ?? "layer";
-    const storageKey = root.dataset.storageKey ?? "endoretic:language-layer";
     const catalogUrl = root.dataset.catalogUrl ?? "/locales/hymmnos.json";
     /*
      * The gloss label stays in the interface language even inside the layer. A
      * gloss whose own label needs glossing helps nobody.
      */
     const translitLabel = root.dataset.translitLabel ?? "Transliteration";
-
-    contract = { layerLocale, storageKey };
 
     /*
      * Interface strings carry their catalog key in `data-i18n`. Content
@@ -599,7 +584,7 @@ const { seed = "language-layer" } = Astro.props;
       }
 
       if (signal.aborted || current !== request) return;
-      write(storageKey, locale);
+      activeLayer = locale === layerLocale ? layerLocale : null;
       markOptions();
     };
 
@@ -683,17 +668,14 @@ const { seed = "language-layer" } = Astro.props;
         : requested !== null
           ? defaultLocale
           : null;
-    const remembered = read(storageKey);
-
-    if (asked === layerLocale || (asked === null && remembered === layerLocale)) {
+    if (asked === layerLocale || (asked === null && activeLayer === layerLocale)) {
       /*
-       * A remembered layer is the reader's settled state, so it arrives without
-       * theatre; a link that asks for it explicitly gets the decode. Every page
-       * after the first is a remembered state, never a fresh reveal.
+       * An in-visit navigation keeps the settled layer without another reveal;
+       * an explicit link can still request the easter egg directly.
        */
       void apply(layerLocale, asked !== null);
     } else {
-      markOptions();
+      void apply(defaultLocale, false);
     }
   };
 
@@ -701,10 +683,9 @@ const { seed = "language-layer" } = Astro.props;
    * Two triggers, one run per page.
    *
    * The router fires astro:page-load on the window `load` event, which is after
-   * every image and stylesheet has settled. Waiting for it would leave a reader
-   * who has the layer remembered watching the page sit in English until the
-   * last asset arrived, so the first page is set up here instead, at the old
-   * timing: module scripts are deferred, so the footer is already parsed.
+   * every image and stylesheet has settled. Set up the first page immediately
+   * so the switch and explicit easter-egg links need not wait for every image.
+   * Module scripts are deferred, so the footer is already parsed.
    *
    * astro:page-load then covers every page reached by navigating, since the
    * router leaves this module loaded and nothing else would rebind the switch
@@ -732,8 +713,8 @@ const { seed = "language-layer" } = Astro.props;
   document.addEventListener("astro:after-swap", () => {
     pending = true;
 
-    if (contract && read(contract.storageKey) === contract.layerLocale) {
-      document.documentElement.dataset.languageLayer = contract.layerLocale;
+    if (activeLayer) {
+      document.documentElement.dataset.languageLayer = activeLayer;
     }
   });
 </script>

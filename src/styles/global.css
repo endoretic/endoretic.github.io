@@ -396,7 +396,8 @@ main {
 .hero-media__plate {
   position: relative;
   overflow: hidden;
-  min-height: clamp(20rem, 35vw, 30rem);
+  min-height: 0;
+  aspect-ratio: 16 / 9;
   border: 1px solid var(--line-strong);
   background: var(--surface-2);
 }
@@ -861,7 +862,9 @@ main {
   padding-block: clamp(2.5rem, 6vw, 6rem);
 }
 
-.page-shell--narrow {
+/* Share one content width across pages; the site footer keeps its own shell. */
+.page-shell--narrow,
+main .shell {
   max-width: 68rem;
 }
 

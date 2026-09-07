@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   mkdtempSync,
   mkdirSync,
+  readFileSync,
   rmSync,
   truncateSync,
   writeFileSync,
@@ -9,6 +10,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { parse } from "yaml";
 
 import { validateAssets } from "../scripts/check-assets.mjs";
 
@@ -66,6 +68,28 @@ test("asset checker accepts a complete active manifest entry", (t) => {
   const result = validateAssets([baseAsset()], { repositoryRoot: root });
   assert.deepEqual(result.errors, []);
   assert.deepEqual(result.warnings, []);
+});
+
+test("editorial anime quotations stay limited to their reviewed source and article", () => {
+  const repositoryRoot = new URL("../", import.meta.url);
+  const assets = parse(readFileSync(new URL("src/data/assets.yml", repositoryRoot), "utf8"));
+  const quotations = assets.filter((asset) => asset.license === "Copyrighted; editorial quotation");
+  assert.equal(quotations.length, 2);
+  for (const asset of quotations) {
+    const check = (entry) => validateAssets([entry]).errors
+      .filter((error) => error.includes("not on the first-release allowlist"));
+    assert.deepEqual(check(asset), []);
+    for (const change of [
+      { id: "unreviewed-anime-image" },
+      { kind: "video" },
+      { source_page: "https://example.com/unreviewed-image" },
+      { original_file: "https://example.com/different-image.jpg" },
+      { used_on: ["/"] },
+      { used_on: [...asset.used_on, "/about/"] },
+    ]) {
+      assert.equal(check({ ...asset, ...change }).length, 1);
+    }
+  }
 });
 
 test("asset checker blocks proposed entries that masquerade as active", (t) => {

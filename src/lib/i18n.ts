@@ -98,8 +98,7 @@ export function contentKey(
     : {};
 }
 
-/* Storage and markup contract, shared with the client script. */
-export const STORAGE_KEY = "endoretic:language-layer";
+/* URL and markup contract, shared with the client script. */
 export const LOCALE_PARAM = "layer";
 export const KEY_ATTRIBUTE = "data-i18n";
 

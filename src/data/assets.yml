@@ -2,6 +2,77 @@
 # `status: active` entries may have local files or appear on the site. Proposed
 # entries remain research records, not approval to download or publish.
 
+- id: lost-universe-key-visual-01
+  status: active
+  kind: image
+  title: "Lost Universe — official key visual"
+  creator: "Lost Universe animation production; distributed by Enoki Films"
+  source_page: "https://enoki-films.co.jp/pro_lostuniverse.php"
+  original_file: "https://enoki-films.co.jp/images/proinfo/lostuniverse.png"
+  license: "Copyrighted; editorial quotation"
+  license_url: "https://enoki-films.co.jp/pro_lostuniverse.php"
+  attribution: "Lost Universe official key visual, via Enoki Films. © 1998 HAJIME KAWAZAKA/KUNIKO/YOSHINAKA/KADOKAWA SHOTEN/TV TOKYO/SOFTEX, as credited on the source page."
+  rights_verified_on: "2026-09-07"
+  retrieved_on: "2026-09-07"
+  source_sha256: "99f151fbedc0304c962858b336bd38dfd1e29d59e0f680c92be52a63c814b6c4"
+  local_files:
+    - "/media/images/lost-universe-key-visual-01-500.avif"
+    - "/media/images/lost-universe-key-visual-01-500.webp"
+  modifications:
+    - "Converted the complete 500×680 source to AVIF and WebP; no crop, retouching, or enlargement."
+  used_on:
+    - "/notes/computers-go-to-heaven/"
+  rights_notes: "Copyright retained by the original rights holders. The site owner explicitly requested original anime images on 2026-09-07 for this article's discussion of Canal and the work. This low-resolution image is a scoped editorial quotation, not an open-licence asset; no rightsholder permission or general reuse licence is claimed. Source and copyright context appear in the article references and Credits."
+  notes: "Identifies the work and the green-haired character discussed in the opening paragraphs. Source master is retained outside public/media. Do not reuse as general site decoration."
+
+- id: lost-universe-finale-01
+  status: active
+  kind: image
+  title: "Lost Universe — episode 26 promotional still"
+  creator: "Lost Universe animation production; still published by Bandai Channel"
+  source_page: "https://www.b-ch.com/titles/2915/026"
+  original_file: "https://image2.b-ch.com/ttl2/2915/2915026a.jpg?impolicy=fitin&ww=960&hh=540"
+  license: "Copyrighted; editorial quotation"
+  license_url: "https://www.b-ch.com/titles/2915/026"
+  attribution: "Lost Universe, episode 26, official promotional still via Bandai Channel; copyright remains with the original animation rights holders."
+  rights_verified_on: "2026-09-07"
+  retrieved_on: "2026-09-07"
+  source_sha256: "3362f54ec5b4ecd62858369e579bd5279857c279846d8b6a3cdc899f2649c7e6"
+  local_files:
+    - "/media/images/lost-universe-finale-01-960.avif"
+    - "/media/images/lost-universe-finale-01-960.webp"
+  modifications:
+    - "Converted the complete 960×540 source to AVIF and WebP; retained its pillarboxing and composition."
+  used_on:
+    - "/notes/computers-go-to-heaven/"
+  rights_notes: "Copyright retained by the original rights holders. The site owner explicitly requested original anime images on 2026-09-07 for this article's discussion of the finale. This single publicly displayed episode still is a scoped editorial quotation, not an open-licence asset; no rightsholder permission or general reuse licence is claimed. Source and copyright context appear in the article references and Credits."
+  notes: "The pictured character is Kain. Caption explicitly distinguishes this episode still from the exact frame of Canal's quoted line. No video or paywalled material was downloaded. Source master is retained outside public/media."
+
+- id: pygmalion-and-galatea-01
+  status: active
+  kind: image
+  title: "Pygmalion and Galatea"
+  creator: "Jean-Léon Gérôme; The Metropolitan Museum of Art"
+  source_page: "https://www.metmuseum.org/art/collection/search/436483"
+  original_file: "https://collectionapi.metmuseum.org/api/collection/v1/iiif/436483/1728751/main-image"
+  license: "Public domain"
+  license_url: "https://www.metmuseum.org/hubs/open-access"
+  attribution: "Jean-Léon Gérôme, Pygmalion and Galatea, ca. 1890. The Metropolitan Museum of Art, Gift of Louis C. Raegner, 1927 (27.200). Public domain."
+  rights_verified_on: "2026-09-07"
+  retrieved_on: "2026-09-07"
+  source_sha256: "137970a63f46afe5bd6c074988dfb0c0789b9441f81bc42781100249656f4f39"
+  local_files:
+    - "/media/images/pygmalion-and-galatea-01-640.avif"
+    - "/media/images/pygmalion-and-galatea-01-640.webp"
+    - "/media/images/pygmalion-and-galatea-01-956.avif"
+    - "/media/images/pygmalion-and-galatea-01-956.webp"
+  modifications:
+    - "Resized the full 956×1200 image proportionally to 640 pixels wide and retained a 956-pixel variant; converted to AVIF and WebP without recolouring or cropping."
+  used_on:
+    - "/notes/computers-go-to-heaven/"
+  rights_notes: "The Met marks this object image Public Domain and provides it through its Open Access programme. Historical painting reproduced in full; no endorsement by the museum is implied."
+  notes: "Illustrates the article's discussion of an artwork coming to life. The downloaded JPEG master stays in assets/source/original and is not deployed."
+
 - id: hero-radio-array-01
   status: proposed
   kind: video
