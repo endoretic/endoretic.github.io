@@ -65,6 +65,33 @@ const licenseRules = new Map([
   ],
 ]);
 
+// The owner explicitly requested original anime illustrations for this review
+// on 2026-09-07. These two scoped quotations retain their copyright status;
+// they are not reusable stock assets or additions to the licence allowlist.
+const editorialImageQuotations = new Map([
+  ["lost-universe-key-visual-01", {
+    page: "https://enoki-films.co.jp/pro_lostuniverse.php",
+    file: "https://enoki-films.co.jp/images/proinfo/lostuniverse.png",
+  }],
+  ["lost-universe-finale-01", {
+    page: "https://www.b-ch.com/titles/2915/026",
+    file: "https://image2.b-ch.com/ttl2/2915/2915026a.jpg?impolicy=fitin&ww=960&hh=540",
+  }],
+]);
+
+function isReviewedEditorialQuotation(entry) {
+  const quotation = editorialImageQuotations.get(entry.id);
+  return quotation !== undefined &&
+    entry.kind === "image" &&
+    entry.license === "Copyrighted; editorial quotation" &&
+    entry.source_page === quotation.page &&
+    entry.original_file === quotation.file &&
+    entry.license_url === quotation.page &&
+    Array.isArray(entry.used_on) &&
+    entry.used_on.length === 1 &&
+    entry.used_on[0] === "/notes/computers-go-to-heaven/";
+}
+
 function normalizeLicense(value) {
   return value.trim().replaceAll(/\s+/g, " ").toLowerCase();
 }
@@ -330,11 +357,11 @@ export function validateAssets(entries, options = {}) {
       ? normalizeLicense(entry.license)
       : "";
     const licenseRule = licenseRules.get(normalizedLicense);
-    if (!licenseRule) {
+    if (!licenseRule && !isReviewedEditorialQuotation(entry)) {
       errors.push(
         `[${id}] license ${JSON.stringify(entry.license)} is not on the first-release allowlist.`,
       );
-    } else if (licenseUrl) {
+    } else if (licenseRule && licenseUrl) {
       if (
         licenseRule.host &&
         !hostMatches(licenseUrl, licenseRule.host)
